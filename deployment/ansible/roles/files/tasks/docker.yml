@@ -1,0 +1,23 @@
+- name: Deploy files
+  copy:
+    src: '{{ playbook_dir }}/../docker/{{ item }}'
+    dest: "{{ app_directory }}/docker/"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+  loop:
+    - '.dockerignore'
+
+- name: Deploy directories
+  synchronize:
+    delete: true
+    src: '{{ playbook_dir }}/../docker/{{ item }}'
+    dest: "{{ app_directory }}/docker/"
+    recursive: true
+    rsync_opts:
+      - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
+      - '--chmod=0755'
+      - '--exclude=db'
+  loop:
+    - 'backend'
+    - 'mariadb'

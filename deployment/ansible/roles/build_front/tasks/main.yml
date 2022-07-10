@@ -1,0 +1,48 @@
+- name: Add Yarn apt key
+  become: true
+  become_user: root
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+
+- name: Add Yarn repository
+  become: true
+  become_user: root
+  apt_repository:
+    repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+    filename: yarn
+
+- name: Install Yarn
+  become: true
+  become_user: root
+  apt:
+    name: yarn
+
+- name: Yarn install
+  yarn:
+    path: "{{ app_directory }}/frontend"
+
+- name: Create directories
+  file:
+    path: "{{ app_directory }}/frontend/{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+    recurse: true
+  loop:
+    - 'config'
+    - 'dist'
+    - 'log'
+
+- name: Create variables.json
+  template:
+    src: templates/variables.json.j2
+    dest: "/{{ app_directory }}/frontend/config/variables.json"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+
+- name: Npm run build
+  shell:
+    cmd: npm run build
+    chdir: "{{ app_directory }}/frontend"

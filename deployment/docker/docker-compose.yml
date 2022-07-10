@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb:10.4
+    environment:
+      MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
+      MYSQL_DATABASE: "$MYSQL_DATABASE"
+      MYSQL_USER: "$MYSQL_USER"
+      MYSQL_PASSWORD: "$MYSQL_PASSWORD"
+    volumes:
+      - ./mariadb/db:/var/lib/mysql
+      - ./mariadb/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mariadb/log:/var/log/mysql
+
+  mariadb_test:
+    image: mariadb:10.4
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: media_scrapper_test
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: password1
+    volumes:
+      - ./mariadb_test/db:/var/lib/mysql
+      - ./mariadb_test/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mariadb/log:/var/log/mysql
+
+  # todo: volume pas bon
+  dw:
+    image: golang:1.18
+    command: /usr/src/app/main
+    volumes:
+      - ../dw/bin:/usr/src/app
+    depends_on:
+      - mariadb
+
+  backend:
+    build: backend
+    ports:
+      - "5000:80"
+    volumes:
+      - ../../backend:/var/www/html
+      - ./backend/sites-enabled:/etc/apache2/sites-enabled
+      - ./backend/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    depends_on:
+      - mariadb
+
+  adminer:
+    image: adminer
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mariadb
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:80"

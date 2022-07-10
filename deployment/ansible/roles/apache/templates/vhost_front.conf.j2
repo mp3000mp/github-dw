@@ -1,0 +1,7 @@
+<VirtualHost *:80>
+        ServerName {{ front_server_name }}
+        DocumentRoot "{{ app_directory }}/frontend/dist"
+
+        ErrorLog "{{ app_directory }}/frontend/log/apache_error.log"
+        CustomLog "{{ app_directory }}/frontend/log/apache_access.log" combined
+</VirtualHost>

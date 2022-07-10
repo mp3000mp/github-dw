@@ -1,0 +1,37 @@
+- name: Deploy files
+  copy:
+    src: '{{ playbook_dir }}/../../backend/{{ item }}'
+    dest: "{{ app_directory }}/backend/"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+  loop:
+    - '.env'
+    - 'composer.json'
+    - 'composer.lock'
+    - 'symfony.lock'
+
+- name: Deploy directories
+  synchronize:
+    delete: true
+    src: '{{ playbook_dir }}/../../backend/{{ item }}'
+    dest: "{{ app_directory }}/backend/"
+    recursive: true
+    rsync_opts:
+      - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
+      - '--chmod=0755'
+      - '--exclude=jwt'
+  loop:
+    - 'bin'
+    - 'config'
+    - 'public'
+    - 'src'
+    - 'templates'
+#    - 'translations'
+
+- name: Remove files
+  file:
+    state: absent
+    path: "{{ app_directory }}/backend/{{ item }}"
+  loop:
+    - 'bin/phpunit'

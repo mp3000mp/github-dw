@@ -2,10 +2,6 @@ package query
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"strconv"
 
 	"github.com/google/go-github/v45/github"
 )
@@ -19,15 +15,15 @@ type Repository struct {
 }
 
 // list all repositories matching search
-func QueryRepo(client *github.Client, ctx context.Context, userName string, repoName string) bool {
+func QueryRepo(client *github.Client, ctx context.Context, userName string, repoName string) (Repository, error) {
 	githubRepo, _, err := client.Repositories.Get(ctx, userName, repoName)
 	if !CheckResponse(err) {
-		return false
+		return Repository{}, err
 	}
 
 	githubLanguages, _, err := client.Repositories.ListLanguages(ctx, userName, repoName)
 	if !CheckResponse(err) {
-		return false
+		return Repository{}, err
 	}
 
 	data := Repository{
@@ -36,7 +32,6 @@ func QueryRepo(client *github.Client, ctx context.Context, userName string, repo
     	FullName: *githubRepo.FullName,
     	ID: *githubRepo.ID,
     	Languages: githubLanguages,
-		LicenseName: *githubRepo.License.Name,
     	MainLanguage: *githubRepo.Language,
     	Name: *githubRepo.Name,
     	OpenIssuesCount: *githubRepo.OpenIssuesCount,
@@ -47,17 +42,9 @@ func QueryRepo(client *github.Client, ctx context.Context, userName string, repo
 		URL: *githubRepo.HTMLURL,
 		Username: *githubRepo.Owner.Login,
 	}
-
-	f, err := json.MarshalIndent(data, "", " ")
-	if err != nil {
-		fmt.Println("Error while parsing into json format")
+	if githubRepo.License != nil {
+		data.LicenseName = *githubRepo.License.Name
 	}
-	fileName := fmt.Sprintf("output/%s.json", strconv.FormatInt(data.ID, 10))
-	err = ioutil.WriteFile(fileName, f, 0644)
-	if err != nil {
-		fmt.Printf("Error while writing into file %s\n", fileName)
-	}
-	fmt.Printf("Repo %s success\n", repoName)
 
-	return true
+	return data, nil
 }

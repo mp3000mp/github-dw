@@ -1,5 +1,6 @@
 github crawler
-  faire marcher les trois routines en parallele
+  gérer 403 You have exceeded a secondary rate limit. Please wait a few minutes before you try again.
+  mettre en place model sql
   routine 1
     store in db instead of files
     handle duplicate (on conflict do nothing)
@@ -16,7 +17,7 @@ github crawler
 	update status 2
 
 php: ok
-js: ok
+js: todo
 python: todo
 go: todo
 
@@ -25,8 +26,6 @@ projet front
     projet qui possède x package telle version et y package telle version
 
 scrapper github
-
-
   data
     curl -i -H "Authorization: token $token" https://api.github.com/repositories
     pagination
@@ -54,7 +53,5 @@ scrapper github
         -H "accept: application/vnd.github.VERSION.raw" /repos/{full_name}/contents/{path}
           parser package + min version + max version
       loop header link next
-
-
 
 curl -i -H "accept: application/vnd.github.VERSION.raw" /repos/Noah-cuba/HotelBot/contents/composer.json/composer.json

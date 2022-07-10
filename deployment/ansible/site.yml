@@ -1,0 +1,13 @@
+- name: Deploy
+  hosts: prod_servers
+  become: true
+  become_user: "{{ maintainer_user }}"
+  vars_files:
+    - vars.yml
+  roles:
+    - files
+    - docker
+    - build_dw
+#    - build_back
+#    - build_front
+#    - apache

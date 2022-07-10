@@ -1,0 +1,21 @@
+- name: Create directories
+  become: true
+  become_user: root
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+    recurse: true
+  loop:
+    - "{{ app_directory }}"
+    - "{{ app_directory }}/dw"
+    - "{{ app_directory }}/frontend"
+    - "{{ app_directory }}/backend"
+    - "{{ app_directory }}/docker"
+
+- include: docker.yml
+- include: dw.yml
+- include: backend.yml
+- include: frontend.yml

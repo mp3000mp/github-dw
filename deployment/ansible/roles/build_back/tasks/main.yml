@@ -1,0 +1,70 @@
+- name: Create .env.local
+  template:
+    src: templates/.env.j2
+    dest: "/{{ app_directory }}/backend/.env.local"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+
+- name: Create directories system
+  file:
+    path: "{{ app_directory }}/backend/{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+    recurse: true
+  loop:
+    - 'config/jwt'
+    - 'documents'
+
+# todo 777 horrible
+- name: Create directories writable
+  file:
+    path: "{{ app_directory }}/backend/{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '777'
+    recurse: true
+  loop:
+    - 'var/log'
+    - 'var/cache'
+    - 'documents/todo'
+    - 'documents/documents'
+    - 'documents/error'
+
+- name: Create jwt private rsa keys
+  openssl_privatekey:
+    path: "{{ app_directory }}/backend/config/jwt/private.pem"
+    passphrase: "{{ jwt_passphrase }}"
+    cipher: auto
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+
+- name: Create jwt public rsa keys
+  openssl_publickey:
+    path: "{{ app_directory }}/backend/config/jwt/public.pem"
+    privatekey_path: "{{ app_directory }}/backend/config/jwt/private.pem"
+    privatekey_passphrase: "{{ jwt_passphrase }}"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+
+- name: Composer install
+  shell:
+    cmd: docker-compose exec backend bash -l -c "composer install"
+    chdir: "{{ app_directory }}/docker"
+
+- name: Composer cache clear
+  shell:
+    cmd: docker-compose exec backend bash -l -c "php bin/console cache:clear"
+    chdir: "{{ app_directory }}/docker"
+
+- name: Composer migration
+  shell:
+    cmd: docker-compose exec backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"
+    chdir: "{{ app_directory }}/docker"
+
+# todo if first deployment create first user with command

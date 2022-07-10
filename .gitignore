@@ -1,5 +1,12 @@
-/bin
-/pkg
-/output
+/dw/bin
+/dw/pkg
+/dw/output
 
 .env
+
+/deployment/ansible/vars.yml
+/deployment/ansible/roles/*/vars.yml
+
+/deployment/docker/.env
+
+/todo.txt
