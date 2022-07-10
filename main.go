@@ -29,12 +29,11 @@ func main() {
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
+ 	fmt.Println("Starting search loop")
+ 	searchPage := 0
+ 	nbPerPage := 100
+ 	query.QuerySearchCodes(client, ctx, "composer.json", searchPage, nbPerPage)
 
-// 	fmt.Println("Starting search loop")
-// 	searchPage := 0
-// 	nbPerPage := 100
-// 	query.QuerySearch(client, ctx, searchPage, nbPerPage)
-
-	fmt.Println("Starting repo loop")
-	query.QueryRepo(client, ctx, "mp3000mp", "template-symfony-vuejs")
+//	fmt.Println("Starting repo loop")
+//	query.QueryRepo(client, ctx, "mp3000mp", "template-symfony-vuejs")
 }
