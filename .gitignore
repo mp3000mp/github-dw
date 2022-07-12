@@ -8,5 +8,9 @@
 /deployment/ansible/roles/*/vars.yml
 
 /deployment/docker/.env
+/deployment/docker/mariadb/db
+/deployment/docker/mariadb/log
+/deployment/docker/mariadb_test/db
+/deployment/docker/mariadb_test/log
 
 /todo.txt

@@ -12,12 +12,12 @@ import (
 
 // consume first queue item
 // todo autre type que query.SearchCodeItem ?
-func RunRoutine2(client *github.Client, ctx context.Context, isRunning *bool, queue *[]query.SearchCodeItem) {
+func RunRoutine3(client *github.Client, ctx context.Context, isRunning *bool, queue *[]query.SearchCodeItem) {
 	*isRunning = true
 	codeItem := (*queue)[0]
 	log.Printf("Start routine 3: %s/%s\n", codeItem.User, codeItem.Name)
 
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 3)
 
 // todo get raw file
 // 	repo, err := query.QueryRepo(client, ctx, codeItem.User, codeItem.Name)

@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"main/model"
 	"main/query"
 	"main/routine"
 
@@ -13,6 +14,8 @@ import (
 
  	"github.com/google/go-github/v45/github"
  	"golang.org/x/oauth2"
+ 	"gorm.io/driver/mysql"
+    "gorm.io/gorm"
 )
 
 func main() {
@@ -28,9 +31,21 @@ func main() {
 	log.Println("Loading config...")
 	err := godotenv.Load()
 	if err != nil {
- 		log.Printf("Error loading .env file")
+ 		log.Printf("Error while loading .env file")
  		os.Exit(1)
 	}
+
+	log.Println("Connecting to database...")
+   	db, err := gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{
+		NamingStrategy: model.GetNamingStrategy(),
+   	})
+	if err != nil {
+ 		log.Printf("Error while connecting to database")
+ 		os.Exit(1)
+	}
+	db.AutoMigrate(&model.Repository{}, &model.RepositoryLanguage{}, &model.RepositoryTopic{})
+
+	time.Sleep(time.Second * 10)
 
 	log.Println("Creating client...")
 	ctx := context.Background()

@@ -1,0 +1,11 @@
+parameters:
+  bootstrapFiles:
+    - vendor/bin/.phpunit/phpunit/vendor/autoload.php
+  checkMissingIterableValueType: false
+  level: 6
+  paths:
+    - src
+    - tests
+  excludePaths:
+    - src/Kernel.php
+    - tests/bootstrap.php
