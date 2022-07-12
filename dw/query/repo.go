@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/go-github/v45/github"
 )
@@ -16,6 +17,10 @@ type Repository struct {
 
 // list all repositories matching search
 func QueryRepo(client *github.Client, ctx context.Context, userName string, repoName string) (Repository, error) {
+	if userName != "" {
+		return Repository{}, errors.New("salut")
+	}
+
 	githubRepo, _, err := client.Repositories.Get(ctx, userName, repoName)
 	if !CheckResponse(err) {
 		return Repository{}, err

@@ -5,14 +5,16 @@ import (
 	"log"
 	"time"
 
+	// "main/model"
 	"main/query"
 
 	"github.com/google/go-github/v45/github"
+	"gorm.io/gorm"
 )
 
 // consume first queue item
 // todo autre type que query.SearchCodeItem ?
-func RunRoutine3(client *github.Client, ctx context.Context, isRunning *bool, queue *[]query.SearchCodeItem) {
+func RunRoutine3(db *gorm.DB, client *github.Client, ctx context.Context, isRunning *bool, queue *[]query.SearchCodeItem) {
 	*isRunning = true
 	codeItem := (*queue)[0]
 	log.Printf("Start routine 3: %s/%s\n", codeItem.User, codeItem.Name)

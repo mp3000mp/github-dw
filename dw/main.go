@@ -14,8 +14,6 @@ import (
 
  	"github.com/google/go-github/v45/github"
  	"golang.org/x/oauth2"
- 	"gorm.io/driver/mysql"
-    "gorm.io/gorm"
 )
 
 func main() {
@@ -36,16 +34,14 @@ func main() {
 	}
 
 	log.Println("Connecting to database...")
-   	db, err := gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{
-		NamingStrategy: model.GetNamingStrategy(),
-   	})
+   	db, err := model.GetConnection()
 	if err != nil {
  		log.Printf("Error while connecting to database")
  		os.Exit(1)
 	}
 	db.AutoMigrate(&model.Repository{}, &model.RepositoryLanguage{}, &model.RepositoryTopic{})
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 3)
 
 	log.Println("Creating client...")
 	ctx := context.Background()
@@ -70,18 +66,18 @@ func main() {
 
 	for {
 		if !routine1Running {
-			go routine.RunRoutine1(client, ctx, &routine1Running, "composer.json", &searchPage, &routine2Queue)
+			go routine.RunRoutine1(db, client, ctx, &routine1Running, "composer.json", &searchPage, &routine2Queue)
 		}
 
 		// todo sync ?
 		if !routine2Running && len(routine2Queue) > 0 {
 			// todo send routine3Queue to be feed
-			go routine.RunRoutine2(client, ctx, &routine2Running, &routine2Queue)
+			go routine.RunRoutine2(db, client, ctx, &routine2Running, &routine2Queue)
 		}
 
 		// todo sync ?
 		if !routine3Running && len(routine3Queue) > 0 {
-			go routine.RunRoutine3(client, ctx, &routine3Running, &routine3Queue)
+			go routine.RunRoutine3(db, client, ctx, &routine3Running, &routine3Queue)
 		}
 
 		time.Sleep(tick)

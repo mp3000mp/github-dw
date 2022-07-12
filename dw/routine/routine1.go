@@ -6,14 +6,17 @@ import (
 	"strconv"
 	"time"
 
+	"main/model"
 	"main/query"
 
 	"github.com/google/go-github/v45/github"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const nbPerPage = 100
 
-func RunRoutine1(client *github.Client, ctx context.Context, isRunning *bool, fileName string, searchPage *int, queue *[]query.SearchCodeItem) {
+func RunRoutine1(db *gorm.DB, client *github.Client, ctx context.Context, isRunning *bool, fileName string, searchPage *int, queue *[]query.SearchCodeItem) {
 	*isRunning = true
 	log.Printf("Start routine 1: %s\n", strconv.Itoa(*searchPage))
 
@@ -26,14 +29,13 @@ func RunRoutine1(client *github.Client, ctx context.Context, isRunning *bool, fi
 		return
 	}
 
-	tmpQueue := make([]query.SearchCodeItem, 0)
-	for _, item := range codes {
-		tmpQueue = append(tmpQueue, item)
+	for _, code := range codes {
+		repo := model.Repository{Name: code.Name, Username: code.User, URL: code.URL, Routine1At: time.Now()}
+		result := db.Select("Name", "Username", "URL", "Routine1At").Clauses(clause.OnConflict{DoNothing: true}).Create(&repo)
+		if result.RowsAffected > 0 {
+			*queue = append(*queue, code)
+		}
 	}
-	// todo insert codes in db
-	// todo select queue in db and update queue
-	// todo remove
-	*queue = append(*queue, tmpQueue...)
 
 	log.Println("End routine 1")
 	*searchPage++

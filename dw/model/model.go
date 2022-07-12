@@ -1,19 +1,25 @@
 package model
 
 import (
+  "os"
   "time"
 
+  "gorm.io/driver/mysql"
+  "gorm.io/gorm"
   "gorm.io/gorm/schema"
 )
 
 type Repository struct {
 	ID uint                                             `gorm:"primaryKey"`
-	MainLanguage, Name, Username string                 `gorm:"size:100;not null"`
-	FullName, URL string                                `gorm:"size:255;not null"`
+	Name, Username string                               `gorm:"size:100;not null"`
+	MainLanguage string 			                    `gorm:"size:50"`
+	URL string                                          `gorm:"uniqueIndex;size:255;not null"`
+	FullName string                                     `gorm:"size:255"`
 	LicenseName string                                  `gorm:"size:100"`
-	ForksCount, OpenIssuesCount, StargazersCount uint32 `gorm:"not null"`
-	GithubId, Size uint                                 `gorm:"not null"`
-	CreatedAt, PushedAt, Routine1At time.Time           `gorm:"type:DATETIME(0);not null"`
+	ForksCount, OpenIssuesCount, StargazersCount uint32
+	GithubId, Size uint
+	Routine1At time.Time                                `gorm:"type:DATETIME(0);not null"`
+	CreatedAt, PushedAt time.Time                       `gorm:"type:DATETIME(0);default:null"`
 	Routine2At, Routine3At time.Time                    `gorm:"type:DATETIME(0)"`
 	Languages []RepositoryLanguage
 	Topics []RepositoryTopic
@@ -36,4 +42,19 @@ func GetNamingStrategy() schema.NamingStrategy {
 	return schema.NamingStrategy{
 		SingularTable: true,
 	}
+}
+
+var Connection *gorm.DB
+
+func GetConnection() (*gorm.DB, error) {
+	var err error
+	if Connection == nil {
+		Connection, err = gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{
+			NamingStrategy: GetNamingStrategy(),
+		})
+	}
+   	if err != nil {
+		return nil, err
+   	}
+   	return Connection, nil
 }
