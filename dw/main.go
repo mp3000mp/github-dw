@@ -7,11 +7,9 @@ import (
 	"time"
 
 	"main/model"
-	"main/query"
 	"main/routine"
 
 	"github.com/joho/godotenv"
-
  	"github.com/google/go-github/v45/github"
  	"golang.org/x/oauth2"
 )
@@ -19,12 +17,11 @@ import (
 func main() {
 	tick := time.Millisecond * 100
 	routine1Running := false
-	searchPage := 0
+	pack := model.Package{}
 	routine2Running := false
-	routine2Queue := make([]query.SearchCodeItem, 0)
+	routine2Queue := make([]model.Repository, 0)
 	routine3Running := false
-	// todo quel type ?
-	routine3Queue := make([]query.SearchCodeItem, 0)
+	routine3Queue := make([]model.Repository, 0)
 
 	log.Println("Loading config...")
 	err := godotenv.Load()
@@ -39,9 +36,11 @@ func main() {
  		log.Printf("Error while connecting to database")
  		os.Exit(1)
 	}
-	db.AutoMigrate(&model.Repository{}, &model.RepositoryLanguage{}, &model.RepositoryTopic{})
-
-	time.Sleep(time.Second * 3)
+	err = model.InitDatabase(db)
+	if err != nil {
+ 		log.Printf("Error while initializing database: %s", err.Error())
+ 		os.Exit(1)
+	}
 
 	log.Println("Creating client...")
 	ctx := context.Background()
@@ -51,34 +50,37 @@ func main() {
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	// todo gérer rate limiter
-	// a, _, _ := client.RateLimits(ctx)
-	// log.Printf("%v\n", a)
-
-	log.Println("Loading queue for routine 1...")
-	// todo: load fileName et searchPage from db
+	// todo only composer.json for now
+	log.Println("Loading package for routine 1...")
+	db.Order("updated_at asc").Where(&model.Package{Language: "PHP"}).First(&pack)
+	log.Printf("Working on package '%s' file '%s'", pack.Name, pack.File)
 
 	log.Println("Loading queue for routine 2...")
-	// todo: load routine2Queue from db
+	db.Order("routine1_at asc").Where("routine_error IS NULL AND routine2_at IS NULL").Find(&routine2Queue)
+	log.Printf("%d items in queue2", len(routine2Queue))
 
 	log.Println("Loading queue for routine 3...")
-	// todo: load routine3Queue from db
+	db.Order("routine2_at asc").Where("routine_error IS NULL AND routine2_at IS NOT NULL AND routine3_at IS NULL").Find(&routine3Queue)
+	log.Printf("%d items in queue3", len(routine3Queue))
 
 	for {
 		if !routine1Running {
-			go routine.RunRoutine1(db, client, ctx, &routine1Running, "composer.json", &searchPage, &routine2Queue)
+			go routine.RunRoutine1(db, client, ctx, &routine1Running, &pack, &routine2Queue)
 		}
 
 		// todo sync ?
 		if !routine2Running && len(routine2Queue) > 0 {
-			// todo send routine3Queue to be feed
-			go routine.RunRoutine2(db, client, ctx, &routine2Running, &routine2Queue)
+			go routine.RunRoutine2(db, client, ctx, &routine2Running, &routine2Queue, &routine3Queue)
 		}
 
 		// todo sync ?
 		if !routine3Running && len(routine3Queue) > 0 {
-			go routine.RunRoutine3(db, client, ctx, &routine3Running, &routine3Queue)
+			go routine.RunRoutine3(db, client, ctx, &routine3Running, pack, &routine3Queue)
 		}
+
+		// todo gérer rate limiter
+		// a, _, _ := client.RateLimits(ctx)
+		// log.Printf("%v\n", a)
 
 		time.Sleep(tick)
 	}

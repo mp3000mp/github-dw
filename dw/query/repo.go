@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/google/go-github/v45/github"
 )
@@ -17,8 +16,13 @@ type Repository struct {
 
 // list all repositories matching search
 func QueryRepo(client *github.Client, ctx context.Context, userName string, repoName string) (Repository, error) {
+	// todo remove
 	if userName != "" {
-		return Repository{}, errors.New("salut")
+		t := []string{"oui", "non"}
+		l := make(map[string]int)
+		l["PHP"] = 400
+		l["js"] = 800
+		return Repository{MainLanguage: "PHP", Languages: l, Topics: t}, nil
 	}
 
 	githubRepo, _, err := client.Repositories.Get(ctx, userName, repoName)
@@ -31,7 +35,7 @@ func QueryRepo(client *github.Client, ctx context.Context, userName string, repo
 		return Repository{}, err
 	}
 
-	data := Repository{
+	repo := Repository{
     	CreatedAt: githubRepo.CreatedAt.Time.Format("2006-01-02T15:04:05.000Z"),
     	ForksCount: *githubRepo.ForksCount,
     	FullName: *githubRepo.FullName,
@@ -48,8 +52,8 @@ func QueryRepo(client *github.Client, ctx context.Context, userName string, repo
 		Username: *githubRepo.Owner.Login,
 	}
 	if githubRepo.License != nil {
-		data.LicenseName = *githubRepo.License.Name
+		repo.LicenseName = *githubRepo.License.Name
 	}
 
-	return data, nil
+	return repo, nil
 }

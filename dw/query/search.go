@@ -19,9 +19,10 @@ func QuerySearchCodes(client *github.Client, ctx context.Context, searchFileName
 	codes := make([]SearchCodeItem, 0)
 	opts := &github.SearchOptions{Sort: "indexed", Order: "desc", ListOptions: github.ListOptions{Page: page, PerPage: nbPerPage}}
 
-	codes = append(codes, SearchCodeItem{User: "1", Name: "4", URL: "a"})
-	codes = append(codes, SearchCodeItem{User: "2", Name: "5", URL: "b"})
-	codes = append(codes, SearchCodeItem{User: "3", Name: "6", URL: "c"})
+	// todo remove
+	codes = append(codes, SearchCodeItem{User: "1", Name: "4", URL: fmt.Sprintf("A%d", page)})
+	codes = append(codes, SearchCodeItem{User: "2", Name: "5", URL: fmt.Sprintf("B%d", page)})
+	codes = append(codes, SearchCodeItem{User: "3", Name: "6", URL: fmt.Sprintf("C%d", page)})
 	if len(codes) > 0 {
 		return codes, nil
 	}
