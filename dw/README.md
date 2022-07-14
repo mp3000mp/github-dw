@@ -30,8 +30,8 @@ Uses github API to create a datawarehouse
 
 # github api rate-limit
 
-- routine 1 => github API => 5000 query / hour => 120k / day
-- routine 2 => search 30 query / hour => 700 / day
+- routine 1 => search 30 query / hour => 700 / day
+- routine 2 => github API => 5000 query / hour => 120k / day
 - limit dans header x-ratelimit-used / x-ratelimit-limit / x-ratelimit-remaining
 - https://api.github.com/rate_limit
 - if header Retry-After=x => faire une pause de x secondes

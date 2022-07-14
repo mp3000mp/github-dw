@@ -1,9 +1,7 @@
 package query
 
 import (
-	"context"
-
-	"github.com/google/go-github/v45/github"
+	"time"
 )
 
 type Repository struct {
@@ -15,23 +13,24 @@ type Repository struct {
 }
 
 // list all repositories matching search
-func QueryRepo(client *github.Client, ctx context.Context, userName string, repoName string) (Repository, error) {
-	// todo remove
-	if userName != "" {
-		t := []string{"oui", "non"}
-		l := make(map[string]int)
-		l["PHP"] = 400
-		l["js"] = 800
-		return Repository{MainLanguage: "PHP", Languages: l, Topics: t}, nil
+func QueryRepo(context *Context, userName string, repoName string) (Repository, error) {
+	wait := WaitBeforeQuery(context.RateLimiter, "core")
+	if wait > 0 {
+		time.Sleep(time.Duration(wait * 1000 * 1000) * time.Millisecond)
 	}
-
-	githubRepo, _, err := client.Repositories.Get(ctx, userName, repoName)
-	if !CheckResponse(err) {
+	context.RateLimiter.CoreLastQuery = time.Now()
+	githubRepo, _, err := context.Client.Repositories.Get(*context.Context, userName, repoName)
+	if !CheckResponse(err, &context.RateLimiter, "core") {
 		return Repository{}, err
 	}
 
-	githubLanguages, _, err := client.Repositories.ListLanguages(ctx, userName, repoName)
-	if !CheckResponse(err) {
+	wait = WaitBeforeQuery(context.RateLimiter, "core")
+	if wait > 0 {
+		time.Sleep(time.Duration(wait * 1000 * 1000) * time.Millisecond)
+	}
+	context.RateLimiter.CoreLastQuery = time.Now()
+	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Context, userName, repoName)
+	if !CheckResponse(err, &context.RateLimiter, "core") {
 		return Repository{}, err
 	}
 

@@ -20,10 +20,9 @@ type Repository struct {
 	ForksCount, OpenIssuesCount, StargazersCount uint32
 	GithubId, Size uint
 	Routine1At time.Time                                `gorm:"type:DATETIME(0);not null"`
-	CreatedAt, PushedAt time.Time                       `gorm:"type:DATETIME(0);default:null"`
-	Routine2At, Routine3At time.Time                    `gorm:"type:DATETIME(0)"`
-	Languages []RepositoryLanguage                      `gorm:"constraint:OnUpdate:CASCADE;"`
-	Topics []RepositoryTopic                            `gorm:"constraint:OnUpdate:CASCADE;"`
+	CreatedAt, PushedAt, Routine2At time.Time           `gorm:"type:DATETIME(0);default:null"`
+	Languages []RepositoryLanguage                      `gorm:"constraint:OnUpdate:CASCADE"`
+	Topics []RepositoryTopic                            `gorm:"constraint:OnUpdate:CASCADE"`
 }
 
 type RepositoryLanguage struct {
@@ -39,12 +38,31 @@ type RepositoryTopic struct {
 	Topic string      `gorm:"size:100;not null"`
 }
 
-type Package struct {
+type PackageType struct {
 	ID uint                  `gorm:"primaryKey"`
 	File string              `gorm:"uniqueIndex;size:50;not null"`
 	Language, Name string    `gorm:"size:50;not null"`
 	GithubCurrentPage uint32 `gorm:"default:0"`
 	UpdatedAt time.Time      `gorm:"type:DATETIME(0);not null"`
+}
+
+type RepositoryPackageTypeFile struct {
+	ID uint                                `gorm:"primaryKey"`
+	RepositoryID uint                      `gorm:"not null"`
+	PackageTypeID uint 	                   `gorm:"not null"`
+	Path string                            `gorm:"size:255;not null"`
+	RoutineError string                    `gorm:"size:255"`
+	SHA string                             `gorm:"size:100;not null"`
+	Routine1At time.Time                   `gorm:"type:DATETIME(0);not null"`
+	Routine3At time.Time                   `gorm:"type:DATETIME(0);default:null"`
+	RepositoryPackages []RepositoryPackage `gorm:"constraint:OnDelete:CASCADE"`
+}
+
+type RepositoryPackage struct {
+	ID uint                          `gorm:"primaryKey"`
+	RepositoryPackageTypeFileID uint `gorm:"not null"`
+	Name string                      `gorm:"size:100;not null"`
+	Version string                   `gorm:"size:20;not null"`
 }
 
 func GetNamingStrategy() schema.NamingStrategy {
@@ -69,19 +87,27 @@ func GetConnection() (*gorm.DB, error) {
 }
 
 func InitDatabase(db *gorm.DB) error {
-	err := db.AutoMigrate(&Repository{}, &Repository{}, &RepositoryLanguage{}, &RepositoryTopic{}, &Package{})
+	err := db.AutoMigrate(
+		&Repository{},
+		&Repository{},
+		&RepositoryLanguage{},
+		&RepositoryTopic{},
+		&PackageType{},
+		&RepositoryPackageTypeFile{},
+		&RepositoryPackage{},
+	)
 	if err != nil {
 		return err
 	}
 
-	packages := []Package{
-		Package{Language: "PHP", Name: "Composer", File: "composer.json"},
-		Package{Language: "Javascript", Name: "npm", File: "package.json"},
-		Package{Language: "Go", Name: "Go", File: "go.mod"},
-		Package{Language: "Python", Name: "PyPi", File: "requirements.txt"},
-		Package{Language: "Python", Name: "PyPi", File: "setup.py"},
+	packageTypes := []PackageType{
+		PackageType{Language: "PHP", Name: "Composer", File: "composer.json"},
+		PackageType{Language: "Javascript", Name: "npm", File: "package.json"},
+		PackageType{Language: "Go", Name: "Go", File: "go.mod"},
+		PackageType{Language: "Python", Name: "PyPi", File: "requirements.txt"},
+		PackageType{Language: "Python", Name: "PyPi", File: "setup.py"},
 	}
-	for _, pack := range packages {
+	for _, pack := range packageTypes {
 		db.Clauses(clause.OnConflict{DoNothing: true}).Create(&pack)
 	}
 

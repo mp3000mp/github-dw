@@ -1,8 +1,9 @@
 package query
 
 import (
-	"context"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/google/go-github/v45/github"
 )
@@ -11,35 +12,41 @@ type SearchCodeItem struct {
 	User string
 	Name string
 	URL  string
+	Path string
+	SHA string
 }
 
 // list all codes matching search
 // info: cannot use Repo search because filename is a code search only parameter...
-func QuerySearchCodes(client *github.Client, ctx context.Context, searchFileName string, page int, nbPerPage int) ([]SearchCodeItem, error) {
+//   so we cannot do for example: "pushed:>2021-01-01 size:>1000 filename:%s"
+func QuerySearchCodes(context *Context, searchFileName string, page int, nbPerPage int) ([]SearchCodeItem, error) {
 	codes := make([]SearchCodeItem, 0)
 	opts := &github.SearchOptions{Sort: "indexed", Order: "desc", ListOptions: github.ListOptions{Page: page, PerPage: nbPerPage}}
 
-	// todo remove
-	codes = append(codes, SearchCodeItem{User: "1", Name: "4", URL: fmt.Sprintf("A%d", page)})
-	codes = append(codes, SearchCodeItem{User: "2", Name: "5", URL: fmt.Sprintf("B%d", page)})
-	codes = append(codes, SearchCodeItem{User: "3", Name: "6", URL: fmt.Sprintf("C%d", page)})
-	if len(codes) > 0 {
-		return codes, nil
-	}
-
 	// info: https://docs.github.com/en/search-github/searching-on-github/searching-code
-	searchRes, _, err := client.Search.Code(ctx, fmt.Sprintf("filename:%s", searchFileName), opts)
-	// searchRes, _, err := client.Search.Repositories(ctx, fmt.Sprintf("pushed:>2021-01-01 size:>1000 filename:%s", searchFileName), opts)
-	if !CheckResponse(err) {
+	wait := WaitBeforeQuery(context.RateLimiter, "search")
+	if wait > 0 {
+		time.Sleep(time.Duration(wait * 1000 * 1000) * time.Millisecond)
+	}
+	context.RateLimiter.SearchLastQuery = time.Now()
+	searchRes, _, err := context.Client.Search.Code(*context.Context, fmt.Sprintf("filename:%s", searchFileName), opts)
+
+	if !CheckResponse(err, &context.RateLimiter, "search") {
 		return codes, err
 	}
 
 	for _, cResult := range searchRes.CodeResults {
-		if *cResult.Repository.Fork || *cResult.Repository.Private {
+		if *cResult.Repository.Fork || *cResult.Repository.Private || strings.Contains(*cResult.Path, "node_modules") || strings.Contains(*cResult.Path, "vendor") {
 			continue
 		}
 
-		item := SearchCodeItem{User: *cResult.Repository.Owner.Login, Name: *cResult.Repository.Name, URL: *cResult.Repository.HTMLURL}
+		item := SearchCodeItem{
+			User: *cResult.Repository.Owner.Login,
+			Name: *cResult.Repository.Name,
+			URL: *cResult.Repository.HTMLURL,
+			Path: *cResult.Path,
+			SHA: *cResult.SHA,
+		}
 		// todo sync ?
 		codes = append(codes, item)
 	}

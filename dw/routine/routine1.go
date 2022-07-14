@@ -1,48 +1,52 @@
 package routine
 
 import (
-	"context"
 	"log"
 	"time"
 
 	"main/model"
 	"main/query"
 
-	"github.com/google/go-github/v45/github"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 const nbPerPage = 100
 
-func RunRoutine1(db *gorm.DB, client *github.Client, ctx context.Context, isRunning *bool, pack *model.Package, queue *[]model.Repository) {
-	*isRunning = true
-	log.Printf("Start routine 1: %d\n", int(pack.GithubCurrentPage))
+func RunRoutine1(queryContext *query.Context) {
+	queryContext.Routine1Running = true
+	log.Printf("Start routine 1: %d\n", int(queryContext.Routine1PackageType.GithubCurrentPage))
 
 	// todo remove
 	time.Sleep(time.Second * 5)
 
 	// get repos with file x
-	codes, err := query.QuerySearchCodes(client, ctx, pack.File, int(pack.GithubCurrentPage), nbPerPage)
+	codes, err := query.QuerySearchCodes(queryContext, queryContext.Routine1PackageType.File, int(queryContext.Routine1PackageType.GithubCurrentPage), nbPerPage)
 	if err != nil {
 		log.Printf("Routine 1 => Error while querying codes: %s", err.Error())
 		return
 	}
 
-	// insert repo routine1At=now
 	for _, code := range codes {
+		// insert repo routine1At=now
 		repo := model.Repository{Name: code.Name, Username: code.User, URL: code.URL, Routine1At: time.Now()}
-		result := db.Select("Name", "Username", "URL", "Routine1At").Clauses(clause.OnConflict{DoNothing: true}).Create(&repo)
+		result := queryContext.DB.Select("Name", "Username", "URL", "Routine1At").Clauses(clause.OnConflict{DoNothing: true}).Create(&repo)
 		if result.RowsAffected > 0 {
-			*queue = append(*queue, repo)
+			*queryContext.Routine2Queue = append(*queryContext.Routine2Queue, repo)
+		} else {
+			queryContext.DB.Where("URL = ?", repo.URL).First(&repo)
 		}
+		// insert package file routine1At=now
+		repoPackageFile := model.RepositoryPackageTypeFile{RepositoryID: repo.ID, PackageTypeID: queryContext.Routine1PackageType.ID, Path: code.Path, SHA: code.SHA, Routine1At: time.Now()}
+		queryContext.DB.Where("repository_id = ? AND package_type_id = ? AND path = ?", repoPackageFile.RepositoryID, repoPackageFile.PackageTypeID, repoPackageFile.Path).Delete(&repoPackageFile)
+		queryContext.DB.Clauses(clause.OnConflict{DoNothing: true}).Create(&repoPackageFile)
+		*queryContext.Routine3Queue = append(*queryContext.Routine3Queue, repoPackageFile)
 	}
 
 	// next page
-	pack.GithubCurrentPage++
-	pack.UpdatedAt = time.Now()
-	db.Save(pack)
+	queryContext.Routine1PackageType.GithubCurrentPage++
+	queryContext.Routine1PackageType.UpdatedAt = time.Now()
+	queryContext.DB.Save(queryContext.Routine1PackageType)
 
-	*isRunning = false
+	queryContext.Routine1Running = false
 	log.Println("End routine 1")
 }
