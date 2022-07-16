@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -20,29 +22,35 @@ func main() {
 	log.Println("Loading config...")
 	err := godotenv.Load()
 	if err != nil {
- 		log.Printf("Error while loading .env file")
- 		os.Exit(1)
+ 		panic("Error while loading .env file")
 	}
 
 	log.Println("Connecting to database...")
    	queryContext.DB, err = model.GetConnection()
 	if err != nil {
- 		log.Printf("Error while connecting to database")
- 		os.Exit(1)
+ 		panic("Error while connecting to database")
 	}
 	err = model.InitDatabase(queryContext.DB)
 	if err != nil {
- 		log.Printf("Error while initializing database: %s", err.Error())
- 		os.Exit(1)
+ 		panic(fmt.Sprintf("Error while initializing database: %s", err.Error()))
 	}
 
 	log.Println("Creating client...")
 	ctx := context.Background()
 	queryContext.Client = query.CreateClient(ctx, os.Getenv("api_key"))
+	queryContext.Context = &ctx
 
-	// todo add go and python
+	log.Println("Creating log file...")
+	logFile, err := os.OpenFile(fmt.Sprintf("log/%s.txt", time.Now().Format("20060102_150405")), os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if err != nil {
+		panic(fmt.Sprintf("Error while creating log file: %s", err.Error()))
+	}
+	multiW := io.MultiWriter(logFile, os.Stdout)
+    log.SetOutput(multiW)
+
+	// todo python
 	log.Println("Loading packageType for routine 1...")
-	queryContext.DB.Order("updated_at asc").Where("language IN ('PHP', 'Javascript')").First(&queryContext.Routine1PackageType)
+	queryContext.DB.Order("updated_at asc").Where("language IN ('PHP'/*, 'Javascript', 'Go'*/)").First(&queryContext.Routine1PackageType)
 	log.Printf("Working on packageType '%s' file '%s'", queryContext.Routine1PackageType.Name, queryContext.Routine1PackageType.File)
 
 	log.Println("Loading queue for routine 2...")

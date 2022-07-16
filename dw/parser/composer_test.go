@@ -13,16 +13,19 @@ func TestParseComposerJson(t *testing.T) {
 	assert.Equal("invalid character '}' looking for beginning of object key string", err.Error())
 
 	// empty json
-	expected := make(map[string]string)
+	expected := make([]Package, 0)
 	r, err := ParseComposerJson(`{"empty": "json"}`)
 	assert.Equal(nil, err)
 	assert.Equal(expected, r)
 
 	// json with packages
-	expected["pkgA"] = "^1.0.0"
-	expected["pkgB"] = "1.1.*"
-	expected["pkgC"] = "^2.0.0-0"
-	r, err = ParseComposerJson(`{"require": {"pkgA": "^1.0.0", "pkgB": "1.1.*"}, "require-dev": {"pkgC": "^2.0.0-0"}}`)
+	expected = []Package{
+		{Name: "pkgA", Version: "^1.0.0"},
+		{Name: "pkgB", Version: "1.1.*"},
+		{Name: "pkgC", Version: "^1.7"},
+		{Name: "pkgC", Version: "^2.0.0-0"},
+	}
+	r, err = ParseComposerJson(`{"require": {"pkgA": "^1.0.0", "pkgB": "1.1.*"}, "require-dev": {"pkgC": "^1.7 || ^2.0.0-0"}}`)
 	assert.Equal(nil, err)
 	assert.Equal(expected, r)
 }

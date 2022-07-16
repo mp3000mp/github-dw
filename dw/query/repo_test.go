@@ -16,13 +16,15 @@ func TestQueryRepo(t *testing.T) {
 
 	mockedUser := github.User{Login: github.String("user")}
 	mockedLicense := github.License{Name: github.String("license")}
-	tp := time.Date(2022, time.July, 16, 1, 0, 0, 0, time.UTC)
-	//tp, _ := time.Parse("2006-01-02 15:04:05", "2022-07-16 01:00:00")
-	ts := github.Timestamp{tp}
+	ts := github.Timestamp{Time: time.Date(2022, time.July, 16, 1, 0, 0, 0, time.UTC)}
+	languages := make(map[string]int, 0)
+	languages["PHP"] = 10
+	languages["go"] = 20
+	topics := []string{"topicA", "topicB"}
 
 	mockedClient := mock.NewMockedHTTPClient(
 		mock.WithRequestMatch(
-			mock.GetRepositories,
+			mock.GetReposByOwnerByRepo,
 			github.Repository{
 				CreatedAt: &ts,
 				ForksCount: github.Int(1),
@@ -37,19 +39,22 @@ func TestQueryRepo(t *testing.T) {
 				StargazersCount: github.Int(3),
 				HTMLURL: github.String("url"),
 				Owner: &mockedUser,
+				Topics: topics,
 			},
+		),
+		mock.WithRequestMatch(
+			mock.GetReposLanguagesByOwnerByRepo,
+			languages,
 		),
 	)
 	ctx := context.Background()
 	queryContext := Context{Client: github.NewClient(mockedClient), Context: &ctx}
 
 	r, err := QueryRepo(&queryContext, "user", "repo")
+	sDate := "2022-07-16T01:00:00.000Z"
 	assert.Equal(nil, err)
-	languages := make(map[string]int, 0)
-	languages["PHP"] = 10
-	languages["go"] = 20
 	expected := Repository{
-		CreatedAt: "2022-07-16 01:00:00",
+		CreatedAt: sDate,
 		ForksCount: 1,
 		FullName: "fullName",
 		ID: 1000,
@@ -58,10 +63,10 @@ func TestQueryRepo(t *testing.T) {
 		MainLanguage: "PHP",
 		Name: "repo",
 		OpenIssuesCount: 2,
-		PushedAt: "2022-07-16 01:00:00",
+		PushedAt: sDate,
 		Size: 99,
 		StargazersCount: 3,
-		Topics: []string{"topicA", "topicB"},
+		Topics: topics,
 		URL: "url",
 		Username: "user",
 	}

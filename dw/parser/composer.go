@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type ComposerJson struct {
@@ -9,23 +10,29 @@ type ComposerJson struct {
 	DevRequire map[string]string `json:"require-dev"`
 }
 
-func ParseComposerJson(rawContent string) (map[string]string, error) {
-	requires := make(map[string]string)
+func ParseComposerJson(rawContent string) ([]Package, error) {
+	packages := make([]Package, 0)
 
 	// json decode
 	data := ComposerJson{}
 	err := json.Unmarshal([]byte(rawContent), &data)
 	if (err != nil) {
-		return requires, err
+		return packages, err
 	}
 
 	// find packages
 	for pkg, version := range data.Require {
-		requires[pkg] = version
+		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "||")
+		for _, v := range versions {
+			packages = append(packages, Package{Name: pkg, Version: v})
+		}
 	}
 	for pkg, version := range data.DevRequire {
-		requires[pkg] = version
+		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "||")
+		for _, v := range versions {
+			packages = append(packages, Package{Name: pkg, Version: v})
+		}
 	}
 
-	return requires, nil
+	return packages, nil
 }

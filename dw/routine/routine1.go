@@ -14,13 +14,10 @@ const nbPerPage = 100
 
 func RunRoutine1(queryContext *query.Context) {
 	queryContext.Routine1Running = true
-	log.Printf("Start routine 1: %d\n", int(queryContext.Routine1PackageType.GithubCurrentPage))
-
-	// todo remove
-	time.Sleep(time.Second * 5)
+	log.Printf("Start routine 1: size %d, page %d\n", int(queryContext.Routine1PackageType.GithubCurrentSize), int(queryContext.Routine1PackageType.GithubCurrentPage))
 
 	// get repos with file x
-	codes, err := query.QuerySearchCodes(queryContext, queryContext.Routine1PackageType.File, int(queryContext.Routine1PackageType.GithubCurrentPage), nbPerPage)
+	codes, maxPage, err := query.QuerySearchCodes(queryContext, queryContext.Routine1PackageType.File, int(queryContext.Routine1PackageType.GithubCurrentSize), int(queryContext.Routine1PackageType.GithubCurrentPage), nbPerPage)
 	if err != nil {
 		log.Printf("Routine 1 => Error while querying codes: %s", err.Error())
 		return
@@ -43,7 +40,13 @@ func RunRoutine1(queryContext *query.Context) {
 	}
 
 	// next page
-	queryContext.Routine1PackageType.GithubCurrentPage++
+	// info: free account are limited to 1000 first results
+	if queryContext.Routine1PackageType.GithubCurrentPage == 10 || queryContext.Routine1PackageType.GithubCurrentPage >= uint32(maxPage) {
+		queryContext.Routine1PackageType.GithubCurrentSize++
+		queryContext.Routine1PackageType.GithubCurrentPage = 1
+	} else {
+		queryContext.Routine1PackageType.GithubCurrentPage++
+	}
 	queryContext.Routine1PackageType.UpdatedAt = time.Now()
 	queryContext.DB.Save(queryContext.Routine1PackageType)
 

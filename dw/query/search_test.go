@@ -49,7 +49,7 @@ func TestQuerySearchCodes(t *testing.T) {
 		mock.WithRequestMatch(
 			mock.GetSearchCode,
 			github.CodeSearchResult{
-				Total: github.Int(4000000),
+				Total: github.Int(1001),
 				CodeResults: mockedCodeResults,
 			},
 		),
@@ -57,8 +57,9 @@ func TestQuerySearchCodes(t *testing.T) {
 	ctx := context.Background()
 	queryContext := Context{Client: github.NewClient(mockedClient), Context: &ctx}
 
-	r, err := QuerySearchCodes(&queryContext, "test.txt", 0, 2)
+	r, maxPage, err := QuerySearchCodes(&queryContext, "test.txt", 100, 0, 100)
 	assert.Equal(nil, err)
+	assert.Equal(11, maxPage)
 	expected := []SearchCodeItem{
 		{
 			User: "userA",

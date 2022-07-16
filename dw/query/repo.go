@@ -14,33 +14,31 @@ type Repository struct {
 
 // list all repositories matching search
 func QueryRepo(context *Context, userName string, repoName string) (Repository, error) {
-	wait := WaitBeforeQuery(context.RateLimiter, "core")
-	if wait > 0 {
-		time.Sleep(time.Duration(wait * 1000 * 1000) * time.Millisecond)
-	}
+	WaitBeforeQuery(context.RateLimiter, "core", true)
 	context.RateLimiter.CoreLastQuery = time.Now()
 	githubRepo, _, err := context.Client.Repositories.Get(*context.Context, userName, repoName)
 	if !CheckResponse(err, &context.RateLimiter, "core") {
 		return Repository{}, err
 	}
 
-	wait = WaitBeforeQuery(context.RateLimiter, "core")
-	if wait > 0 {
-		time.Sleep(time.Duration(wait * 1000 * 1000) * time.Millisecond)
-	}
+	WaitBeforeQuery(context.RateLimiter, "core", true)
 	context.RateLimiter.CoreLastQuery = time.Now()
 	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Context, userName, repoName)
 	if !CheckResponse(err, &context.RateLimiter, "core") {
 		return Repository{}, err
 	}
 
+	mainLanguage := ""
+	if githubRepo.Language != nil {
+		mainLanguage = *githubRepo.Language
+	}
 	repo := Repository{
     	CreatedAt: githubRepo.CreatedAt.Time.Format("2006-01-02T15:04:05.000Z"),
     	ForksCount: *githubRepo.ForksCount,
     	FullName: *githubRepo.FullName,
     	ID: *githubRepo.ID,
     	Languages: githubLanguages,
-    	MainLanguage: *githubRepo.Language,
+    	MainLanguage: mainLanguage,
     	Name: *githubRepo.Name,
     	OpenIssuesCount: *githubRepo.OpenIssuesCount,
 		PushedAt: githubRepo.PushedAt.Time.Format("2006-01-02T15:04:05.000Z"),

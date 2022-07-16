@@ -2,7 +2,7 @@ package query
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -19,7 +19,7 @@ func CheckResponse(err error, rateLimiter *RateLimiter, rateType string) bool {
 				rateLimiter.CoreLast429 = time.Now()
 			}
 		}
- 		fmt.Printf("Unknown response error: %s", err.Error())
+ 		log.Printf("Unknown response error: %s", err.Error())
  		return false
 	}
 
@@ -38,11 +38,13 @@ const tickSearch = time.Second * 120 // 30 queries / hour = 1/(30/3600) = 120s
 const tickCore = time.Millisecond * 720 // 5000 queries / hour = 1000/(5000/3600) = 720ms
 const waitAfter429 = time.Second * 3600
 
-func WaitBeforeQuery(rateLimiter RateLimiter, rateType string) int {
+func WaitBeforeQuery(rateLimiter RateLimiter, rateType string, doWait bool) int {
 	now := time.Now()
+	wait := 0
 	var tick time.Duration
 	var last429 time.Time
 	var lastQuery time.Time
+
 	if rateType == "search" {
 		last429 = rateLimiter.SearchLast429
 		lastQuery = rateLimiter.SearchLastQuery
@@ -52,17 +54,24 @@ func WaitBeforeQuery(rateLimiter RateLimiter, rateType string) int {
 		lastQuery = rateLimiter.CoreLastQuery
 		tick = tickCore
 	}
+
 	if !last429.IsZero() {
 		diff := last429.Add(waitAfter429).Sub(now).Milliseconds()
 		if diff > 0 {
-			return int(diff)+1000
+			log.Printf("Ratelimiter 429: %dms\n", int(diff))
+			wait = int(diff)+1000
 		}
 	}
 	if !lastQuery.IsZero() {
 		diff := lastQuery.Add(tick).Sub(now).Milliseconds()
 		if diff > 0 {
-			return int(diff)+1000
+			//log.Printf("Ratelimiter last query: %dms\n", int(diff))
+			wait = int(diff)+1000
 		}
 	}
-	return 0
+
+	if wait > 0 && doWait {
+		time.Sleep(time.Duration(wait) * time.Millisecond)
+	}
+	return wait
 }

@@ -1,7 +1,6 @@
 package routine
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -17,13 +16,9 @@ func RunRoutine3(queryContext *query.Context) {
 	queryContext.Routine3Running = true
 	repoPackageFile := (*queryContext.Routine3Queue)[0]
 	var repo model.Repository
-	log.Printf("Start routine 3: %s\n", repoPackageFile.Path)
-
-	// todo remove
-	time.Sleep(time.Second * 2)
-
 	// todo keep relation instead of query
 	queryContext.DB.Where("id = ?", repoPackageFile.RepositoryID).First(&repo)
+	log.Printf("Start routine 3: repo '%s' file '%s'\n", repo.URL, repoPackageFile.Path)
 
 	// get raw file
 	blob, err := query.QueryBlob(queryContext, repo.Username, repo.Name, repoPackageFile.SHA)
@@ -31,33 +26,39 @@ func RunRoutine3(queryContext *query.Context) {
 		msg := fmt.Sprintf("Routine 3 => Error while querying repo %s file %s: %s", repo.URL, repoPackageFile.Path, err.Error())
 		log.Println(msg)
 		EndRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
-	 	queryContext.DB.Model(&repo).Updates(model.RepositoryPackageTypeFile{Routine3At: time.Now(), RoutineError: msg})
+	 	queryContext.DB.Model(&repoPackageFile).Updates(model.RepositoryPackageTypeFile{ID: repoPackageFile.ID, Routine3At: time.Now(), RoutineError: msg})
 		return
 	}
 
 	// parse package file
-	// todo support go and python
-	packages := make(map[string]string)
+	packages := make([]parser.Package, 0)
 	if queryContext.Routine1PackageType.File == "composer.json" {
 		packages, err = parser.ParseComposerJson(blob.Content)
 	} else if queryContext.Routine1PackageType.File == "package.json" {
 		packages, err = parser.ParsePackageJson(blob.Content)
+	} else if queryContext.Routine1PackageType.File == "go.mod" {
+		packages, err = parser.ParseGoMod(blob.Content)
+	} else if queryContext.Routine1PackageType.File == "requirements.txt" {
+		packages, err = parser.ParseRequirementsTxt(blob.Content)
+// todo
+//	} else if queryContext.Routine1PackageType.File == "setup.py" {
+//		packages, err = parser.ParseSetupPy(blob.Content)
 	} else {
-		err = errors.New("Routine 3 => Package file %s is not supported")
+		err = fmt.Errorf("Package file %s is not supported", queryContext.Routine1PackageType.File)
 	}
 	if err != nil {
-		msg := fmt.Sprintf(err.Error(), queryContext.Routine1PackageType.File)
+		msg := fmt.Sprintf("Routine 3 => Error while parsing package file: %s", err.Error())
 		log.Println(msg)
 		EndRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
-	 	queryContext.DB.Model(&repo).Updates(model.RepositoryPackageTypeFile{Routine3At: time.Now(), RoutineError: msg})
+	 	queryContext.DB.Model(&repoPackageFile).Updates(model.RepositoryPackageTypeFile{ID: repoPackageFile.ID, Routine3At: time.Now(), RoutineError: msg})
 		return
 	}
 
 	// store packages in db
 	repoPackage := model.RepositoryPackage{}
 	queryContext.DB.Where("repository_package_type_file_id = ?", repoPackageFile.ID).Delete(&repoPackage)
-	for pkg, version := range packages {
-		repoPackage = model.RepositoryPackage{RepositoryPackageTypeFileID: repoPackageFile.ID, Name: pkg, Version: version}
+	for _, pkg := range packages {
+		repoPackage = model.RepositoryPackage{RepositoryPackageTypeFileID: repoPackageFile.ID, Name: pkg.Name, VersionStr: pkg.Version}
 		queryContext.DB.Create(&repoPackage)
 	}
 

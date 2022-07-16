@@ -42,7 +42,8 @@ type PackageType struct {
 	ID uint                  `gorm:"primaryKey"`
 	File string              `gorm:"uniqueIndex;size:50;not null"`
 	Language, Name string    `gorm:"size:50;not null"`
-	GithubCurrentPage uint32 `gorm:"default:0"`
+	GithubCurrentSize uint32 `gorm:"default:100"`
+	GithubCurrentPage uint32 `gorm:"default:1"`
 	UpdatedAt time.Time      `gorm:"type:DATETIME(0);not null"`
 }
 
@@ -62,7 +63,9 @@ type RepositoryPackage struct {
 	ID uint                          `gorm:"primaryKey"`
 	RepositoryPackageTypeFileID uint `gorm:"not null"`
 	Name string                      `gorm:"size:100;not null"`
-	Version string                   `gorm:"size:20;not null"`
+	VersionStr string                `gorm:"size:20;not null"`
+	VersionMin uint16                `gorm:"not null"`
+	VersionMax uint16
 }
 
 func GetNamingStrategy() schema.NamingStrategy {
@@ -104,8 +107,8 @@ func InitDatabase(db *gorm.DB) error {
 		PackageType{Language: "PHP", Name: "Composer", File: "composer.json"},
 		PackageType{Language: "Javascript", Name: "npm", File: "package.json"},
 		PackageType{Language: "Go", Name: "Go", File: "go.mod"},
-		PackageType{Language: "Python", Name: "PyPi", File: "requirements.txt"},
-		PackageType{Language: "Python", Name: "PyPi", File: "setup.py"},
+		PackageType{Language: "Python", Name: "pip", File: "requirements.txt"},
+		PackageType{Language: "Python", Name: "pip", File: "setup.py"},
 	}
 	for _, pack := range packageTypes {
 		db.Clauses(clause.OnConflict{DoNothing: true}).Create(&pack)

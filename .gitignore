@@ -1,6 +1,7 @@
 /dw/bin
 /dw/pkg
 /dw/output
+/dw/log
 
 .env
 
@@ -12,5 +13,7 @@
 /deployment/docker/mariadb/log
 /deployment/docker/mariadb_test/db
 /deployment/docker/mariadb_test/log
+
+/frontend/node_modules
 
 /todo.txt

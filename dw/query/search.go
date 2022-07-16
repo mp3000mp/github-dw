@@ -19,24 +19,27 @@ type SearchCodeItem struct {
 // list all codes matching search
 // info: cannot use Repo search because filename is a code search only parameter...
 //   so we cannot do for example: "pushed:>2021-01-01 size:>1000 filename:%s"
-func QuerySearchCodes(context *Context, searchFileName string, page int, nbPerPage int) ([]SearchCodeItem, error) {
+func QuerySearchCodes(context *Context, searchFileName string, fileSize int, page int, nbPerPage int) ([]SearchCodeItem, int, error) {
 	codes := make([]SearchCodeItem, 0)
 	opts := &github.SearchOptions{Sort: "indexed", Order: "desc", ListOptions: github.ListOptions{Page: page, PerPage: nbPerPage}}
 
 	// info: https://docs.github.com/en/search-github/searching-on-github/searching-code
-	wait := WaitBeforeQuery(context.RateLimiter, "search")
-	if wait > 0 {
-		time.Sleep(time.Duration(wait * 1000 * 1000) * time.Millisecond)
-	}
+	// info: free account are limited to 1000 first results so we try to get more result by trying each size
+	// info: we limit to / be cause of too much useless results in vendor, libs that should be in .gitignore...
+	WaitBeforeQuery(context.RateLimiter, "search", true)
 	context.RateLimiter.SearchLastQuery = time.Now()
-	searchRes, _, err := context.Client.Search.Code(*context.Context, fmt.Sprintf("filename:%s", searchFileName), opts)
+	searchRes, _, err := context.Client.Search.Code(*context.Context, fmt.Sprintf("filename:%s size:%d..%d extension:%s path:/", searchFileName, fileSize, fileSize, getFileExt(searchFileName)), opts)
 
 	if !CheckResponse(err, &context.RateLimiter, "search") {
-		return codes, err
+		return codes, 0, err
 	}
 
 	for _, cResult := range searchRes.CodeResults {
-		if *cResult.Repository.Fork || *cResult.Repository.Private || strings.Contains(*cResult.Path, "node_modules") || strings.Contains(*cResult.Path, "vendor") {
+		// todo: can we implement path filter in github search query ?
+		if *cResult.Repository.Fork ||
+		   *cResult.Repository.Private ||
+		   strings.Contains(*cResult.Path, "node_modules") ||
+		   strings.Contains(*cResult.Path, "vendor") {
 			continue
 		}
 
@@ -51,5 +54,12 @@ func QuerySearchCodes(context *Context, searchFileName string, page int, nbPerPa
 		codes = append(codes, item)
 	}
 
-	return codes, nil
+	maxPage := int(*searchRes.Total / nbPerPage)+1
+
+	return codes, maxPage, nil
+}
+
+func getFileExt(fileName string) string {
+	arr := strings.Split(fileName, ".")
+	return arr[1]
 }

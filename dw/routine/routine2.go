@@ -13,10 +13,7 @@ import (
 func RunRoutine2(queryContext *query.Context) {
 	queryContext.Routine2Running = true
 	repo := (*queryContext.Routine2Queue)[0]
-	log.Printf("Start routine 2: %s\n", repo.URL)
-
-	// todo remove
-	time.Sleep(time.Second * 7)
+	log.Printf("Start routine 2: repo '%s'\n", repo.URL)
 
 	searchResult, err := query.QueryRepo(queryContext, repo.Username, repo.Name)
 	if err != nil {
@@ -42,9 +39,9 @@ func RunRoutine2(queryContext *query.Context) {
 		MainLanguage: searchResult.MainLanguage,
 		FullName: searchResult.FullName,
 		LicenseName: searchResult.LicenseName,
-		ForksCount: uint32(searchResult.ForksCount),
-		OpenIssuesCount: uint32(searchResult.OpenIssuesCount),
-		StargazersCount: uint32(searchResult.StargazersCount),
+		ForksCount: hndlCount(&searchResult.ForksCount),
+		OpenIssuesCount: hndlCount(&searchResult.OpenIssuesCount),
+		StargazersCount: hndlCount(&searchResult.StargazersCount),
 		GithubId: uint(searchResult.ID),
 		CreatedAt: createdAt,
 		PushedAt: pushedAt,
@@ -64,4 +61,11 @@ func EndRoutine2(isRunning *bool, queue *[]model.Repository) {
 	*queue = (*queue)[1:]
 	*isRunning = false
 	log.Println("End routine 2")
+}
+
+func hndlCount(count *int) uint32 {
+	if count == nil {
+		return 0
+	}
+	return uint32(*count)
 }
