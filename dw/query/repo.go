@@ -5,7 +5,7 @@ import (
 )
 
 type Repository struct {
-	CreatedAt, FullName, URL, LicenseName, MainLanguage, Name, PushedAt, Username string
+	CreatedAt, Description, FullName, URL, LicenseName, MainLanguage, Name, PushedAt, Username string
 	ForksCount, OpenIssuesCount, StargazersCount, Size int
 	ID int64
 	Topics []string
@@ -32,8 +32,13 @@ func QueryRepo(context *Context, userName string, repoName string) (Repository, 
 	if githubRepo.Language != nil {
 		mainLanguage = *githubRepo.Language
 	}
+	description := ""
+	if githubRepo.Description != nil {
+		description = *githubRepo.Description
+	}
 	repo := Repository{
     	CreatedAt: githubRepo.CreatedAt.Time.Format("2006-01-02T15:04:05.000Z"),
+    	Description: description,
     	ForksCount: *githubRepo.ForksCount,
     	FullName: *githubRepo.FullName,
     	ID: *githubRepo.ID,

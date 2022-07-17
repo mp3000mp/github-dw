@@ -34,12 +34,11 @@ func CreateClient(ctx context.Context, apiKey string) *github.Client {
 	return github.NewClient(tc)
 }
 
-const tickSearch = time.Second * 120 // 30 queries / hour = 1/(30/3600) = 120s
+const TickSearch = time.Second * 120 // 30 queries / hour = 1/(30/3600) = 120s
 const tickCore = time.Millisecond * 720 // 5000 queries / hour = 1000/(5000/3600) = 720ms
 const waitAfter429 = time.Second * 3600
 
 func WaitBeforeQuery(rateLimiter RateLimiter, rateType string, doWait bool) int {
-	now := time.Now()
 	wait := 0
 	var tick time.Duration
 	var last429 time.Time
@@ -48,7 +47,7 @@ func WaitBeforeQuery(rateLimiter RateLimiter, rateType string, doWait bool) int 
 	if rateType == "search" {
 		last429 = rateLimiter.SearchLast429
 		lastQuery = rateLimiter.SearchLastQuery
-		tick = tickSearch
+		tick = TickSearch
 	} else {
 		last429 = rateLimiter.CoreLast429
 		lastQuery = rateLimiter.CoreLastQuery
@@ -56,14 +55,14 @@ func WaitBeforeQuery(rateLimiter RateLimiter, rateType string, doWait bool) int 
 	}
 
 	if !last429.IsZero() {
-		diff := last429.Add(waitAfter429).Sub(now).Milliseconds()
+		diff := time.Until(last429.Add(waitAfter429)).Milliseconds()
 		if diff > 0 {
 			log.Printf("Ratelimiter 429: %dms\n", int(diff))
 			wait = int(diff)+1000
 		}
 	}
 	if !lastQuery.IsZero() {
-		diff := lastQuery.Add(tick).Sub(now).Milliseconds()
+		diff := time.Until(lastQuery.Add(tick)).Milliseconds()
 		if diff > 0 {
 			//log.Printf("Ratelimiter last query: %dms\n", int(diff))
 			wait = int(diff)+1000

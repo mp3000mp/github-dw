@@ -17,7 +17,7 @@ import (
 
 func main() {
 	queryContext := query.Context{}
-	tick := time.Millisecond * 100
+	tickReload := time.Second * 60
 
 	log.Println("Loading config...")
 	err := godotenv.Load()
@@ -48,22 +48,19 @@ func main() {
 	multiW := io.MultiWriter(logFile, os.Stdout)
     log.SetOutput(multiW)
 
-	// todo python
-	log.Println("Loading packageType for routine 1...")
-	queryContext.DB.Order("updated_at asc").Where("language IN ('PHP'/*, 'Javascript', 'Go'*/)").First(&queryContext.Routine1PackageType)
-	log.Printf("Working on packageType '%s' file '%s'", queryContext.Routine1PackageType.Name, queryContext.Routine1PackageType.File)
-
-	log.Println("Loading queue for routine 2...")
-	queryContext.DB.Order("routine1_at asc").Where("routine_error IS NULL AND routine2_at IS NULL").Find(&queryContext.Routine2Queue)
-	log.Printf("%d items in queue2", len(*queryContext.Routine2Queue))
-
-	log.Println("Loading queue for routine 3...")
-	queryContext.DB.Order("routine1_at asc").Where("routine_error IS NULL AND routine3_at IS NULL").Find(&queryContext.Routine3Queue)
-	log.Printf("%d items in queue3", len(*queryContext.Routine3Queue))
+    routine.RunPreroutine(&queryContext)
 
 	for {
+		if queryContext.PreroutineRunning {
+			continue
+		}
+
 		if !queryContext.Routine1Running {
-			go routine.RunRoutine1(&queryContext)
+			// avoid sleeping 120s that would possibly block other routines
+			if queryContext.RateLimiter.SearchLastQuery.IsZero() ||
+			   time.Until(queryContext.RateLimiter.SearchLastQuery.Add(query.TickSearch)).Milliseconds() < 0 {
+				go routine.RunRoutine1(&queryContext)
+			}
 		}
 
 		// todo sync ?
@@ -76,10 +73,15 @@ func main() {
 			go routine.RunRoutine3(&queryContext)
 		}
 
+		// we donot want to run preroutine to often
+		if time.Until(queryContext.PreroutineLastReload.Add(tickReload)).Milliseconds() < 0 {
+			routine.RunPreroutine(&queryContext)
+		}
+
 		// todo gérer rate limiter
 		// a, _, _ := client.RateLimits(ctx)
 		// log.Printf("%v\n", a)
 
-		time.Sleep(tick)
+		time.Sleep(routine.Tick)
 	}
 }

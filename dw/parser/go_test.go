@@ -2,6 +2,7 @@ package parser
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,6 +13,7 @@ func TestParseGoMod(t *testing.T) {
 		{Name: "go", Version: "1.18"},
 		{Name: "pkgA", Version: "v1.0.0"},
 		{Name: "pkgB", Version: "v1.1.0"},
+		{Name: "pkgC", Version: "v1.2.0"},
 	}
 	r, _ := ParseGoMod(`module main
 
@@ -20,6 +22,8 @@ func TestParseGoMod(t *testing.T) {
 	require (
 		pkgA v1.0.0
 		pkgB v1.1.0
-	)`)
-	assert.Equal(expected, r)
+	)
+
+	require pkgC v1.2.0`)
+	assert.ElementsMatch(expected, r)
 }

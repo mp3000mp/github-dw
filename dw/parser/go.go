@@ -24,8 +24,15 @@ func ParseGoMod(rawContent string) ([]Package, error) {
 		}
 
 		if strings.HasPrefix(trimed, "require") {
-			isInRequire = true
-			continue
+			if trimed == "require (" {
+				isInRequire = true
+				continue
+			}
+			pkg := strings.Split(trimed, " ")
+			if len(pkg) >= 3 && pkg[0] == "require" && strings.HasPrefix(pkg[2], "v") {
+				packages = append(packages, Package{Name: pkg[1], Version: pkg[2]})
+				continue
+			}
 		}
 		if strings.HasPrefix(trimed, ")") {
 			isInRequire = false

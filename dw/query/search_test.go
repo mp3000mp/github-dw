@@ -31,18 +31,24 @@ func TestQuerySearchCodes(t *testing.T) {
 		Private: &f,
 	}
 	mockedCodeResultA := github.CodeResult{
-		Path: github.String("pathA"),
+		Path: github.String("pathA/test.txt"),
 		Repository: &mockedRepoA,
 		SHA: github.String("SHAA"),
 	}
 	mockedCodeResultB := github.CodeResult{
-		Path: github.String("pathB"),
+		Path: github.String("pathB/test.txt"),
 		Repository: &mockedRepoB,
 		SHA: github.String("SHAB"),
+	}
+	mockedCodeResultC := github.CodeResult{
+		Path: github.String("pathC/other.txt"),
+		Repository: &mockedRepoB,
+		SHA: github.String("SHAC"),
 	}
 	mockedCodeResults := []*github.CodeResult{
 		&mockedCodeResultA,
 		&mockedCodeResultB,
+		&mockedCodeResultC,
 	}
 
 	mockedClient := mock.NewMockedHTTPClient(
@@ -65,14 +71,14 @@ func TestQuerySearchCodes(t *testing.T) {
 			User: "userA",
 			Name: "repoA",
 			URL: "URLA",
-			Path: "pathA",
+			Path: "pathA/test.txt",
 			SHA: "SHAA",
 		},
 		{
 			User: "userB",
 			Name: "repoB",
 			URL: "URLB",
-			Path: "pathB",
+			Path: "pathB/test.txt",
 			SHA: "SHAB",
 		},
 	}

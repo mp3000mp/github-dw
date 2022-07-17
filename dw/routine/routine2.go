@@ -39,9 +39,9 @@ func RunRoutine2(queryContext *query.Context) {
 		MainLanguage: searchResult.MainLanguage,
 		FullName: searchResult.FullName,
 		LicenseName: searchResult.LicenseName,
-		ForksCount: hndlCount(&searchResult.ForksCount),
-		OpenIssuesCount: hndlCount(&searchResult.OpenIssuesCount),
-		StargazersCount: hndlCount(&searchResult.StargazersCount),
+		ForksCount: HndlCount(&searchResult.ForksCount),
+		OpenIssuesCount: HndlCount(&searchResult.OpenIssuesCount),
+		StargazersCount: HndlCount(&searchResult.StargazersCount),
 		GithubId: uint(searchResult.ID),
 		CreatedAt: createdAt,
 		PushedAt: pushedAt,
@@ -63,7 +63,7 @@ func EndRoutine2(isRunning *bool, queue *[]model.Repository) {
 	log.Println("End routine 2")
 }
 
-func hndlCount(count *int) uint32 {
+func HndlCount(count *int) uint32 {
 	if count == nil {
 		return 0
 	}

@@ -2,6 +2,7 @@ package parser
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,5 +24,5 @@ func TestParseRequirementsTxt(t *testing.T) {
 	pkgC>=1.1.0 # comment
 	pkgD >= 1.1.0, >=2.0.0
 	pkgE == 1.0.*`)
-	assert.Equal(expected, r)
+	assert.ElementsMatch(expected, r)
 }

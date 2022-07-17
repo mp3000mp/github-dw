@@ -14,6 +14,8 @@ type Context struct {
 	Client *github.Client
 	Context *context.Context
 	DB *gorm.DB
+	PreroutineLastReload time.Time
+	PreroutineRunning bool
 	Routine1PackageType *model.PackageType
 	Routine1Running bool
 	Routine2Queue *[]model.Repository

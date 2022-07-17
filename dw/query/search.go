@@ -18,7 +18,7 @@ type SearchCodeItem struct {
 
 // list all codes matching search
 // info: cannot use Repo search because filename is a code search only parameter...
-//   so we cannot do for example: "pushed:>2021-01-01 size:>1000 filename:%s"
+//   so we cannot do for example: "pushed:>2021-01-01 filename:%s"
 func QuerySearchCodes(context *Context, searchFileName string, fileSize int, page int, nbPerPage int) ([]SearchCodeItem, int, error) {
 	codes := make([]SearchCodeItem, 0)
 	opts := &github.SearchOptions{Sort: "indexed", Order: "desc", ListOptions: github.ListOptions{Page: page, PerPage: nbPerPage}}
@@ -38,6 +38,7 @@ func QuerySearchCodes(context *Context, searchFileName string, fileSize int, pag
 		// todo: can we implement path filter in github search query ?
 		if *cResult.Repository.Fork ||
 		   *cResult.Repository.Private ||
+		   !strings.HasSuffix(*cResult.Path, searchFileName) ||
 		   strings.Contains(*cResult.Path, "node_modules") ||
 		   strings.Contains(*cResult.Path, "vendor") {
 			continue

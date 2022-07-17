@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import semver from 'semver'
-
-const v = ['1.0.*']
-const r = '>1.1.1-alpha || >2.0.0'
-console.log(v, semver.minSatisfying(v, r), semver.maxSatisfying(v, r))
-
 </script>
 
 <template>

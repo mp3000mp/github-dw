@@ -2,6 +2,7 @@ package parser
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,5 +28,5 @@ func TestParsePackageJson(t *testing.T) {
 	}
 	r, err = ParsePackageJson(`{"dependencies": {"pkgA": "^1.0.0", "pkgB": "1.1.*"}, "devDependencies": {"pkgC": "^2.0.0-0"}, "peerDependencies": {"pkgD": "oui"}}`)
 	assert.Equal(nil, err)
-	assert.Equal(expected, r)
+	assert.ElementsMatch(expected, r)
 }

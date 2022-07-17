@@ -3,7 +3,6 @@ module main
 go 1.18
 
 require (
-	github.com/blang/semver/v4 v4.0.0
 	github.com/google/go-github/v45 v45.0.0
 	github.com/joho/godotenv v1.4.0
 	github.com/migueleliasweb/go-github-mock v0.0.10

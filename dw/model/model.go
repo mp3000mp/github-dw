@@ -16,6 +16,7 @@ type Repository struct {
 	MainLanguage string 			                    `gorm:"size:50"`
 	URL string                                          `gorm:"uniqueIndex;size:255;not null"`
 	FullName, RoutineError string                       `gorm:"size:255"`
+	Description string                                  `gorm:"size:1000"`
 	LicenseName string                                  `gorm:"size:100"`
 	ForksCount, OpenIssuesCount, StargazersCount uint32
 	GithubId, Size uint
@@ -23,6 +24,7 @@ type Repository struct {
 	CreatedAt, PushedAt, Routine2At time.Time           `gorm:"type:DATETIME(0);default:null"`
 	Languages []RepositoryLanguage                      `gorm:"constraint:OnUpdate:CASCADE"`
 	Topics []RepositoryTopic                            `gorm:"constraint:OnUpdate:CASCADE"`
+	PackageTypeFiles []RepositoryPackageTypeFile        `gorm:"constraint:OnUpdate:CASCADE"`
 }
 
 type RepositoryLanguage struct {
@@ -39,12 +41,14 @@ type RepositoryTopic struct {
 }
 
 type PackageType struct {
-	ID uint                  `gorm:"primaryKey"`
-	File string              `gorm:"uniqueIndex;size:50;not null"`
-	Language, Name string    `gorm:"size:50;not null"`
-	GithubCurrentSize uint32 `gorm:"default:100"`
-	GithubCurrentPage uint32 `gorm:"default:1"`
-	UpdatedAt time.Time      `gorm:"type:DATETIME(0);not null"`
+	ID uint                                      `gorm:"primaryKey"`
+	File string                                  `gorm:"uniqueIndex;size:50;not null"`
+	Language, Name string                        `gorm:"size:50;not null"`
+	GithubCurrentSize uint32                     `gorm:"default:100"`
+	GithubCurrentPage uint32                     `gorm:"default:1"`
+	UpdatedAt time.Time                          `gorm:"type:DATETIME(0);not null"`
+	Priority bool                                `gorm:"default:false"`
+	PackageTypeFiles []RepositoryPackageTypeFile `gorm:"constraint:OnUpdate:CASCADE"`
 }
 
 type RepositoryPackageTypeFile struct {
@@ -60,12 +64,13 @@ type RepositoryPackageTypeFile struct {
 }
 
 type RepositoryPackage struct {
-	ID uint                          `gorm:"primaryKey"`
-	RepositoryPackageTypeFileID uint `gorm:"not null"`
-	Name string                      `gorm:"size:100;not null"`
-	VersionStr string                `gorm:"size:20;not null"`
-	VersionMin uint16                `gorm:"not null"`
-	VersionMax uint16
+	ID uint                                                  `gorm:"primaryKey"`
+	RepositoryPackageTypeFileID uint                         `gorm:"not null"`
+	Name string                                              `gorm:"size:100;not null"`
+	VersionStr string                                        `gorm:"size:20;not null"`
+	VersionMinMajor, VersionMinMinor, VersionMinPatch uint16 `gorm:"not null"`
+	VersionMaxMajor, VersionMaxMinor, VersionMaxPatch uint16
+	Valid bool 												 `gorm:"default:false;not null"`
 }
 
 func GetNamingStrategy() schema.NamingStrategy {
@@ -104,7 +109,7 @@ func InitDatabase(db *gorm.DB) error {
 	}
 
 	packageTypes := []PackageType{
-		PackageType{Language: "PHP", Name: "Composer", File: "composer.json"},
+		PackageType{Language: "PHP", Name: "Composer", File: "composer.json", Priority: true},
 		PackageType{Language: "Javascript", Name: "npm", File: "package.json"},
 		PackageType{Language: "Go", Name: "Go", File: "go.mod"},
 		PackageType{Language: "Python", Name: "pip", File: "requirements.txt"},

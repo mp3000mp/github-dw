@@ -27,6 +27,7 @@ func TestQueryRepo(t *testing.T) {
 			mock.GetReposByOwnerByRepo,
 			github.Repository{
 				CreatedAt: &ts,
+				Description: github.String("description"),
 				ForksCount: github.Int(1),
 				FullName: github.String("fullName"),
 				ID: github.Int64(1000),
@@ -55,6 +56,7 @@ func TestQueryRepo(t *testing.T) {
 	assert.Equal(nil, err)
 	expected := Repository{
 		CreatedAt: sDate,
+		Description: "description",
 		ForksCount: 1,
 		FullName: "fullName",
 		ID: 1000,
