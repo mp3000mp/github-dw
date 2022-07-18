@@ -1,7 +1,6 @@
 package model
 
 import (
-  "os"
   "time"
 
   "gorm.io/driver/mysql"
@@ -67,13 +66,13 @@ type RepositoryPackage struct {
 	ID uint                                                  `gorm:"primaryKey"`
 	RepositoryPackageTypeFileID uint                         `gorm:"not null"`
 	Name string                                              `gorm:"size:100;not null"`
-	VersionStr string                                        `gorm:"size:20;not null"`
+	VersionStr string                                        `gorm:"size:55;not null"`
 	VersionMinMajor, VersionMinMinor, VersionMinPatch uint16 `gorm:"not null"`
 	VersionMaxMajor, VersionMaxMinor, VersionMaxPatch uint16
 	Valid bool 												 `gorm:"default:false;not null"`
 }
 
-func GetNamingStrategy() schema.NamingStrategy {
+func getNamingStrategy() schema.NamingStrategy {
 	return schema.NamingStrategy{
 		SingularTable: true,
 	}
@@ -81,11 +80,11 @@ func GetNamingStrategy() schema.NamingStrategy {
 
 var Connection *gorm.DB
 
-func GetConnection() (*gorm.DB, error) {
+func GetConnection(databaseUrl string) (*gorm.DB, error) {
 	var err error
 	if Connection == nil {
-		Connection, err = gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{
-			NamingStrategy: GetNamingStrategy(),
+		Connection, err = gorm.Open(mysql.Open(databaseUrl), &gorm.Config{
+			NamingStrategy: getNamingStrategy(),
 		})
 	}
    	if err != nil {

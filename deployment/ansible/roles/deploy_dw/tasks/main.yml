@@ -1,0 +1,26 @@
+- name: Create .env
+  template:
+    src: templates/.env.j2
+    dest: "/{{ app_directory }}/dw/.env"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+
+- name: Create directories system
+  file:
+    path: "{{ app_directory }}/dw/{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+    recurse: true
+  loop:
+    - 'log'
+
+- name: Deploy build
+  copy:
+    src: '{{ playbook_dir }}/../../dw/bin/main'
+    dest: '{{ app_directory }}/dw/main'
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'

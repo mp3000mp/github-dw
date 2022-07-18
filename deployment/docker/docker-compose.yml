@@ -27,7 +27,7 @@ services:
 
   dw:
     image: golang:1.18
-    # command: bin/main
+    # command: ./main
     command: go run main.go
     working_dir: /usr/src/app
     volumes:

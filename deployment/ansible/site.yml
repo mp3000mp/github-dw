@@ -1,3 +1,13 @@
+- name: Build
+  hosts: 127.0.0.1
+  connection: local
+  vars_files:
+    - vars.yml
+  roles:
+    - build_dw
+#    - build_back ?
+#    - build_front
+
 - name: Deploy
   hosts: prod_servers
   become: true
@@ -7,7 +17,7 @@
   roles:
     - files
     - docker
-    - build_dw
-#    - build_back
-#    - build_front
+    - deploy_dw
+#    - deploy_back
+#    - deploy_front
 #    - apache

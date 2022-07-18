@@ -11,6 +11,7 @@ import (
 	"main/model"
 	"main/query"
 	"main/routine"
+	"main/system"
 
 	"github.com/joho/godotenv"
 )
@@ -19,14 +20,17 @@ func main() {
 	queryContext := query.Context{}
 	tickReload := time.Second * 60
 
-	log.Println("Loading config...")
 	err := godotenv.Load()
 	if err != nil {
  		panic("Error while loading .env file")
 	}
 
-	log.Println("Connecting to database...")
-   	queryContext.DB, err = model.GetConnection()
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		fmt.Println(os.Getenv("DW_VERSION"))
+		return
+	}
+
+   	queryContext.DB, err = model.GetConnection(os.Getenv("DATABASE_URL"))
 	if err != nil {
  		panic("Error while connecting to database")
 	}
@@ -35,12 +39,10 @@ func main() {
  		panic(fmt.Sprintf("Error while initializing database: %s", err.Error()))
 	}
 
-	log.Println("Creating client...")
 	ctx := context.Background()
 	queryContext.Client = query.CreateClient(ctx, os.Getenv("api_key"))
 	queryContext.Context = &ctx
 
-	log.Println("Creating log file...")
 	logFile, err := os.OpenFile(fmt.Sprintf("log/%s.txt", time.Now().Format("20060102_150405")), os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
 	if err != nil {
 		panic(fmt.Sprintf("Error while creating log file: %s", err.Error()))
@@ -76,6 +78,7 @@ func main() {
 		// we donot want to run preroutine to often
 		if time.Until(queryContext.PreroutineLastReload.Add(tickReload)).Milliseconds() < 0 {
 			routine.RunPreroutine(&queryContext)
+			log.Printf("Memory used: %d\n", system.GetUsedMem())
 		}
 
 		// todo gérer rate limiter

@@ -25,7 +25,7 @@ func RunRoutine3(queryContext *query.Context) {
 	if err != nil {
 		msg := fmt.Sprintf("Routine 3 => Error while querying blob %s file %s: %s", repo.URL, repoPackageFile.Path, err.Error())
 		log.Println(msg)
-		EndRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
+		endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
 	 	queryContext.DB.Model(&repoPackageFile).Updates(model.RepositoryPackageTypeFile{ID: repoPackageFile.ID, Routine3At: time.Now(), RoutineError: msg})
 		return
 	}
@@ -49,7 +49,7 @@ func RunRoutine3(queryContext *query.Context) {
 	if err != nil {
 		msg := fmt.Sprintf("Routine 3 => Error while parsing package file: %s", err.Error())
 		log.Println(msg)
-		EndRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
+		endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
 	 	queryContext.DB.Model(&repoPackageFile).Updates(model.RepositoryPackageTypeFile{ID: repoPackageFile.ID, Routine3At: time.Now(), RoutineError: msg})
 		return
 	}
@@ -85,10 +85,10 @@ func RunRoutine3(queryContext *query.Context) {
 		Routine3At: time.Now(),
 	})
 
-	EndRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
+	endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
 }
 
-func EndRoutine3(isRunning *bool, queue *[]model.RepositoryPackageTypeFile) {
+func endRoutine3(isRunning *bool, queue *[]model.RepositoryPackageTypeFile) {
 	// todo sync ?
 	*queue = (*queue)[1:]
 	*isRunning = false

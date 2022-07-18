@@ -17,7 +17,7 @@ func RunPreroutine(queryContext *query.Context) {
 
 	if queryContext.Routine1PackageType != nil && newPackageType.ID == queryContext.Routine1PackageType.ID {
 		log.Println("Pre-routine => no change")
-		EndPreroutine(&queryContext.PreroutineRunning, &queryContext.PreroutineLastReload)
+		endPreroutine(&queryContext.PreroutineRunning, &queryContext.PreroutineLastReload)
 		return
 	}
 
@@ -39,12 +39,12 @@ func RunPreroutine(queryContext *query.Context) {
 		queryContext.DB.Order("routine1_at asc").Where("package_type_id = ? AND routine_error IS NULL AND routine3_at IS NULL", queryContext.Routine1PackageType.ID).Find(&queryContext.Routine3Queue)
 		log.Printf("%d items in queue3", len(*queryContext.Routine3Queue))
 
-		EndPreroutine(&queryContext.PreroutineRunning, &queryContext.PreroutineLastReload)
+		endPreroutine(&queryContext.PreroutineRunning, &queryContext.PreroutineLastReload)
 		return
 	}
 }
 
-func EndPreroutine(isRunning *bool, lastReload *time.Time) {
+func endPreroutine(isRunning *bool, lastReload *time.Time) {
 	*isRunning = false
 	*lastReload = time.Now()
 	log.Println("End pre-routine")

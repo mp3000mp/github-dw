@@ -49,7 +49,7 @@ func GetVersionRange(v string) VersionRange {
 	if len(rs) > 0 {
 		tmpVr := VersionRange{}
 		semver := Coerce(rs[2], true)
-		RangeGTE(semver, &tmpVr)
+		rangeGTE(semver, &tmpVr)
 		vr.MinMajor = tmpVr.MinMajor
 		vr.MinMinor = tmpVr.MinMinor
 		vr.MinPatch = tmpVr.MinPatch
@@ -58,7 +58,7 @@ func GetVersionRange(v string) VersionRange {
 		} else {
 			semver = Coerce(rs[3], false)
 		}
-		RangeLT(semver, &tmpVr)
+		rangeLT(semver, &tmpVr)
 		vr.MaxMajor = tmpVr.MaxMajor
 		vr.MaxMinor = tmpVr.MaxMinor
 		vr.MaxPatch = tmpVr.MaxPatch
@@ -117,17 +117,17 @@ func GetVersionRange(v string) VersionRange {
 	}
 
 	if rs[1] == ">" {
-		RangeGT(semver, &vr)
+		rangeGT(semver, &vr)
 	} else if rs[1] == ">=" {
-		RangeGTE(semver, &vr)
+		rangeGTE(semver, &vr)
 	} else if rs[1] == "<" {
-		RangeLT(semver, &vr)
+		rangeLT(semver, &vr)
 	} else if rs[1] == "<=" {
-		RangeLTE(semver, &vr)
+		rangeLTE(semver, &vr)
 	} else if rs[1] == "~" {
-		RangeTilde(semver, &vr)
+		rangeTilde(semver, &vr)
 	} else if rs[1] == "^" {
-		RangeCaret(semver, &vr)
+		rangeCaret(semver, &vr)
 	} else {
 		return vr
 	}
@@ -204,16 +204,7 @@ func Coerce(v string, patchMin bool) Semver {
 	return r
 }
 
-func RangeEq(semver Semver, vr *VersionRange) {
-	vr.MinMajor = semver.Major
-	vr.MinMinor = semver.Minor
-	vr.MinPatch = semver.Patch
-	vr.MaxMajor = semver.Major
-	vr.MaxMinor = semver.Minor
-	vr.MaxPatch = semver.Patch+1
-	vr.Valid = true
-}
-func RangeGT(semver Semver, vr *VersionRange) {
+func rangeGT(semver Semver, vr *VersionRange) {
 	vr.MinMajor = semver.Major
 	vr.MinMinor = semver.Minor
 	vr.MinPatch = semver.Patch+1
@@ -222,7 +213,7 @@ func RangeGT(semver Semver, vr *VersionRange) {
 	vr.MaxPatch = math.MaxUint16
 	vr.Valid = true
 }
-func RangeGTE(semver Semver, vr *VersionRange) {
+func rangeGTE(semver Semver, vr *VersionRange) {
 	vr.MinMajor = semver.Major
 	vr.MinMinor = semver.Minor
 	vr.MinPatch = semver.Patch
@@ -231,7 +222,7 @@ func RangeGTE(semver Semver, vr *VersionRange) {
 	vr.MaxPatch = math.MaxUint16
 	vr.Valid = true
 }
-func RangeLT(semver Semver, vr *VersionRange) {
+func rangeLT(semver Semver, vr *VersionRange) {
 	if semver.Major == 0 && semver.Minor == 0 && semver.Patch == 0 {
 		vr.Valid = false
  		return
@@ -244,7 +235,7 @@ func RangeLT(semver Semver, vr *VersionRange) {
 	vr.MaxPatch = semver.Patch
 	vr.Valid = true
 }
-func RangeLTE(semver Semver, vr *VersionRange) {
+func rangeLTE(semver Semver, vr *VersionRange) {
 	vr.MinMajor = 0
 	vr.MinMinor = 0
 	vr.MinPatch = 0
@@ -253,7 +244,7 @@ func RangeLTE(semver Semver, vr *VersionRange) {
 	vr.MaxPatch = semver.Patch+1
 	vr.Valid = true
 }
-func RangeTilde(semver Semver, vr *VersionRange) {
+func rangeTilde(semver Semver, vr *VersionRange) {
 	vr.MinMajor = semver.Major
 	vr.MinMinor = semver.Minor
 	vr.MinPatch = semver.Patch
@@ -262,7 +253,7 @@ func RangeTilde(semver Semver, vr *VersionRange) {
 	vr.MaxPatch = 0
 	vr.Valid = true
 }
-func RangeCaret(semver Semver, vr *VersionRange) {
+func rangeCaret(semver Semver, vr *VersionRange) {
 	vr.MinMajor = semver.Major
 	vr.MinMinor = semver.Minor
 	vr.MinPatch = semver.Patch

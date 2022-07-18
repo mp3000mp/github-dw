@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type ComposerJson struct {
+type composerJson struct {
 	Require map[string]string `json:"require"`
 	DevRequire map[string]string `json:"require-dev"`
 }
@@ -14,7 +14,7 @@ func ParseComposerJson(rawContent string) ([]Package, error) {
 	packages := make([]Package, 0)
 
 	// json decode
-	data := ComposerJson{}
+	data := composerJson{}
 	err := json.Unmarshal([]byte(rawContent), &data)
 	if (err != nil) {
 		return packages, err

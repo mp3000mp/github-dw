@@ -18,7 +18,7 @@ docker-compose up -d
 
 Dev tools are now accessible here:
 - Maildev: localhost:1080
-- Adminer: localhost:8080
+- Adminer: localhost:5001
 
 ## Prod
 
@@ -41,11 +41,12 @@ This hosting server needs the following requirements to deploy:
 Prod deployment include:
 - Deployment of code source
 - A mariadb server
+- Start of dw service
 
 You can easily deploy the application:
 - Step 1: Create your inventory file in deployment/ansible/inventory/hosts
 - Step 2: Create deployment/ansible/vars.yml file based on deployment/ansible/vars.example.yml
-- Step 4: Go to deployment/ansible and run the following command
+- Step 3: Go to deployment/ansible and run the following command
 
 ```
 ansible-playbook -i inventory/hosts site.yml

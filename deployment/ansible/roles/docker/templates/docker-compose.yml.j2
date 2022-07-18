@@ -15,22 +15,23 @@ services:
 
   dw:
     image: golang:1.18
-    command: /usr/src/app/main
+    command: ./main
+    working_dir: /usr/src/app
     volumes:
       - ../dw:/usr/src/app
     depends_on:
       - mariadb
 
-  backend:
-    build: backend
-    ports:
-      - "{{ back_proxy_port }}:80"
-    volumes:
-      - ../backend:/var/www/html
-      - ./backend/sites-enabled:/etc/apache2/sites-enabled
-      - ./backend/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
-    depends_on:
-      - mariadb
+#  backend:
+#    build: backend
+#    ports:
+#      - "{{ back_proxy_port }}:80"
+#    volumes:
+#      - ../backend:/var/www/html
+#      - ./backend/sites-enabled:/etc/apache2/sites-enabled
+#      - ./backend/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+#    depends_on:
+#      - mariadb
 
 #  adminer:
 #    image: adminer

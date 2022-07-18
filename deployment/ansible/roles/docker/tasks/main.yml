@@ -1,23 +1,23 @@
-- name: Create .env
+- name: Create .env and docker-compose.yml
   template:
-    src: templates/.env.j2
-    dest: "/{{ app_directory }}/docker/.env"
+    src: "templates/{{ item }}.j2"
+    dest: "/{{ app_directory }}/docker/{{ item }}"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '755'
+  loop:
+    - '.env'
+    - 'docker-compose.yml'
 
-- name: Create docker-compose.yml
-  template:
-    src: templates/docker-compose.yml.j2
-    dest: "/{{ app_directory }}/docker/docker-compose.yml"
+- name: Deploy files
+  copy:
+    src: '{{ playbook_dir }}/../docker/{{ item }}'
+    dest: "{{ app_directory }}/docker/"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '755'
-
-#- name: Docker compose down
-#  docker_compose:
-#    project_src: "{{ app_directory }}/docker"
-#    state: absent
+  loop:
+    - '.dockerignore'
 
 - name: Docker compose up
   docker_compose:
