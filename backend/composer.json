@@ -2,7 +2,7 @@
   "name": "mp3000mp/github-finder",
   "type": "project",
   "license": "MIT",
-  "description": "A skeleton to start a new Symfony website",
+  "description": "Backend of github finder",
   "minimum-stability": "stable",
   "prefer-stable": true,
   "require": {

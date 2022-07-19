@@ -1,5 +1,0 @@
-- name: Build binary
-  shell: go build -o bin/
-  args:
-    executable: /bin/bash
-    chdir: '{{ playbook_dir }}/../../dw/'

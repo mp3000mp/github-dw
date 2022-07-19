@@ -49,5 +49,6 @@ You can easily deploy the application:
 - Step 3: Go to deployment/ansible and run the following command
 
 ```
+./local_build.sh
 ansible-playbook -i inventory/hosts site.yml
 ```

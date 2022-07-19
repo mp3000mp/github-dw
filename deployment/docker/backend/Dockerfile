@@ -1,8 +1,8 @@
 FROM php:8.1-apache
 
 # install utilities
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl zip unzip locales apt-utils vim git libicu-dev software-properties-common;
+RUN apt update \
+    && apt install -y --no-install-recommends curl zip unzip locales apt-utils vim git libicu-dev software-properties-common;
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
     && echo "fr_FR.UTF-8 UTF-8" >> /etc/locale.gen \
@@ -23,8 +23,6 @@ RUN docker-php-ext-install iconv pdo_mysql intl \
 RUN mkdir -p /var/www/html/var \
     && mkdir -p /var/www/html/var/log /var/www/html/var/cache \
     && chmod -R 755 /var/www/html/var
-
-RUN ls /var/www/html/var
 
 # config apache
 RUN a2enmod rewrite \

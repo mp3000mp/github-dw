@@ -40,8 +40,6 @@ class HealthCheckCommand extends Command
             return Command::FAILURE;
         }
 
-        // todo check mailer
-
         $output->writeln('SUCCESS');
 
         return Command::SUCCESS;

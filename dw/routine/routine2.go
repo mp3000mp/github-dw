@@ -33,7 +33,7 @@ func RunRoutine2(queryContext *query.Context) {
 	}
 	languages := make([]model.RepositoryLanguage, 0)
 	for language, weight := range searchResult.Languages {
-		languages = append(languages, model.RepositoryLanguage{RepositoryID: repo.ID, Language: language, Weight: weight})
+		languages = append(languages, model.RepositoryLanguage{RepositoryID: repo.ID, Language: language, Weight: uint(weight)})
 	}
 
 	queryContext.DB.Model(&repo).Updates(model.Repository{

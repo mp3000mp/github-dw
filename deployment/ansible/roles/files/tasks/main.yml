@@ -15,6 +15,5 @@
     - "{{ app_directory }}/backend"
     - "{{ app_directory }}/docker"
 
-- include: docker.yml
 #- include: backend.yml
 #- include: frontend.yml

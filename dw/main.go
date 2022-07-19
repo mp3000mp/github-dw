@@ -78,7 +78,7 @@ func main() {
 		// we donot want to run preroutine to often
 		if time.Until(queryContext.PreroutineLastReload.Add(tickReload)).Milliseconds() < 0 {
 			routine.RunPreroutine(&queryContext)
-			log.Printf("Memory used: %d\n", system.GetUsedMem())
+			log.Printf("Memory used: %dMo\n", system.GetUsedMem())
 		}
 
 		// todo gérer rate limiter

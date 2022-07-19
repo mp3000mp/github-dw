@@ -16,7 +16,7 @@ type Context struct {
 	DB *gorm.DB
 	PreroutineLastReload time.Time
 	PreroutineRunning bool
-	Routine1PackageType *model.PackageType
+	Routine1PackageType *model.PackageTypeFile
 	Routine1Running bool
 	Routine2Queue *[]model.Repository
 	Routine2Running bool

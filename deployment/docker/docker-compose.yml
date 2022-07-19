@@ -1,5 +1,7 @@
 version: '3'
 
+# this config is for DEV use only
+
 services:
   mariadb:
     image: mariadb:10.4
@@ -27,7 +29,6 @@ services:
 
   dw:
     image: golang:1.18
-    # command: ./main
     command: go run main.go
     working_dir: /usr/src/app
     volumes:

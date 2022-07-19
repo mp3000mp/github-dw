@@ -1,3 +1,19 @@
+# todo build and host images
+- name: Deploy directories
+  synchronize:
+    delete: true
+    src: '{{ playbook_dir }}/../docker/{{ item }}'
+    dest: "{{ app_directory }}/docker/"
+    recursive: true
+    rsync_opts:
+      - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
+      - '--chmod=0755'
+      - '--exclude=db'
+  loop:
+    - 'backend'
+    - 'mariadb'
+    - 'dw'
+
 - name: Create .env and docker-compose.yml
   template:
     src: "templates/{{ item }}.j2"

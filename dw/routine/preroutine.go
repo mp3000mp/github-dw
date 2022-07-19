@@ -10,7 +10,7 @@ import (
 
 func RunPreroutine(queryContext *query.Context) {
 	queryContext.PreroutineRunning = true
-	newPackageType := model.PackageType{}
+	newPackageType := model.PackageTypeFile{}
 	log.Println("Start pre-routine")
 
 	queryContext.DB.Order("priority desc, updated_at asc").First(&newPackageType)
@@ -29,7 +29,7 @@ func RunPreroutine(queryContext *query.Context) {
 		}
 
 		queryContext.Routine1PackageType = &newPackageType
-		log.Printf("Working on packageType '%s' file '%s'", queryContext.Routine1PackageType.Name, queryContext.Routine1PackageType.File)
+		log.Printf("Working on package type file '%s' file '%s'", queryContext.Routine1PackageType.Name, queryContext.Routine1PackageType.File)
 
 		log.Println("Loading queue for routine 2...")
 		queryContext.DB.Order("routine1_at asc").Where("routine_error IS NULL AND routine2_at IS NULL").Find(&queryContext.Routine2Queue)
