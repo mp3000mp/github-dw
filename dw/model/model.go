@@ -46,14 +46,14 @@ type PackageTypeFile struct {
 	GithubCurrentSize uint32                               `gorm:"default:100;not null"`
 	GithubCurrentPage uint32                               `gorm:"default:1;not null"`
 	UpdatedAt time.Time                                    `gorm:"type:DATETIME(0);not null"`
-	Priority bool                                          `gorm:"default:false"`
+	Priority bool                                          `gorm:"default:false;not null"`
 	RepositoryPackageTypeFiles []RepositoryPackageTypeFile `gorm:"constraint:OnUpdate:CASCADE"`
 }
 
 type RepositoryPackageTypeFile struct {
 	ID uint                                `gorm:"primaryKey"`
 	RepositoryID uint                      `gorm:"not null"`
-	PackageTypeID uint 	                   `gorm:"not null"`
+	PackageTypeFileID uint 	               `gorm:"not null"`
 	Path string                            `gorm:"size:255;not null"`
 	RoutineError string                    `gorm:"size:255"`
 	SHA string                             `gorm:"size:100;not null"`
@@ -74,6 +74,7 @@ type RepositoryPackage struct {
 
 func getNamingStrategy() schema.NamingStrategy {
 	return schema.NamingStrategy{
+		TablePrefix: "dw_",
 		SingularTable: true,
 	}
 }

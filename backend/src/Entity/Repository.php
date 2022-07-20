@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RepositoryRepository")
+ * @ORM\Table(name="dw_repository")
  * @UniqueEntity(fields="url", message="This url is not available")
  */
 class Repository

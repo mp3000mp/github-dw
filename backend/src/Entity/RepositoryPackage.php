@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RepositoryPackageRepository")
+ * @ORM\Table(name="dw_repository_package")
  */
 class RepositoryPackage
 {

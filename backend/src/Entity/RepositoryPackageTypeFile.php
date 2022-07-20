@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ * @ORM\Table(name="dw_repository_package_type_file")
  */
 class RepositoryPackageTypeFile
 {

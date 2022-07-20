@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
+ * @ORM\Table(name="dw_repository_language")
  */
 class RepositoryLanguage
 {

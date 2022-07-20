@@ -36,7 +36,7 @@ func RunPreroutine(queryContext *query.Context) {
 		log.Printf("%d items in queue2", len(*queryContext.Routine2Queue))
 
 		log.Println("Loading queue for routine 3...")
-		queryContext.DB.Order("routine1_at asc").Where("package_type_id = ? AND routine_error IS NULL AND routine3_at IS NULL", queryContext.Routine1PackageType.ID).Find(&queryContext.Routine3Queue)
+		queryContext.DB.Order("routine1_at asc").Where("package_type_file_id = ? AND routine_error IS NULL AND routine3_at IS NULL", queryContext.Routine1PackageType.ID).Find(&queryContext.Routine3Queue)
 		log.Printf("%d items in queue3", len(*queryContext.Routine3Queue))
 
 		endPreroutine(&queryContext.PreroutineRunning, &queryContext.PreroutineLastReload)

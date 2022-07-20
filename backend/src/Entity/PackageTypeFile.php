@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PackageTypeFileRepository")
+ * @ORM\Table(name="dw_package_type_file")
  * @UniqueEntity(fields="file", message="This file is not available")
  */
 class PackageTypeFile

@@ -44,7 +44,7 @@ func RunRoutine3(queryContext *query.Context) {
 //	} else if queryContext.Routine1PackageType.File == "setup.py" {
 //		packages, err = parser.ParseSetupPy(blob.Content)
 	} else {
-		err = fmt.Errorf("Package file %s is not supported", queryContext.Routine1PackageType.File)
+		err = fmt.Errorf("Routine 3 => Package file %s is not supported", queryContext.Routine1PackageType.File)
 	}
 	if err != nil {
 		msg := fmt.Sprintf("Routine 3 => Error while parsing package file: %s", err.Error())
