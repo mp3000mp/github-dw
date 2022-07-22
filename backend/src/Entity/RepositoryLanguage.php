@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -14,7 +13,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class RepositoryLanguage
 {
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -42,4 +40,38 @@ class RepositoryLanguage
      */
     private Repository $repository;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(string $language): void
+    {
+        $this->language = $language;
+    }
+
+    public function getWeight(): int
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(int $weight): void
+    {
+        $this->weight = $weight;
+    }
+
+    public function getRepository(): Repository
+    {
+        return $this->repository;
+    }
+
+    public function setRepository(Repository $repository): void
+    {
+        $this->repository = $repository;
+    }
 }

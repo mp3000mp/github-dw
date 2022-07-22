@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -35,4 +34,28 @@ class RepositoryTopic
      */
     private Repository $repository;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTopic(): string
+    {
+        return $this->topic;
+    }
+
+    public function setTopic(string $topic): void
+    {
+        $this->topic = $topic;
+    }
+
+    public function getRepository(): Repository
+    {
+        return $this->repository;
+    }
+
+    public function setRepository(Repository $repository): void
+    {
+        $this->repository = $repository;
+    }
 }

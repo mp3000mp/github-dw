@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -82,4 +81,108 @@ class RepositoryPackage
      */
     private RepositoryPackageTypeFile $repositoryPackageTypeFile;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getVersionStr(): string
+    {
+        return $this->versionStr;
+    }
+
+    public function setVersionStr(string $versionStr): void
+    {
+        $this->versionStr = $versionStr;
+    }
+
+    public function getVersionMinMajor(): int
+    {
+        return $this->versionMinMajor;
+    }
+
+    public function setVersionMinMajor(int $versionMinMajor): void
+    {
+        $this->versionMinMajor = $versionMinMajor;
+    }
+
+    public function getVersionMinMinor(): int
+    {
+        return $this->versionMinMinor;
+    }
+
+    public function setVersionMinMinor(int $versionMinMinor): void
+    {
+        $this->versionMinMinor = $versionMinMinor;
+    }
+
+    public function getVersionMinPatch(): int
+    {
+        return $this->versionMinPatch;
+    }
+
+    public function setVersionMinPatch(int $versionMinPatch): void
+    {
+        $this->versionMinPatch = $versionMinPatch;
+    }
+
+    public function getVersionMaxMajor(): int
+    {
+        return $this->versionMaxMajor;
+    }
+
+    public function setVersionMaxMajor(int $versionMaxMajor): void
+    {
+        $this->versionMaxMajor = $versionMaxMajor;
+    }
+
+    public function getVersionMaxMinor(): int
+    {
+        return $this->versionMaxMinor;
+    }
+
+    public function setVersionMaxMinor(int $versionMaxMinor): void
+    {
+        $this->versionMaxMinor = $versionMaxMinor;
+    }
+
+    public function getVersionMaxPatch(): int
+    {
+        return $this->versionMaxPatch;
+    }
+
+    public function setVersionMaxPatch(int $versionMaxPatch): void
+    {
+        $this->versionMaxPatch = $versionMaxPatch;
+    }
+
+    public function isValid(): bool
+    {
+        return $this->valid;
+    }
+
+    public function setValid(bool $valid): void
+    {
+        $this->valid = $valid;
+    }
+
+    public function getRepositoryPackageTypeFile(): RepositoryPackageTypeFile
+    {
+        return $this->repositoryPackageTypeFile;
+    }
+
+    public function setRepositoryPackageTypeFile(RepositoryPackageTypeFile $repositoryPackageTypeFile): void
+    {
+        $this->repositoryPackageTypeFile = $repositoryPackageTypeFile;
+    }
 }

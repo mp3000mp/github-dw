@@ -16,7 +16,6 @@
     recurse: true
   loop:
     - 'config/jwt'
-    - 'documents'
 
 # todo 777 horrible
 - name: Create directories writable
@@ -30,9 +29,6 @@
   loop:
     - 'var/log'
     - 'var/cache'
-    - 'documents/todo'
-    - 'documents/documents'
-    - 'documents/error'
 
 - name: Create jwt private rsa keys
   openssl_privatekey:
@@ -62,6 +58,7 @@
     cmd: docker-compose exec backend bash -l -c "php bin/console cache:clear"
     chdir: "{{ app_directory }}/docker"
 
+# todo access denied on volume ?
 - name: Composer migration
   shell:
     cmd: docker-compose exec backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"

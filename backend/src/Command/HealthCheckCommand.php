@@ -34,7 +34,7 @@ class HealthCheckCommand extends Command
         $q = $this->em->createNativeQuery('SELECT 1+1 AS s', $rsm);
 
         $r = $q->getSingleScalarResult();
-        if ($r !== 2) {
+        if (2 !== $r) {
             $output->writeln('FAILED');
 
             return Command::FAILURE;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -72,6 +73,107 @@ class PackageTypeFile
      *
      * @ORM\OneToMany(targetEntity="RepositoryPackageTypeFile", mappedBy="packageTypeFile")
      */
-    private Collection $packageTypeFiles;
+    private Collection $repositoryPackageTypeFiles;
 
+    public function __construct()
+    {
+        $this->repositoryPackageTypeFiles = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getFile(): string
+    {
+        return $this->file;
+    }
+
+    public function setFile(string $file): void
+    {
+        $this->file = $file;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(string $language): void
+    {
+        $this->language = $language;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getGithubCurrentSize(): int
+    {
+        return $this->githubCurrentSize;
+    }
+
+    public function setGithubCurrentSize(int $githubCurrentSize): void
+    {
+        $this->githubCurrentSize = $githubCurrentSize;
+    }
+
+    public function getGithubCurrentPage(): int
+    {
+        return $this->githubCurrentPage;
+    }
+
+    public function setGithubCurrentPage(int $githubCurrentPage): void
+    {
+        $this->githubCurrentPage = $githubCurrentPage;
+    }
+
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function isPriority(): bool
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(bool $priority): void
+    {
+        $this->priority = $priority;
+    }
+
+    /**
+     * @return Collection<int, RepositoryPackageTypeFile>
+     */
+    public function getRepositoryPackageTypeFiles(): Collection
+    {
+        return $this->repositoryPackageTypeFiles;
+    }
+
+    public function addPackageTypeFile(RepositoryPackageTypeFile $packageTypeFile): void
+    {
+        if (!$this->repositoryPackageTypeFiles->contains($packageTypeFile)) {
+            $this->repositoryPackageTypeFiles->add($packageTypeFile);
+        }
+    }
+
+    public function removePackageTypeFile(RepositoryPackageTypeFile $packageTypeFile): void
+    {
+        if ($this->repositoryPackageTypeFiles->contains($packageTypeFile)) {
+            $this->repositoryPackageTypeFiles->removeElement($packageTypeFile);
+        }
+    }
 }

@@ -4,18 +4,23 @@ namespace App\Command;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+#[AsCommand(
+    name: 'app:user:create',
+    description: 'Create new user.'
+)]
 class CreateUserCommand extends Command
 {
     protected EntityManagerInterface $em;
     protected UserPasswordHasherInterface $passwordHasher;
-    protected static $defaultName = 'app:user:create';
 
     public function __construct(EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher)
     {
@@ -26,16 +31,19 @@ class CreateUserCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Create new user.');
         $this->setHelp('This command creates a new user.');
         $this->addArgument('username', InputArgument::REQUIRED, 'Username');
         $this->addArgument('email', InputArgument::REQUIRED, 'Email');
-        $this->addArgument('password', InputArgument::REQUIRED, 'Password');
         $this->addOption('is-admin', 'a', InputOption::VALUE_NONE, 'Is admin');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $helper = $this->getHelper('question');
+        $question = new Question('Enter password:');
+        $question->setHidden(true);
+        $password = $helper->ask($input, $output, $question);
+
         $output->writeln(['Creating user '.$input->getArgument('username')]);
 
         $roles = ['ROLE_USER'];
@@ -49,7 +57,7 @@ class CreateUserCommand extends Command
         $user->setEmail($input->getArgument('email'));
         $user->setPasswordUpdatedAt(new \DateTime());
         $user->setRoles($roles);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $input->getArgument('password')));
+        $user->setPassword($this->passwordHasher->hashPassword($user, $password));
 
         $this->em->persist($user);
         $this->em->flush();
