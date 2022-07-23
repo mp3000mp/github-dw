@@ -1,6 +1,7 @@
 app_directory: /var/www/app
 maintainer_user: user1
 
+mysql_version: 10.6.8
 mysql_root_password: root_pwd
 mysql_database: template_sf
 mysql_user: user
@@ -12,12 +13,6 @@ dw_version: 1.0.0
 back_server_name: template-back.mp3000.fr
 front_server_name: template.mp3000.fr
 back_proxy_port: 5000
-admin_email: mperret@mp3000.fr
-
-mailer_dsn: smtp://maildev:1025?verify_peer=false
-mailer_sender: "mp3000 admin"
-mailer_from: no-reply@mp3000.fr
-mailer_bcc: admin@mp3000.fr
 
 app_version: 1.0.0
 app_secret: secret

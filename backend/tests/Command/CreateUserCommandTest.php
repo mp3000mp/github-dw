@@ -14,11 +14,11 @@ class CreateUserCommandTest extends AbstractCommandTest
         $commandName = 'app:user:create';
         $commandTester = $this->getCommandTester($commandName);
 
+        $commandTester->setInputs(['Test2000!']);
         $commandTester->execute([
             'command' => $commandName,
             'username' => 'test',
             'email' => 'test@mp3000.fr',
-            'password' => 'Test2000!',
             '--is-admin' => $isAdmin,
         ]);
 

@@ -6,54 +6,52 @@ use App\Entity\User;
 
 class UserControllerTest extends AbstractControllerTest
 {
-    private function getUserId(string $username): int
-    {
-        return $this->em->getRepository(User::class)->findOneBy(['username' => $username])->getId();
-    }
-
     public function testIndexOk(): void
     {
-        $this->loginUser($this->client, 'ROLE_ADMIN');
+        $this->loginUser($this->client);
 
         $this->client->request('GET', '/api/users');
-
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'user']);
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
-        self::assertCount(3, $jsonResponse);
+        self::assertCount(1, $jsonResponse);
         self::assertEquals([
             'id' => $user->getId(),
             'email' => $user->getEmail(),
             'username' => $user->getUsername(),
             'isEnabled' => $user->getIsEnabled(),
             'roles' => $user->getRoles(),
+            'isSuperAdmin' => $user->getIsSuperAdmin(),
         ], $jsonResponse[0]);
     }
 
     public function testShowOk(): void
     {
-        $this->loginUser($this->client, 'ROLE_ADMIN');
+        $this->loginUser($this->client);
 
-        $id = $this->getUserId('user');
-        $this->client->request('GET', "/api/users/$id");
+        $user = $this->getUser('admin');
+        $this->client->request('GET', sprintf('/api/users/%s', $user->getId()));
 
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
 
-        self::assertEquals('user', $jsonResponse['username']);
+        self::assertEquals('admin', $jsonResponse['username']);
     }
 
     public function testRoles(): void
     {
-        $this->loginUser($this->client);
-
-        $id = $this->getUserId('user');
+        $user = $this->getUser('admin');
 
         $this->client->request('GET', '/api/users');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
-        $this->client->request('GET', "/api/users/$id");
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseCode(401);
+        $this->client->request('GET', sprintf('/api/users/%s', $user->getId()));
+        $this->assertResponseCode(401);
+    }
+
+    private function getUser(string $username): User
+    {
+        return $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
     }
 }

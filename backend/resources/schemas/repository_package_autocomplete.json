@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "repository_package_autocomplete",
+  "description": "repository_package_autocomplete",
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "enum": ["PHP", "Javascript", "Go", "Python"]
+    },
+    "text": {
+      "type": "string",
+      "pattern": "^[^\\s]{3,}$"
+    }
+  },
+  "required": ["language", "text"],
+  "additionalProperties": false
+}

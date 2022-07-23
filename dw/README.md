@@ -13,8 +13,9 @@ Uses github API to create a datawarehouse
     golangci-lint run
     go test ./...
 
-
 # Dev
+
+    go run main.go migrate
 
     cd deployment/docker
     docker-compose run --rm dw 

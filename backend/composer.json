@@ -10,6 +10,7 @@
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
+    "ext-openssl": "*",
     "ext-pdo": "*",
     "doctrine/annotations": "^1.0",
     "doctrine/doctrine-bundle": "^2.7",

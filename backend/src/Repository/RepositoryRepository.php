@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @method Repository|null find($id, $lockMode = null, $lockVersion = null)
@@ -23,5 +24,22 @@ class RepositoryRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Repository::class);
+    }
+
+    #[ArrayShape([
+        'error' => 'string',
+        'date' => \DateTime::class,
+        'url' => 'string',
+    ])]
+    public function findErrors(\DateTime $from): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select(['r.routineError as error', 'r.routine2At as date', 'r.url'])
+            ->where('r.routineError IS NOT NULL')
+            ->andWhere('r.routineError >= :from')
+            ->setParameter('from', $from)
+            ->orderBy('r.routine2At', 'desc')
+            ->getQuery()
+            ->getArrayResult();
     }
 }

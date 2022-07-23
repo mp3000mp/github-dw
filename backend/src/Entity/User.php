@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -12,73 +13,52 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Class User.
- *
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @UniqueEntity(fields="email", message="This email is not available")
- * @UniqueEntity(fields="username", message="This username is not available")
- */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: 'email', message: 'This email is not available')]
+#[UniqueEntity(fields: 'username', message: 'This username is not available')]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     * @Groups({"admin"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['admin'])]
     private ?int $id = null;
 
-    /**
-     * @Assert\Email()
-     * @Assert\NotBlank()
-     * @ORM\Column(type="string", length=100, unique=true)
-     * @Groups({"admin"})
-     */
+    #[Assert\Email]
+    #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 100, unique: true)]
+    #[Groups(['admin'])]
     private string $email;
 
-    /**
-     * @Assert\NotBlank()
-     * @ORM\Column(type="string", length=55, unique=true)
-     * @Groups({"admin", "me"})
-     */
+    #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 55, unique: true)]
+    #[Groups(['admin', 'me'])]
     private string $username;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[Assert\Email]
+    #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $password;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?DateTime $password_updated_at;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $reset_password_token;
 
-    /**
-     * @ORM\Column(type="datetime", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?DateTime $reset_password_at;
 
-    /**
-     * @ORM\Column(type="boolean")
-     * @Groups({"admin"})
-     */
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['admin'])]
     private bool $isEnabled = false;
 
-    /**
-     * @ORM\Column(type="json", nullable=false)
-     * @Groups({"me", "admin"})
-     */
+    #[ORM\Column(type: 'json')]
+    #[Groups(['admin', 'me'])]
     private array $roles = [];
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['admin'])]
     private bool $isSuperAdmin = false;
 
     public function getId(): ?int

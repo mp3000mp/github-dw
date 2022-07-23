@@ -13,10 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(
-    name: 'app:user:create',
-    description: 'Create new user.'
-)]
+#[AsCommand(name: 'app:user:create', description: 'Create new user.')]
 class CreateUserCommand extends Command
 {
     protected EntityManagerInterface $em;

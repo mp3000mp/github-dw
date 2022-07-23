@@ -38,7 +38,7 @@ class JsonRequestHelper
      * @param ?class-string<T> $class
      * @param T|null           $entity
      *
-     * @return T|bool
+     * @return T|\stdClass
      */
     public function handleRequest($rawData, string $schema, ?string $class = null, $entity = null)
     {
@@ -60,7 +60,7 @@ class JsonRequestHelper
         }
 
         if (null === $class) {
-            return true;
+            return $jsonData;
         }
 
         // entity validation

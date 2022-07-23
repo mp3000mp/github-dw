@@ -34,9 +34,14 @@ func main() {
 	if err != nil {
  		panic("Error while connecting to database")
 	}
-	err = model.InitDatabase(queryContext.DB)
-	if err != nil {
- 		panic(fmt.Sprintf("Error while initializing database: %s", err.Error()))
+
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		err = model.InitDatabase(queryContext.DB)
+		if err != nil {
+			panic(fmt.Sprintf("Error while initializing database: %s", err.Error()))
+		}
+		fmt.Println("SUCCESS")
+		return
 	}
 
 	ctx := context.Background()

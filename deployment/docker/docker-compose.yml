@@ -4,7 +4,7 @@ version: '3'
 
 services:
   mariadb:
-    image: mariadb:10.4
+    image: mariadb:10.6
     environment:
       MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
       MYSQL_DATABASE: "$MYSQL_DATABASE"
@@ -16,10 +16,10 @@ services:
       - ./mariadb/log:/var/log/mysql
 
   mariadb_test:
-    image: mariadb:10.4
+    image: mariadb:10.6
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: media_scrapper_test
+      MYSQL_DATABASE: github_finder_test
       MYSQL_USER: user1
       MYSQL_PASSWORD: password1
     volumes:
@@ -30,6 +30,7 @@ services:
   dw:
     image: golang:1.18
     command: go run main.go
+    # command: go run main.go migrate
     working_dir: /usr/src/app
     volumes:
       - ../../dw:/usr/src/app
@@ -53,6 +54,8 @@ services:
       - '5001:8080'
     depends_on:
       - mariadb
+      - mariadb_test
+      - backend
 
   maildev:
     image: maildev/maildev

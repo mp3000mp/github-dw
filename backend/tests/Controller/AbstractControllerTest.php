@@ -11,12 +11,19 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractControllerTest extends WebTestCase
 {
     use TestUtilsTrait;
+
     private array $userByRole = [
         'ROLE_USER' => 'user',
         'ROLE_ADMIN' => 'admin',
     ];
-
     protected KernelBrowser $client;
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->terminateTest();
+    }
 
     protected function setUp(): void
     {
@@ -29,32 +36,42 @@ abstract class AbstractControllerTest extends WebTestCase
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function assertResponseCode(int $expectedCode): void
     {
-        parent::tearDown();
+        $responseCode = $this->client->getResponse()->getStatusCode();
 
-        $this->terminateTest();
+        if ($expectedCode === $responseCode) {
+            self::assertEquals($expectedCode, $responseCode);
+
+            return;
+        }
+
+        $responseContent = $this->client->getResponse()->getContent();
+        $responseJson = json_decode($responseContent, true);
+        if (null === $responseJson) {
+            echo "Response: $responseContent";
+            self::assertEquals($expectedCode, $responseCode);
+
+            return;
+        }
+
+        dump($responseJson);
+        self::assertEquals($expectedCode, $responseCode);
     }
 
-    protected function loginUser(KernelBrowser $client, string $role = 'ROLE_USER'): void
+    protected function loginUser(KernelBrowser $client, string $role = 'ROLE_ADMIN'): void
     {
         $userRepository = $this->em->getRepository(User::class);
-        // $userRepository = static::$container->get(UserRepository::class);
         $testUser = $userRepository->findOneBy(['username' => $this->userByRole[$role]]);
-        $client->request(
-            'POST',
-            '/api/logincheck',
-            [],
-            [],
-            [],
-            json_encode([
-                'username' => $testUser->getUsername(),
-                'password' => 'Test2000!',
-            ])
-        );
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $credentials = [
+            'username' => $testUser->getUsername(),
+            'password' => 'Test2000!',
+        ];
+        $client->request('POST', '/api/login', [], [], [], json_encode($credentials));
+        $this->assertResponseCode(200);
 
-        $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+        //$data = json_decode($client->getResponse()->getContent(), true);
+        //$client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
     }
 
     protected function getResponseJson(Response $response): array

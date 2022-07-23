@@ -20,7 +20,7 @@ trait TestUtilsTrait
             ->getManager();
 
         // reset database
-        $purger = new ORMPurger($this->em, ['media_type']);
+        $purger = new ORMPurger($this->em, []);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
         $loader = new ContainerAwareLoader(self::getContainer());
         $loader->addFixture(new AppFixtures());

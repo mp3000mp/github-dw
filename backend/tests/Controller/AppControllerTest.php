@@ -7,8 +7,7 @@ class AppControllerTest extends AbstractControllerTest
     public function testInfo(): void
     {
         $this->client->request('GET', '/api/info');
-
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
 
         self::assertArrayHasKey('version', $jsonResponse);
@@ -19,13 +18,12 @@ class AppControllerTest extends AbstractControllerTest
         $this->loginUser($this->client);
 
         $this->client->request('GET', '/api/me');
-
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
 
         self::assertEquals([
-            'username' => 'user',
-            'roles' => ['ROLE_USER'],
+            'username' => 'admin',
+            'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
         ], $jsonResponse);
     }
 }

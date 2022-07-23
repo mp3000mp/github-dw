@@ -10,6 +10,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 abstract class AbstractCommandTest extends KernelTestCase
 {
     use TestUtilsTrait;
+
     protected Application $application;
 
     protected function setUp(): void

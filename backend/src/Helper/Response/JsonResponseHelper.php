@@ -20,7 +20,7 @@ class JsonResponseHelper
      * @param mixed    $entity
      * @param string[] $serializationGroups
      */
-    public function createResponse($entity, array $serializationGroups, int $status): Response
+    public function createResponse($entity, array $serializationGroups, int $status = 200): Response
     {
         return new Response(
             $this->serializer->serialize($entity, 'json', ['groups' => $serializationGroups]),

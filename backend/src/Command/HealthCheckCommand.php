@@ -4,19 +4,20 @@ namespace App\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'app:health-check', description: 'Create new user.')]
 class HealthCheckCommand extends Command
 {
-    protected static $defaultName = 'app:health-check';
     private EntityManagerInterface $em;
 
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
-        parent::__construct(self::$defaultName);
+        parent::__construct();
     }
 
     protected function configure(): void

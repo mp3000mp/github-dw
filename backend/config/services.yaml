@@ -6,7 +6,7 @@
 parameters:
     APP_ENV: '%env(APP_ENV)%'
     APP_VERSION: '%env(APP_VERSION)%'
-    PATH_SCHEMAS: '%kernel.project_dir%/src/schemas/'
+    PATH_SCHEMAS: '%kernel.project_dir%/resources/schemas/'
 
 services:
     # default configuration for services in *this* file
