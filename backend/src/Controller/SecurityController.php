@@ -22,7 +22,7 @@ class SecurityController extends AbstractController
     {
         return $this->json([
             'error' => $authenticationUtils->getLastAuthenticationError(),
-            'lastUsername' =>  $authenticationUtils->getLastUsername(),
+            'lastUsername' => $authenticationUtils->getLastUsername(),
         ], Response::HTTP_UNAUTHORIZED);
     }
 }

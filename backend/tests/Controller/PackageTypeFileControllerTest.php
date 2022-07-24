@@ -3,7 +3,6 @@
 namespace App\Tests\Controller;
 
 use App\Entity\PackageTypeFile;
-use App\Entity\User;
 
 class PackageTypeFileControllerTest extends AbstractControllerTest
 {
@@ -11,7 +10,7 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
     {
         $this->client->request('GET', '/api/package-type-file');
         $this->assertResponseCode(401);
-        $pft = $this->getPackageTypeFile('composer.json');
+        $pft = $this->getPackageTypeByFile('composer.json');
         $this->client->request('PUT', '/api/package-type-file/'.$pft->getId().'/priority');
         $this->assertResponseCode(401);
     }
@@ -30,7 +29,7 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
     {
         $this->loginUser($this->client);
 
-        $pft = $this->getPackageTypeFile('package.json');
+        $pft = $this->getPackageTypeByFile('package.json');
         $this->client->request('PUT', '/api/package-type-file/'.$pft->getId().'/priority');
         $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
@@ -39,7 +38,7 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
         self::assertEquals(true, $jsonResponse[1]['priority']);
     }
 
-    private function getPackageTypeFile(string $file): PackageTypeFile
+    private function getPackageTypeByFile(string $file): PackageTypeFile
     {
         return $this->em->getRepository(PackageTypeFile::class)->findOneBy(['file' => $file]);
     }

@@ -70,8 +70,8 @@ abstract class AbstractControllerTest extends WebTestCase
         $client->request('POST', '/api/login', [], [], [], json_encode($credentials));
         $this->assertResponseCode(200);
 
-        //$data = json_decode($client->getResponse()->getContent(), true);
-        //$client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+        // $data = json_decode($client->getResponse()->getContent(), true);
+        // $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
     }
 
     protected function getResponseJson(Response $response): array

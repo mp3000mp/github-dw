@@ -31,7 +31,7 @@ class UserControllerTest extends AbstractControllerTest
     {
         $this->loginUser($this->client);
 
-        $user = $this->getUser('admin');
+        $user = $this->getUserByUsername('admin');
         $this->client->request('GET', sprintf('/api/users/%s', $user->getId()));
 
         $this->assertResponseCode(200);
@@ -42,7 +42,7 @@ class UserControllerTest extends AbstractControllerTest
 
     public function testRoles(): void
     {
-        $user = $this->getUser('admin');
+        $user = $this->getUserByUsername('admin');
 
         $this->client->request('GET', '/api/users');
         $this->assertResponseCode(401);
@@ -50,7 +50,7 @@ class UserControllerTest extends AbstractControllerTest
         $this->assertResponseCode(401);
     }
 
-    private function getUser(string $username): User
+    private function getUserByUsername(string $username): User
     {
         return $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
     }

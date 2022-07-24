@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "repository_package_search",
+  "description": "repository_package_search",
+  "type": "object",
+  "properties": {
+    "page": {"type":  "integer"},
+    "search": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": ["string", "null"]
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "minVersion": {
+                "type": ["string", "null"],
+                "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$"
+              },
+              "maxVersion": {
+                "type": ["string", "null"],
+                "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$"
+              }
+            },
+            "required": ["id", "minVersion", "maxVersion"]
+          },
+          "maxItems": 5
+        }
+      },
+      "required": ["name", "description", "packages"]
+    }
+  },
+  "required": ["page", "search"],
+  "additionalProperties": false
+}

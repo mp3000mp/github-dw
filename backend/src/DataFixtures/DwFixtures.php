@@ -40,6 +40,7 @@ class DwFixtures extends Fixture
         $repoA->setUsername('usernameA');
         $repoA->setUrl('https://a.github.com');
         $repoA->setRoutine1At(new \DateTime('2022-07-22 02:00:00'));
+        $repoA->setRoutine2At(new \DateTime('2022-07-22 02:30:00'));
         $manager->persist($repoA);
 
         $repoB = new Repository();
@@ -47,6 +48,7 @@ class DwFixtures extends Fixture
         $repoB->setUsername('usernameB');
         $repoB->setUrl('https://b.github.com');
         $repoB->setRoutine1At(new \DateTime('2022-07-22 04:00:00'));
+        $repoA->setRoutine2At(new \DateTime('2022-07-22 04:30:00'));
         $manager->persist($repoB);
 
         $repoPackageTypeFile = new RepositoryPackageTypeFile();

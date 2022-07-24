@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,9 +35,10 @@ class AppController extends AbstractController
         $err = $request->get('exception');
 
         $msg = $err->getMessage();
-        //$msg = 'Server error.';
+        // $msg = 'Server error.';
         $statusCode = 500;
         if (method_exists($err, 'getStatusCode')) {
+            /** @phpstan-ignore-next-line */
             $msg = $err->getMessage();
             $statusCode = $err->getStatusCode();
         }
