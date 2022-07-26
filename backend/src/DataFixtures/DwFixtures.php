@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Package;
 use App\Entity\PackageTypeFile;
 use App\Entity\Repository;
 use App\Entity\RepositoryPackage;
@@ -13,87 +14,152 @@ use Doctrine\Persistence\ObjectManager;
 
 class DwFixtures extends Fixture
 {
+    /** @var PackageTypeFile[] */
+    private array $packageTypeFiles;
+    /** @var Repository[] */
+    private array $repositories;
+    /** @var RepositoryPackageTypeFile[] */
+    private array $repositoryPackageTypeFiles;
+    /** @var Package[] */
+    private array $packages;
+    /** @var RepositoryPackage[] */
+    /** @phpstan-ignore-next-line */
+    private array $repositoryPackages;
+
+    private ObjectManager $em;
+
     public function load(ObjectManager $manager): void
     {
-        $packagePhp = new PackageTypeFile();
-        $packagePhp->setName('composer');
-        $packagePhp->setLanguage('PHP');
-        $packagePhp->setFile('composer.json');
-        $packagePhp->setGithubCurrentSize(100);
-        $packagePhp->setGithubCurrentPage(4);
-        $packagePhp->setPriority(true);
-        $packagePhp->setUpdatedAt(new \DateTime('2022-07-22 00:00:00'));
-        $manager->persist($packagePhp);
+        $this->em = $manager;
+        $this->packageTypeFiles = [];
+        $this->repositories = [];
+        $this->repositoryPackageTypeFiles = [];
+        $this->packages = [];
+        $this->repositoryPackages = [];
 
-        $packageJs = new PackageTypeFile();
-        $packageJs->setName('npm');
-        $packageJs->setLanguage('Javascript');
-        $packageJs->setFile('package.json');
-        $packageJs->setGithubCurrentSize(100);
-        $packageJs->setGithubCurrentPage(1);
-        $packageJs->setPriority(false);
-        $packageJs->setUpdatedAt(new \DateTime('2022-07-22 00:00:00'));
-        $manager->persist($packageJs);
+        // routine1
+        $this->packageTypeFiles['PHP'] = new PackageTypeFile();
+        $this->packageTypeFiles['PHP']->setName('composer');
+        $this->packageTypeFiles['PHP']->setLanguage('PHP');
+        $this->packageTypeFiles['PHP']->setFile('composer.json');
+        $this->packageTypeFiles['PHP']->setGithubCurrentSize(100);
+        $this->packageTypeFiles['PHP']->setGithubCurrentPage(4);
+        $this->packageTypeFiles['PHP']->setPriority(true);
+        $this->packageTypeFiles['PHP']->setUpdatedAt(new \DateTime('2022-07-22 00:00:00'));
+        $manager->persist($this->packageTypeFiles['PHP']);
+        $this->packageTypeFiles['js'] = new PackageTypeFile();
+        $this->packageTypeFiles['js']->setName('npm');
+        $this->packageTypeFiles['js']->setLanguage('js');
+        $this->packageTypeFiles['js']->setFile('package.json');
+        $this->packageTypeFiles['js']->setGithubCurrentSize(100);
+        $this->packageTypeFiles['js']->setGithubCurrentPage(1);
+        $this->packageTypeFiles['js']->setPriority(false);
+        $this->packageTypeFiles['js']->setUpdatedAt(new \DateTime('2022-07-22 00:00:00'));
+        $manager->persist($this->packageTypeFiles['js']);
 
-        $repoA = new Repository();
-        $repoA->setName('nameA');
-        $repoA->setUsername('usernameA');
-        $repoA->setUrl('https://a.github.com');
-        $repoA->setRoutine1At(new \DateTime('2022-07-22 02:00:00'));
-        $repoA->setRoutine2At(new \DateTime('2022-07-22 02:30:00'));
-        $manager->persist($repoA);
+        // repos
+        $this->createRepository('A');
+        $this->createRepository('B');
+        $this->createRepository('C');
 
-        $repoB = new Repository();
-        $repoB->setName('nameB');
-        $repoB->setUsername('usernameB');
-        $repoB->setUrl('https://b.github.com');
-        $repoB->setRoutine1At(new \DateTime('2022-07-22 04:00:00'));
-        $repoA->setRoutine2At(new \DateTime('2022-07-22 04:30:00'));
-        $manager->persist($repoB);
+        // blob
+        $this->createRepositoryPackageTypeFile('A', 'PHP');
+        $this->createRepositoryPackageTypeFile('A', 'js');
+        $this->createRepositoryPackageTypeFile('B', 'PHP');
+        $this->createRepositoryPackageTypeFile('C', 'PHP');
+        $this->createRepositoryPackageTypeFile('C', 'js');
 
-        $repoPackageTypeFile = new RepositoryPackageTypeFile();
-        $repoPackageTypeFile->setRoutine1At(new \DateTime('2022-07-22 02:30:00'));
-        $repoPackageTypeFile->setPath('path/a');
-        $repoPackageTypeFile->setSha('sha_a');
-        $repoPackageTypeFile->setRepository($repoA);
-        $repoPackageTypeFile->setPackageTypeFile($packagePhp);
-        $manager->persist($repoPackageTypeFile);
+        // packages
+        $this->createPackage('A', 'PHP');
+        $this->createPackage('B', 'PHP');
+        $this->createPackage('C', 'js');
 
-        $repoPackage = new RepositoryPackage();
-        $repoPackage->setName('repoPackageA');
-        $repoPackage->setVersionStr('^1.1.0');
-        $repoPackage->setVersionMinMajor(1);
-        $repoPackage->setVersionMinMinor(1);
-        $repoPackage->setVersionMinPatch(0);
-        $repoPackage->setVersionMaxMajor(2);
-        $repoPackage->setVersionMaxMinor(0);
-        $repoPackage->setVersionMaxPatch(0);
-        $repoPackage->setValid(true);
-        $repoPackage->setRepositoryPackageTypeFile($repoPackageTypeFile);
-        $manager->persist($repoPackage);
-
-        $repoPackage = clone $repoPackage;
-        $repoPackage->setName('repoPackageB');
-        $manager->persist($repoPackage);
+        // repository packages
+        $this->createRepositoryPackage('A', 'A', '1.0.0', '2.0.0');
+        $this->createRepositoryPackage('A', 'B', '1.5.5', '1.7.0');
+        $this->createRepositoryPackage('A', 'C', '2.5.0', '3.0.0');
+        $this->createRepositoryPackage('B', 'A', '1.0.0', '2.0.0');
+        $this->createRepositoryPackage('C', 'A', '1.0.0', '2.0.0');
+        $this->createRepositoryPackage('C', 'B', '1.0.0', '2.0.0');
+        $this->createRepositoryPackage('C', 'C', '1.0.0', '2.0.0');
 
         // errors
-        $repoC = new Repository();
-        $repoC->setName('nameC');
-        $repoC->setUsername('usernameC');
-        $repoC->setRoutineError('error2');
-        $repoC->setUrl('https://c.github.com');
-        $repoC->setRoutine1At(new \DateTime('2022-07-22 06:00:00'));
-        $manager->persist($repoC);
+        $this->repositories['err'] = new Repository();
+        $this->repositories['err']->setName('nameErr');
+        $this->repositories['err']->setUsername('usernameErr');
+        $this->repositories['err']->setRoutineError('error2');
+        $this->repositories['err']->setUrl('https://err.github.com');
+        $this->repositories['err']->setRoutine1At(new \DateTime('2022-07-22 06:00:00'));
+        $manager->persist($this->repositories['err']);
 
-        $repoPackageTypeFile = new RepositoryPackageTypeFile();
-        $repoPackageTypeFile->setRoutine1At(new \DateTime('2022-07-22 04:30:00'));
-        $repoPackageTypeFile->setPath('path/b');
-        $repoPackageTypeFile->setSha('sha_b');
-        $repoPackageTypeFile->setRepository($repoB);
-        $repoPackageTypeFile->setPackageTypeFile($packagePhp);
-        $repoPackageTypeFile->setRoutineError('error3');
-        $manager->persist($repoPackageTypeFile);
+        $this->repositoryPackageTypeFiles['err_err'] = new RepositoryPackageTypeFile();
+        $this->repositoryPackageTypeFiles['err_err']->setRoutine1At(new \DateTime('2022-07-22 04:30:00'));
+        $this->repositoryPackageTypeFiles['err_err']->setPath('path/err');
+        $this->repositoryPackageTypeFiles['err_err']->setSha('sha_err');
+        $this->repositoryPackageTypeFiles['err_err']->setRepository($this->repositories['err']);
+        $this->repositoryPackageTypeFiles['err_err']->setPackageTypeFile($this->packageTypeFiles['PHP']);
+        $this->repositoryPackageTypeFiles['err_err']->setRoutineError('error3');
+        $manager->persist($this->repositoryPackageTypeFiles['err_err']);
 
         $manager->flush();
+    }
+
+    private function createRepository(string $repoRef): void
+    {
+        $this->repositories[$repoRef] = new Repository();
+        $this->repositories[$repoRef]->setName("repo$repoRef");
+        $this->repositories[$repoRef]->setDescription("description$repoRef");
+        $this->repositories[$repoRef]->setUsername("username$repoRef");
+        $this->repositories[$repoRef]->setUrl("https://$repoRef.github.com");
+        $this->repositories[$repoRef]->setRoutine1At(new \DateTime('2022-07-22 02:00:00'));
+        $this->repositories[$repoRef]->setRoutine2At(new \DateTime('2022-07-22 02:30:00'));
+        $this->em->persist($this->repositories[$repoRef]);
+    }
+
+    private function createRepositoryPackageTypeFile(string $repoRef, string $packageTypeFileRef): void
+    {
+        $ref = $repoRef.'_'.$packageTypeFileRef;
+        $this->repositoryPackageTypeFiles[$ref] = new RepositoryPackageTypeFile();
+        $this->repositoryPackageTypeFiles[$ref]->setRoutine1At(new \DateTime('2022-07-22 02:30:00'));
+        $this->repositoryPackageTypeFiles[$ref]->setPath("path/$ref");
+        $this->repositoryPackageTypeFiles[$ref]->setSha("sha_$ref");
+        $this->repositoryPackageTypeFiles[$ref]->setRepository($this->repositories[$repoRef]);
+        $this->repositoryPackageTypeFiles[$ref]->setPackageTypeFile($this->packageTypeFiles[$packageTypeFileRef]);
+        $this->em->persist($this->repositoryPackageTypeFiles[$ref]);
+    }
+
+    private function createPackage(string $packageRef, string $packageTypeFileRef): void
+    {
+        $this->packages[$packageRef] = new Package();
+        $this->packages[$packageRef]->setName("package$packageRef");
+        $this->packages[$packageRef]->setPackageTypeFile($this->packageTypeFiles[$packageTypeFileRef]);
+        $this->em->persist($this->packages[$packageRef]);
+    }
+
+    private function createRepositoryPackage(string $repoRef, string $packageRef, string $minVersion, string $maxVersion): void
+    {
+        $ref = $repoRef.'_'.$packageRef;
+        $repositoryPackageTypeFileRef = $repoRef.'_'.$this->packages[$packageRef]->getPackageTypeFile()->getLanguage();
+        $repoPackage = new RepositoryPackage();
+        $repoPackage->setVersionStr("$ref $minVersion $maxVersion");
+        $this->setVersions($repoPackage, $minVersion, $maxVersion);
+        $repoPackage->setValid(true);
+        $repoPackage->setPackage($this->packages[$packageRef]);
+        $repoPackage->setRepository($this->repositories[$repoRef]);
+        $repoPackage->setRepositoryPackageTypeFile($this->repositoryPackageTypeFiles[$repositoryPackageTypeFileRef]);
+        $this->em->persist($repoPackage);
+        $this->repositoryPackages[$ref] = $repoPackage;
+    }
+
+    private function setVersions(RepositoryPackage $repoPackage, string $minVersion, string $maxVersion): void
+    {
+        $minArr = explode('.', $minVersion);
+        $maxArr = explode('.', $maxVersion);
+        $repoPackage->setVersionMinMajor((int) $minArr[0]);
+        $repoPackage->setVersionMinMinor((int) $minArr[1]);
+        $repoPackage->setVersionMinPatch((int) $minArr[2]);
+        $repoPackage->setVersionMaxMajor((int) $maxArr[0]);
+        $repoPackage->setVersionMaxMinor((int) $maxArr[1]);
+        $repoPackage->setVersionMaxPatch((int) $maxArr[2]);
     }
 }

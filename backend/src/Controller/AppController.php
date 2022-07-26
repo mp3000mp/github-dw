@@ -18,7 +18,7 @@ class AppController extends AbstractController
     public function info(ParameterBagInterface $parameterBag): Response
     {
         return $this->json([
-            'version' => $parameterBag->get('APP_VERSION'),
+            'version' => $parameterBag->get('app.version'),
         ]);
     }
 
@@ -34,8 +34,14 @@ class AppController extends AbstractController
     {
         $err = $request->get('exception');
 
-        $msg = $err->getMessage();
-        // $msg = 'Server error.';
+//        if ($this->getParameter('app.env') === 'test') {
+//            dump($err);
+//        }
+
+        $msg = 'Server error.';
+        if ('prod' !== $this->getParameter('app.env')) {
+            $msg = $err->getMessage();
+        }
         $statusCode = 500;
         if (method_exists($err, 'getStatusCode')) {
             /** @phpstan-ignore-next-line */

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "repository_package_autocomplete",
-  "description": "repository_package_autocomplete",
+  "title": "package_autocomplete",
+  "description": "package_autocomplete",
   "type": "object",
   "properties": {
     "language": {

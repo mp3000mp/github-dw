@@ -24,7 +24,7 @@ class JsonRequestHelper
 
     public function __construct(ParameterBagInterface $parameterBag, SerializerInterface $serializer, ValidatorInterface $validator, LoggerInterface $logger)
     {
-        $this->pathSchemas = $parameterBag->get('PATH_SCHEMAS');
+        $this->pathSchemas = $parameterBag->get('app.schemas_path');
         $this->serialiser = $serializer;
         $this->jsonValidator = new Validator();
         $this->validator = $validator;

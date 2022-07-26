@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\RepositoryPackageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: RepositoryPackageRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'dw_repository_package')]
 class RepositoryPackage
 {
@@ -17,10 +16,6 @@ class RepositoryPackage
     #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
     #[Groups(['all'])]
     private ?int $id = null;
-
-    #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['all'])]
-    private string $name;
 
     #[ORM\Column(type: 'string', length: 55)]
     #[Groups(['all'])]
@@ -58,19 +53,18 @@ class RepositoryPackage
     #[ORM\JoinColumn(nullable: false)]
     private RepositoryPackageTypeFile $repositoryPackageTypeFile;
 
+    #[ORM\ManyToOne(targetEntity: Package::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['all'])]
+    private Package $package;
+
+    #[ORM\ManyToOne(targetEntity: Repository::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private Repository $repository;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     public function getVersionStr(): string
@@ -161,5 +155,25 @@ class RepositoryPackage
     public function setRepositoryPackageTypeFile(RepositoryPackageTypeFile $repositoryPackageTypeFile): void
     {
         $this->repositoryPackageTypeFile = $repositoryPackageTypeFile;
+    }
+
+    public function getPackage(): Package
+    {
+        return $this->package;
+    }
+
+    public function setPackage(Package $package): void
+    {
+        $this->package = $package;
+    }
+
+    public function getRepository(): Repository
+    {
+        return $this->repository;
+    }
+
+    public function setRepository(Repository $repository): void
+    {
+        $this->repository = $repository;
     }
 }

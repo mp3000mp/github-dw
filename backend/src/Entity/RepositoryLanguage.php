@@ -27,7 +27,6 @@ class RepositoryLanguage
 
     #[ORM\ManyToOne(targetEntity: Repository::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['admin'])]
     private Repository $repository;
 
     public function getId(): ?int

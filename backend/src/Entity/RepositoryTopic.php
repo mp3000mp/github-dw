@@ -23,7 +23,6 @@ class RepositoryTopic
 
     #[ORM\ManyToOne(targetEntity: Repository::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['all'])]
     private Repository $repository;
 
     public function getId(): ?int

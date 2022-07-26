@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "repository_package_search",
-  "description": "repository_package_search",
+  "title": "repository_search",
+  "description": "repository_search",
   "type": "object",
   "properties": {
     "page": {"type":  "integer"},

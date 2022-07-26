@@ -16,6 +16,7 @@ func RunRoutine3(queryContext *query.Context) {
 	queryContext.Routine3Running = true
 	repoPackageFile := (*queryContext.Routine3Queue)[0]
 	var repo model.Repository
+	var dbPackage model.Package
 	// todo keep relation instead of query
 	queryContext.DB.Where("id = ?", repoPackageFile.RepositoryID).First(&repo)
 	log.Printf("Start routine 3: repo '%s' file '%s'\n", repo.URL, repoPackageFile.Path)
@@ -54,21 +55,34 @@ func RunRoutine3(queryContext *query.Context) {
 		return
 	}
 
-	// store packages in db
+	// clean packages then store packages in db
 	repoPackage := model.RepositoryPackage{}
 	queryContext.DB.Where("repository_package_type_file_id = ?", repoPackageFile.ID).Delete(&repoPackage)
-	for _, pkg := range packages {
-		versionRange := parser.GetVersionRange(pkg.Version)
+	for _, pkgItem := range packages {
+		versionRange := parser.GetVersionRange(pkgItem.Version)
 		// if version not valid, we considere it must be here
 		if !versionRange.Valid {
-			log.Printf("Routine 3 => Warning invalid version '%s'\n", pkg.Version)
+			log.Printf("Routine 3 => Warning invalid version '%s'\n", pkgItem.Version)
 			versionRange = parser.GetVersionRange("*")
 			versionRange.Valid = false
 		}
+
+		// check if package exists or create it
+		r := queryContext.DB.Where("package_type_file_id = ? AND name = ?", repoPackageFile.PackageTypeFileID, pkgItem.Name).Limit(1).Find(&dbPackage)
+		if (r.RowsAffected == 0) {
+			dbPackage = model.Package{
+				PackageTypeFileID: repoPackageFile.PackageTypeFileID,
+				Name: pkgItem.Name,
+			}
+			queryContext.DB.Create(&dbPackage)
+		}
+
+		// create repoPackage
 		repoPackage = model.RepositoryPackage{
 			RepositoryPackageTypeFileID: repoPackageFile.ID,
-			Name: pkg.Name,
-			VersionStr: pkg.Version,
+			PackageID: dbPackage.ID,
+			RepositoryID: repo.ID,
+			VersionStr: pkgItem.Version,
 			VersionMinMajor: versionRange.MinMajor,
 			VersionMinMinor: versionRange.MinMinor,
 			VersionMinPatch: versionRange.MinPatch,

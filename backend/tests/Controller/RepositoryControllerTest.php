@@ -2,16 +2,20 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Repository;
+use App\Entity\Package;
 
 class RepositoryControllerTest extends AbstractControllerTest
 {
     /**
      * @dataProvider providerSearch
      */
-    public function testSearch(array $query, int $expectedTotal): void
+    public function testSearch(array $query, array $expectedResult): void
     {
-        // no results
+        // find package ids by name
+        foreach ($query['packages'] as &$package) {
+            $package['id'] = $this->getPackageByName($package['id'])->getId();
+        }
+        unset($package);
         $query = [
             'page' => 1,
             'search' => $query,
@@ -19,8 +23,8 @@ class RepositoryControllerTest extends AbstractControllerTest
         $this->client->request('POST', '/api/repositories/search', [], [], [], json_encode($query));
         $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
-        self::assertCount($expectedTotal, $jsonResponse['results']);
-        self::assertEquals($expectedTotal, $jsonResponse['total']);
+        self::assertEqualsCanonicalizing($expectedResult, array_column($jsonResponse['results'], 'name'));
+        self::assertEquals(count($expectedResult), $jsonResponse['total']);
     }
 
     public function providerSearch(): array
@@ -32,15 +36,15 @@ class RepositoryControllerTest extends AbstractControllerTest
                     'description' => null,
                     'packages' => [],
                 ],
-                'expectedTotal' => 0,
+                'expectedResult' => [],
             ],
             'Name query' => [
                 'query' => [
-                    'name' => 'name',
+                    'name' => 'repo',
                     'description' => null,
                     'packages' => [],
                 ],
-                'expectedRoles' => 2,
+                'expectedResult' => ['repoA', 'repoB', 'repoC'],
             ],
             'Description query' => [
                 'query' => [
@@ -48,29 +52,33 @@ class RepositoryControllerTest extends AbstractControllerTest
                     'description' => 'descri',
                     'packages' => [],
                 ],
-                'expectedRoles' => 2,
+                'expectedResult' => ['repoA', 'repoB', 'repoC'],
             ],
             'Package id query' => [
                 'query' => [
                     'name' => null,
                     'description' => null,
-                    'packages' => [['id' => 1, 'minVersion' => null, 'maxVersion' => null]],
+                    'packages' => [['id' => 'packageC', 'minVersion' => null, 'maxVersion' => null]],
                 ],
-                'expectedRoles' => 2,
+                'expectedResult' => ['repoA', 'repoC'],
             ],
             'Package version query' => [
                 'query' => [
                     'name' => null,
                     'description' => null,
-                    'packages' => [['id' => 1, 'minVersion' => '1.0.0', 'maxVersion' => '2.0.0']],
+                    'packages' => [
+                        ['id' => 'packageA', 'minVersion' => '0.5.0', 'maxVersion' => '1.1.0'], // A,B,C
+                        ['id' => 'packageB', 'minVersion' => '1.7.0', 'maxVersion' => '3.0.0'], // C
+                        ['id' => 'packageC', 'minVersion' => '0.5.0', 'maxVersion' => '3.0.0'], // B,C
+                    ],
                 ],
-                'expectedRoles' => 2,
+                'expectedResult' => ['repoC'],
             ],
         ];
     }
 
-    private function getRepositoryByName(string $name): Repository
+    private function getPackageByName(string $name): Package
     {
-        return $this->em->getRepository(Repository::class)->findOneBy(['name' => $name]);
+        return $this->em->getRepository(Package::class)->findOneBy(['name' => $name]);
     }
 }

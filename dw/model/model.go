@@ -11,19 +11,21 @@ import (
 
 type Repository struct {
 	ID uint                                             `gorm:"primaryKey"`
-	Name, Username string                               `gorm:"size:100;not null"`
+	Name string                                         `gorm:"size:100;not null;index"`
+	Username string                                     `gorm:"size:100;not null"`
 	MainLanguage string 			                    `gorm:"size:50"`
 	URL string                                          `gorm:"uniqueIndex;size:255;not null"`
 	FullName, RoutineError string                       `gorm:"size:255"`
-	Description string                                  `gorm:"size:1000"`
+	Description string                                  `gorm:"size:1000;class:FULLTEXT"`
 	LicenseName string                                  `gorm:"size:100"`
 	ForksCount, OpenIssuesCount, StargazersCount uint32
 	GithubId, Size uint
 	Routine1At time.Time                                `gorm:"type:DATETIME(0);not null"`
 	CreatedAt, PushedAt, Routine2At time.Time           `gorm:"type:DATETIME(0);default:null"`
-	Languages []RepositoryLanguage                      `gorm:"constraint:OnUpdate:CASCADE"`
-	Topics []RepositoryTopic                            `gorm:"constraint:OnUpdate:CASCADE"`
-	PackageTypeFiles []RepositoryPackageTypeFile        `gorm:"constraint:OnUpdate:CASCADE"`
+	Languages []RepositoryLanguage                      `gorm:"constraint:OnDelete:CASCADE"`
+	Topics []RepositoryTopic                            `gorm:"constraint:OnDelete:CASCADE"`
+	PackageTypeFiles []RepositoryPackageTypeFile        `gorm:"constraint:OnDelete:CASCADE"`
+	RepositoryPackages []RepositoryPackage              `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 type RepositoryLanguage struct {
@@ -47,7 +49,7 @@ type PackageTypeFile struct {
 	GithubCurrentPage uint32                               `gorm:"default:1;not null"`
 	UpdatedAt time.Time                                    `gorm:"type:DATETIME(0);not null"`
 	Priority bool                                          `gorm:"default:false;not null"`
-	RepositoryPackageTypeFiles []RepositoryPackageTypeFile `gorm:"constraint:OnUpdate:CASCADE"`
+	RepositoryPackageTypeFiles []RepositoryPackageTypeFile `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 type RepositoryPackageTypeFile struct {
@@ -62,14 +64,26 @@ type RepositoryPackageTypeFile struct {
 	RepositoryPackages []RepositoryPackage `gorm:"constraint:OnDelete:CASCADE"`
 }
 
+type Package struct {
+	ID uint                                `gorm:"primaryKey"`
+	PackageTypeFileID uint                 `gorm:"not null"`
+	Name string                            `gorm:"size:100;not null;index"`
+	RepositoryPackages []RepositoryPackage `gorm:"constraint:OnDelete:CASCADE"`
+}
+
 type RepositoryPackage struct {
-	ID uint                                                  `gorm:"primaryKey"`
-	RepositoryPackageTypeFileID uint                         `gorm:"not null"`
-	Name string                                              `gorm:"size:100;not null"`
-	VersionStr string                                        `gorm:"size:55;not null"`
-	VersionMinMajor, VersionMinMinor, VersionMinPatch uint16 `gorm:"not null"`
-	VersionMaxMajor, VersionMaxMinor, VersionMaxPatch uint16 `gorm:"not null"`
-	Valid bool 												 `gorm:"default:false;not null"`
+	ID uint                          `gorm:"primaryKey"`
+	RepositoryPackageTypeFileID uint `gorm:"not null"`
+	PackageID uint                   `gorm:"not null"`
+	RepositoryID uint                `gorm:"not null"`
+	VersionStr string                `gorm:"size:55;not null"`
+	VersionMinMajor uint16           `gorm:"not null;index"`
+	VersionMinMinor uint16           `gorm:"not null;index"`
+	VersionMinPatch uint16           `gorm:"not null;index"`
+	VersionMaxMajor uint16           `gorm:"not null;index"`
+	VersionMaxMinor uint16           `gorm:"not null;index"`
+	VersionMaxPatch uint16           `gorm:"not null;index"`
+	Valid bool 						 `gorm:"default:false;not null"`
 }
 
 func getNamingStrategy() schema.NamingStrategy {
@@ -102,6 +116,7 @@ func InitDatabase(db *gorm.DB) error {
 		&RepositoryTopic{},
 		&PackageTypeFile{},
 		&RepositoryPackageTypeFile{},
+		&Package{},
 		&RepositoryPackage{},
 	)
 	if err != nil {

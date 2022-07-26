@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\Media;
 use App\Entity\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NativeQuery;
@@ -63,8 +62,8 @@ class RepositoryRepository extends ServiceEntityRepository
         $q = $this->buildQuery($query, true);
 
         $r = $q->getScalarResult();
-        return (int) ($r['nb'] ?? 0);
 
+        return (int) $r[0]['nb'];
     }
 
     private function buildQuery(\stdClass $query, bool $isCounting): NativeQuery
@@ -75,7 +74,7 @@ class RepositoryRepository extends ServiceEntityRepository
         $sqlFrom = 'FROM dw_repository r';
         $sqlJoins = [];
         $sqlWhere = ' WHERE r.routine2_at IS NOT NULL AND r.routine_error IS NULL ';
-        $sqlGroupBy = 'GROUP BY r.id';
+        $sqlGroupBy = '';
         $sqlOrderBy = '';
         $sqlLimit = '';
         $params = [];
@@ -85,51 +84,73 @@ class RepositoryRepository extends ServiceEntityRepository
             $sqlSelect = 'SELECT COUNT(DISTINCT r.id) AS nb';
         } else {
             $rsm->addRootEntityFromClassMetadata(Repository::class, 'r');
+            $sqlGroupBy = 'GROUP BY r.id';
             $sqlOrderBy = 'ORDER BY '.implode(', ', ['r.stargazers_count DESC']);
             $sqlLimit = 'LIMIT :limit OFFSET :offset';
         }
 
         if (null !== $query->name) {
-            $sqlWhere .= ' AND name LIKE :name ';
-            $params['name'] = '%' . $query->name . '%';
+            $sqlWhere .= ' AND r.name LIKE :name ';
+            $params['name'] = '%'.$query->name.'%';
         }
         // todo: fulltext
         if (null !== $query->description) {
-            $sqlWhere .= ' AND name LIKE :description ';
-            $params['description'] = '%' . $query->description . '%';
+            $sqlWhere .= ' AND r.description LIKE :description ';
+            $params['description'] = '%'.$query->description.'%';
         }
         // todo: postgres with ?
         if (count($query->packages) > 0) {
             $i = 1;
             foreach ($query->packages as $package) {
-                $sqlJoins = ["INNER JOIN dw_repository_package rp$i ON r.id = rp.repository_id"];
-                $sqlWhere .= " AND rp.package_id = :package_id$i ";
+                $join = "INNER JOIN dw_repository_package rp$i ON r.id = rp$i.repository_id AND rp$i.package_id = :package_id$i ";
                 $params["package_id$i"] = $package->id;
+
                 if (null !== $package->minVersion) {
+                    // max_repo > min_search
                     $version = explode('.', $package->minVersion);
-                    $sqlWhere .= " AND rp.package_id >= :package_min_major$i ";
+                    $join .= " AND (
+                        rp$i.version_max_major > :package_min_major$i 
+                        OR (
+                            rp$i.version_max_major = :package_min_major$i
+                            AND (
+                                rp$i.version_max_minor > :package_min_minor$i 
+                                OR (
+                                    rp$i.version_max_minor = :package_min_minor$i
+                                    AND rp$i.version_max_patch > :package_min_patch$i
+                                )                                
+                            )
+                        )
+                    ) ";
                     $params["package_min_major$i"] = $version[0];
-                    $sqlWhere .= " AND rp.package_id >= :package_min_minor$i ";
                     $params["package_min_minor$i"] = $version[1];
-                    $sqlWhere .= " AND rp.package_id >= :package_min_patch$i ";
                     $params["package_min_patch$i"] = $version[2];
                 }
                 if (null !== $package->maxVersion) {
+                    // min_repo < max_search
                     $version = explode('.', $package->maxVersion);
-                    $sqlWhere .= " AND rp.package_id <= :package_max_major$i ";
+                    $join .= " AND (
+                        rp$i.version_min_major < :package_max_major$i 
+                        OR (
+                            rp$i.version_min_major = :package_max_major$i
+                            AND (
+                                rp$i.version_min_minor < :package_max_minor$i 
+                                OR (
+                                    rp$i.version_min_minor = :package_max_minor$i
+                                    AND rp$i.version_min_patch < :package_max_patch$i
+                                )                                
+                            )
+                        )
+                    ) ";
                     $params["package_max_major$i"] = $version[0];
-                    $sqlWhere .= " AND rp.package_id <= :package_max_minor$i ";
                     $params["package_max_minor$i"] = $version[1];
-                    $sqlWhere .= " AND rp.package_id <= :package_max_patch$i ";
                     $params["package_max_patch$i"] = $version[2];
                 }
-                $i++;
+
+                $sqlJoins[] = $join;
+                ++$i;
             }
         }
-
         $sql = implode(' ', [$sqlSelect, $sqlFrom, implode(' ', $sqlJoins), $sqlWhere, $sqlGroupBy, $sqlOrderBy, $sqlLimit]);
-
-        echo $sql;
 
         return $this->getEntityManager()->createNativeQuery($sql, $rsm)
             ->setParameters($params);

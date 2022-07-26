@@ -8,6 +8,6 @@
     - files
     - deploy_dw
     - docker
-    - deploy_back
+#    - deploy_back
 #    - deploy_front
 #    - apache

@@ -8,10 +8,10 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
 {
     public function testAuth(): void
     {
-        $this->client->request('GET', '/api/package-type-file');
+        $this->client->request('GET', '/api/package-type-files');
         $this->assertResponseCode(401);
         $pft = $this->getPackageTypeByFile('composer.json');
-        $this->client->request('PUT', '/api/package-type-file/'.$pft->getId().'/priority');
+        $this->client->request('PUT', '/api/package-type-files/'.$pft->getId().'/priority');
         $this->assertResponseCode(401);
     }
 
@@ -19,7 +19,7 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
     {
         $this->loginUser($this->client);
 
-        $this->client->request('GET', '/api/package-type-file');
+        $this->client->request('GET', '/api/package-type-files');
         $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
         self::assertCount(2, $jsonResponse);
@@ -30,7 +30,7 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
         $this->loginUser($this->client);
 
         $pft = $this->getPackageTypeByFile('package.json');
-        $this->client->request('PUT', '/api/package-type-file/'.$pft->getId().'/priority');
+        $this->client->request('PUT', '/api/package-type-files/'.$pft->getId().'/priority');
         $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
         self::assertCount(2, $jsonResponse);
