@@ -15,7 +15,7 @@
     mode: '755'
     recurse: true
   loop:
-    - 'config/jwt'
+    - 'var'
 
 # todo 777 horrible
 - name: Create directories writable
@@ -29,24 +29,6 @@
   loop:
     - 'var/log'
     - 'var/cache'
-
-- name: Create jwt private rsa keys
-  openssl_privatekey:
-    path: "{{ app_directory }}/backend/config/jwt/private.pem"
-    passphrase: "{{ jwt_passphrase }}"
-    cipher: auto
-    owner: "{{ maintainer_user }}"
-    group: "{{ maintainer_user }}"
-    mode: '755'
-
-- name: Create jwt public rsa keys
-  openssl_publickey:
-    path: "{{ app_directory }}/backend/config/jwt/public.pem"
-    privatekey_path: "{{ app_directory }}/backend/config/jwt/private.pem"
-    privatekey_passphrase: "{{ jwt_passphrase }}"
-    owner: "{{ maintainer_user }}"
-    group: "{{ maintainer_user }}"
-    mode: '755'
 
 - name: Composer install
   shell:

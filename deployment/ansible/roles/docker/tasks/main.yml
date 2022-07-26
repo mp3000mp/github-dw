@@ -9,6 +9,7 @@
       - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
       - '--chmod=0755'
       - '--exclude=db'
+      - '--exclude=log'
   loop:
     - 'backend'
     - 'mariadb'

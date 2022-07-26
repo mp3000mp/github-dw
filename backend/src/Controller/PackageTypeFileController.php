@@ -33,4 +33,13 @@ class PackageTypeFileController extends AbstractController
 
         return $this->responseHelper->createResponse($packageTypes, ['admin']);
     }
+
+    #[Route(path: '/stats', name: 'package_types_file.stats', methods: ['GET'])]
+    #[Security("is_granted('ROLE_ADMIN')")]
+    public function stats(): Response
+    {
+        $stats = $this->em->getRepository(PackageTypeFile::class)->stats();
+
+        return $this->json($stats);
+    }
 }

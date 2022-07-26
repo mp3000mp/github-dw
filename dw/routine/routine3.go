@@ -55,6 +55,15 @@ func RunRoutine3(queryContext *query.Context) {
 		return
 	}
 
+	// 80% of github repo has less than 5 deps
+	if len(packages) < 6 {
+		msg := fmt.Sprintf("Routine 3 => Ignored because less than 6 dependencies: %d", len(packages))
+		log.Println(msg)
+		queryContext.DB.Delete(&repoPackageFile)
+		endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
+		return
+	}
+
 	// clean packages then store packages in db
 	repoPackage := model.RepositoryPackage{}
 	queryContext.DB.Where("repository_package_type_file_id = ?", repoPackageFile.ID).Delete(&repoPackage)

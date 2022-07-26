@@ -6,7 +6,9 @@ namespace App\Repository;
 
 use App\Entity\PackageTypeFile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @method PackageTypeFile|null find($id, $lockMode = null, $lockVersion = null)
@@ -23,5 +25,24 @@ class PackageTypeFileRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PackageTypeFile::class);
+    }
+
+    #[ArrayShape([
+        'language' => 'string',
+        'count' => 'int',
+    ])]
+    public function stats(): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('language', 'language');
+        $rsm->addScalarResult('nb', 'count', 'integer');
+        $sql = "SELECT dw_package_type_file.language, COUNT(1) AS nb 
+                    FROM dw_package_type_file 
+                    LEFT JOIN dw_package ON dw_package_type_file.id = dw_package.package_type_file_id
+                    GROUP BY dw_package_type_file.language
+        ";
+
+        return $this->getEntityManager()->createNativeQuery($sql, $rsm)
+            ->getScalarResult();
     }
 }

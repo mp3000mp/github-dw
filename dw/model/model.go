@@ -16,7 +16,7 @@ type Repository struct {
 	MainLanguage string 			                    `gorm:"size:50"`
 	URL string                                          `gorm:"uniqueIndex;size:255;not null"`
 	FullName, RoutineError string                       `gorm:"size:255"`
-	Description string                                  `gorm:"size:1000;class:FULLTEXT"`
+	Description string                                  `gorm:"size:2000;class:FULLTEXT"`
 	LicenseName string                                  `gorm:"size:100"`
 	ForksCount, OpenIssuesCount, StargazersCount uint32
 	GithubId, Size uint

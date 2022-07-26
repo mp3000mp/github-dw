@@ -16,4 +16,3 @@ back_proxy_port: 5000
 
 app_version: 1.0.0
 app_secret: secret
-jwt_passphrase: secret
