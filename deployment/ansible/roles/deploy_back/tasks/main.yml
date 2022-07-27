@@ -30,10 +30,11 @@
     - 'var/log'
     - 'var/cache'
 
-- name: Composer install
-  shell:
-    cmd: docker-compose exec backend bash -l -c "composer install"
-    chdir: "{{ app_directory }}/docker"
+# we sync vendor
+#- name: Composer install
+#  shell:
+#    cmd: docker-compose exec backend bash -l -c "composer install"
+#    chdir: "{{ app_directory }}/docker"
 
 - name: Composer cache clear
   shell:

@@ -6,9 +6,9 @@
     - vars.yml
   roles:
     - files
-    - deploy_dw
     - docker
+    - deploy_dw
     - deploy_back
 #    - deploy_front
 #    - apache
-
+    - launch

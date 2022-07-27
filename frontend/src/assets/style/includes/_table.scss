@@ -1,0 +1,7 @@
+table {
+  tr {
+    &:hover {
+      background-color: $block-bg;
+    }
+  }
+}

@@ -1,0 +1,40 @@
+footer,
+header {
+  a {
+    color: $link-color;
+    border-bottom: 1px;
+    transition: 350ms color ease-in-out;
+    position: relative;
+    text-decoration: none;
+
+    &:before,
+    &:after {
+      content: '';
+      opacity: 0;
+      position: absolute;
+      bottom: -5px;
+      width: 0;
+      height: 2px;
+      transition: all 350ms ease-in-out;
+      background-color: $link-color-hover;
+    }
+
+    &:before {
+      left: 50%;
+    }
+
+    &:after {
+      right: 50%;
+    }
+
+    &:hover {
+      color: $link-color-hover;
+
+      &:before,
+      &:after {
+        opacity: 1;
+        width: 50%;
+      }
+    }
+  }
+}

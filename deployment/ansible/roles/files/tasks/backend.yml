@@ -20,14 +20,16 @@
     rsync_opts:
       - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
       - '--chmod=0755'
-      - '--exclude=jwt'
   loop:
     - 'bin'
     - 'config'
+    - 'migrations'
     - 'public'
+    - 'resources'
     - 'src'
     - 'templates'
-#    - 'translations'
+    - 'translations'
+    - 'vendor'
 
 - name: Remove files
   file:

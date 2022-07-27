@@ -35,9 +35,3 @@
     mode: '755'
   loop:
     - '.dockerignore'
-
-- name: Docker compose up
-  docker_compose:
-    project_src: "{{ app_directory }}/docker"
-    state: present
-    build: true
