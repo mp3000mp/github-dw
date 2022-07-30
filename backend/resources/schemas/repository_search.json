@@ -33,7 +33,7 @@
             },
             "required": ["id", "minVersion", "maxVersion"]
           },
-          "maxItems": 5
+          "maxItems": 4
         }
       },
       "required": ["name", "description", "packages"]

@@ -1,7 +1,6 @@
 type Method = 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH'
 
 export class StoreRequest {
-    auth = true;
     callCount = 0;
     isError = false;
     loading = false;
@@ -11,8 +10,7 @@ export class StoreRequest {
 
     url: string;
 
-    constructor (method: Method, url: string, auth = true) {
-        this.auth = auth
+    constructor (method: Method, url: string) {
         this.method = method
         this.url = url
     }
@@ -39,7 +37,7 @@ export class StoreRequest {
 }
 
 export abstract class AbstractState {
-    actionRequest: {
+    actionRequests: {
         [key: string]: StoreRequest;
     } = {};
 }

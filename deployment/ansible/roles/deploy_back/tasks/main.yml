@@ -1,3 +1,43 @@
+- name: Deploy directories
+  synchronize:
+    delete: true
+    src: '{{ playbook_dir }}/../../backend/{{ item }}'
+    dest: "{{ app_directory }}/backend/"
+    recursive: true
+    rsync_opts:
+      - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
+      - '--chmod=0755'
+  loop:
+    - 'bin'
+    - 'config'
+    - 'migrations'
+    - 'public'
+    - 'resources'
+    - 'src'
+    - 'templates'
+    - 'translations'
+    - 'vendor'
+
+- name: Remove files
+  file:
+    state: absent
+    path: "{{ app_directory }}/backend/{{ item }}"
+  loop:
+    - 'bin/phpunit'
+
+- name: Deploy files
+  copy:
+    src: '{{ playbook_dir }}/../../backend/{{ item }}'
+    dest: "{{ app_directory }}/backend/"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '755'
+  loop:
+    - '.env'
+    - 'composer.json'
+    - 'composer.lock'
+    - 'symfony.lock'
+
 - name: Create .env.local
   template:
     src: templates/.env.j2
@@ -30,7 +70,7 @@
     - 'var/log'
     - 'var/cache'
 
-# we sync vendor
+# not needed because we sync vendor for now
 #- name: Composer install
 #  shell:
 #    cmd: docker-compose exec backend bash -l -c "composer install"

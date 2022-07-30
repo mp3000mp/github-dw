@@ -1,21 +1,40 @@
-# todo template le-ssl
-- name: Create vhost back
+# todo faire une loop
+- name: Create vhosts back
   become: true
   become_user: root
   template:
-    src: templates/vhost_back.conf.j2
+    src: "templates/vhost_back.conf.j2"
     dest: "/etc/apache2/sites-available/{{ back_server_name }}.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '0644'
 
-# todo template le-ssl
-- name: Create vhost front
+- name: Create vhosts back ssl
   become: true
   become_user: root
   template:
-    src: templates/vhost_front.conf.j2
+    src: "templates/vhost_back-le-ssl.conf.j2"
+    dest: "/etc/apache2/sites-available/{{ back_server_name }}-le-ssl.conf"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '0644'
+
+- name: Create vhosts front
+  become: true
+  become_user: root
+  template:
+    src: "templates/vhost_front.conf.j2"
     dest: "/etc/apache2/sites-available/{{ front_server_name }}.conf"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '0644'
+
+- name: Create vhosts ssl
+  become: true
+  become_user: root
+  template:
+    src: "templates/vhost_front-le-ssl.conf.j2"
+    dest: "/etc/apache2/sites-available/{{ front_server_name }}-le-ssl.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '0644'
@@ -28,7 +47,6 @@
     - "{{ back_server_name }}"
     - "{{ front_server_name }}"
 
-# todo no create le-ssl
 - name: Certbot
   become: true
   become_user: root

@@ -1,8 +1,12 @@
 // vars
 @import './includes/vars';
 
+@import '~bootstrap';
+
 // custom
+@import './includes/structure';
+@import './includes/link';
 @import './includes/footer';
 @import './includes/header';
-@import './includes/link';
-@import './includes/structure';
+@import './includes/form';
+@import './includes/utils';

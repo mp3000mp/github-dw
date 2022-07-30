@@ -47,7 +47,10 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
         $this->client->request('GET', '/api/package-type-files/stats');
         $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
-        $expected = [['language' => 'PHP', 'count' => 2], ['language' => 'js', 'count' => 1]];
+        $expected = [
+            ['id' => $this->getPackageTypeByFile('composer.json')->getId(), 'count' => 2],
+            ['id' => $this->getPackageTypeByFile('package.json')->getId(), 'count' => 1],
+        ];
         self::assertEqualsCanonicalizing($expected, $jsonResponse);
     }
 

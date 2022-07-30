@@ -1,19 +1,23 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, {AxiosError, AxiosInstance, AxiosResponse} from 'axios'
 import { StoreRequest } from '@/stores/types'
 import {CallbackOnError} from '@/helpers/apiRegistry'
 
 const debugMode = false
 function debug (msg: string) {
     if (debugMode) {
-        console.log(msg)
+        console.log(msg) // eslint-disable-line
     }
 }
 
+interface ErrorResponseSchemas {
+    message?: string;
+    detail?: string;
+}
 interface ApiRequestConfig {
     headers?: {
         [key: string]: string;
     };
-    data?: any;
+    data?: any; // eslint-disable-line
     urlParams?: {
         [key: string]: string;
     };
@@ -47,8 +51,8 @@ export class ApiClient {
         return url
     }
 
-    public static generateErrorMessage (err: any): string {
-        if (err.response) {
+    public static generateErrorMessage (err: AxiosError<ErrorResponseSchemas>|Error): string {
+        if (err instanceof AxiosError && err.response) {
             return err.response.data.message ||
                 err.response.data.detail ||
                 `Unexpected error ${err.response.status}: ${err.response.statusText}`
@@ -65,11 +69,12 @@ export class ApiClient {
             data: options.data || {},
             headers: options.headers || {},
             method: request.method,
-            url: ApiClient.generateUrl(request.url, options.urlParams || {})
+            url: ApiClient.generateUrl(request.url, options.urlParams || {}),
+            withCredentials: true
         }
-        if (request.auth) {
-            // todo cookie ?
-        }
+        // if (request.auth) {
+        //     // cookie sent in headers
+        // }
 
         debug(`req start: ${config.method} ${config.url}`)
         request.start()
@@ -80,8 +85,8 @@ export class ApiClient {
             debug(`req ok: ${config.method} ${config.url}`)
             request.end(response.status, response.data.message || '')
             return response
-        } catch (err: any) {
-            if (err.response) {
+        } catch (err) {
+            if (err instanceof AxiosError && err.response) {
                 debug(`req ${err.response.status}: ${config.method} ${config.url}`)
 
                 // tru refresh token
@@ -96,7 +101,7 @@ export class ApiClient {
                 request.end(err.response.status, ApiClient.generateErrorMessage(err))
             } else {
                 debug(`unexpected err: ${config.method} ${config.url}`)
-                debug(err)
+                debug(String(err))
                 request.end(500, 'Unexpected request error')
             }
             throw err

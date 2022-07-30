@@ -47,16 +47,16 @@ class JsonRequestHelper
         $jsonSchema = json_decode(file_get_contents($this->pathSchemas.$schema.'.json'));
         $result = $this->jsonValidator->validate($jsonData, $jsonSchema);
         if (!$result->isValid()) {
-            $err = "JSON does not validate. Violations:\n";
+            $msg = "JSON does not validate. Violations:\n";
 
             $formatter = new ErrorFormatter();
             $errors = $formatter->formatKeyed($result->error());
             foreach ($errors as $k => $error) {
-                $err .= sprintf("[%s] %s\n", $k, implode(', ', $error));
+                $msg .= sprintf("[%s] %s\n", $k, implode(', ', $error));
             }
-            $this->logger->error($err);
-            // throw new JsonSchemaException(400, '$err');
-            throw new JsonSchemaException(400, 'Invalid request content.');
+            $this->logger->error($msg);
+            // throw new JsonSchemaException(400, $msg);
+            throw new JsonSchemaException(400, sprintf('Invalid request content: %s', $msg));
         }
 
         if (null === $class) {

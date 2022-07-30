@@ -26,20 +26,25 @@ export const useSecurityStore = defineStore('security', {
     actions: {
         async login (data: LoginPayload) {
             try {
-                const response = await apiRegistry.get().httpReq(this.actionRequest.login, { data })
+                const response = await apiRegistry.get().httpReq(this.actionRequests.login, { data })
                 this.me = response.data.me
             } catch (err) {
+                this.me = new Me()
+            } finally {
+                setMe(this.me)
+            }
+        },
+        async logout () {
+            try {
+                await apiRegistry.get().httpReq(this.actionRequests.logout)
+            } finally {
                 this.me = new Me()
                 setMe(this.me)
             }
         },
-        logout () {
-            this.me = new Me()
-            setMe(this.me)
-        },
         async getMe () {
             try {
-                const response = await apiRegistry.get().httpReq(this.actionRequest.getMe)
+                const response = await apiRegistry.get().httpReq(this.actionRequests.getMe)
                 this.me = response.data
             } catch (err) {
                 this.me = new Me()

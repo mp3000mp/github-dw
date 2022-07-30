@@ -1,0 +1,9 @@
+.input-group-text {
+  background-color: $body-bg;
+}
+
+.form-control {
+  &:disabled {
+    background-color: $grey;
+  }
+}

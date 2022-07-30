@@ -25,4 +25,10 @@ class SecurityController extends AbstractController
             'lastUsername' => $authenticationUtils->getLastUsername(),
         ], Response::HTTP_UNAUTHORIZED);
     }
+
+    #[Route(path: '/logout', name: 'security.logout', methods: ['GET'])]
+    public function logout(): Response
+    {
+        throw new \Exception('Logout should be handled by Symfony internal');
+    }
 }

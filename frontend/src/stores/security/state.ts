@@ -11,8 +11,9 @@ function initMe (): Me {
 
 const state = new SecurityState()
 state.me = initMe()
-state.actionRequest = {
+state.actionRequests = {
     getMe: new StoreRequest('GET', '/api/me'),
-    login: new StoreRequest('POST', '/api/logincheck', false),
+    login: new StoreRequest('POST', '/api/login'),
+    logout: new StoreRequest('GET', '/api/logout'),
 }
 export { state }

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomePage from '../views/HomePage.vue'
 import LoginPage from '../views/LoginPage.vue'
+import { state as securityState } from '@/stores/security/state'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -14,13 +15,25 @@ const routes: Array<RouteRecordRaw> = [
     component: LoginPage,
   },
   {
+    path: '/admin',
+    name: 'admin',
+    // code-splitting
+    component: () =>
+        import('../views/AdminPage.vue'),
+    beforeEnter: (to, from, next) => {
+      if (securityState.me.roles.includes('ROLE_USER')) {
+        next()
+      } else {
+        next({ name: 'home' })
+      }
+    }
+  },
+  {
     path: '/about',
     name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    // code-splitting
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/AboutPage.vue'),
+      import('../views/AboutPage.vue'),
   },
 ]
 

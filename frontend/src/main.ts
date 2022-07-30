@@ -8,15 +8,15 @@ import apiRegistry from './helpers/apiRegistry'
 import {AxiosResponse} from 'axios'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHandSparkles, faMagic } from '@fortawesome/free-solid-svg-icons'
-library.add(faHandSparkles, faMagic)
+import { faCircleExclamation, faEllipsis, faHandSparkles, faQuestion, faRightFromBracket, faTrashCan, faWandMagicSparkles,  } from '@fortawesome/free-solid-svg-icons'
+library.add(faCircleExclamation, faEllipsis, faHandSparkles, faQuestion, faRightFromBracket, faTrashCan, faWandMagicSparkles)
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import './assets/style/app.scss'
 
 apiRegistry.set('default', variables.URL, (error: AxiosResponse) => {
     if (error.status === 401 || error.status === 403) {
-        console.log('redirect login')
+        console.log('redirect login') // eslint-disable-line
         router.push({ path: '/login' })
     }
 })

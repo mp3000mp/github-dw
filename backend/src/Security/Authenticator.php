@@ -56,7 +56,7 @@ class Authenticator extends AbstractLoginFormAuthenticator
     {
         return new JsonResponse([
             'message' => 'Welcome.',
-            'me' => $this->serializer->serialize($token->getUser(), 'json', ['groups' => ['me']]),
+            'me' => json_decode($this->serializer->serialize($token->getUser(), 'json', ['groups' => ['me']])),
         ]);
     }
 

@@ -34,12 +34,12 @@ class PackageTypeFileRepository extends ServiceEntityRepository
     public function stats(): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
-        $rsm->addScalarResult('language', 'language');
+        $rsm->addScalarResult('id', 'id');
         $rsm->addScalarResult('nb', 'count', 'integer');
-        $sql = "SELECT dw_package_type_file.language, COUNT(1) AS nb 
+        $sql = "SELECT dw_package_type_file.id, COUNT(1) AS nb 
                     FROM dw_package_type_file 
                     LEFT JOIN dw_package ON dw_package_type_file.id = dw_package.package_type_file_id
-                    GROUP BY dw_package_type_file.language
+                    GROUP BY dw_package_type_file.id
         ";
 
         return $this->getEntityManager()->createNativeQuery($sql, $rsm)
