@@ -11,8 +11,20 @@ export interface PackageTypeFiles {
     priority: boolean;
     count?: number;
 }
+export interface Stats {
+    packageTypeFiles: {id: number, count: number}[],
+    routines: {
+        routine1Count: number;
+        routine2Count: number;
+        routine2DoneCount: number;
+        routine2ErrorCount: number;
+        routine3Count: number;
+        routine3DoneCount: number;
+        routine3ErrorCount: number;
+    }
+}
 
 export class AdminState extends AbstractState {
     packageTypeFiles: PackageTypeFiles[] = [];
-    stats: {id: number, count: number}[] = [];
+    stats: Stats|null = null;
 }

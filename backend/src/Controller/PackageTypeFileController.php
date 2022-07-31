@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\PackageTypeFile;
+use App\Entity\Repository;
+use App\Entity\RepositoryPackageTypeFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,7 +23,7 @@ class PackageTypeFileController extends AbstractController
         return $this->responseHelper->createResponse($packageTypes, ['admin']);
     }
 
-    #[Route(path: '/{id}/priority', name: 'package_types_file.priority', methods: ['PUT'])]
+    #[Route(path: '/{id}/priority', name: 'package_type_files.priority', methods: ['PUT'])]
     #[Security("is_granted('ROLE_ADMIN')")]
     public function priority(int $id): Response
     {
@@ -34,12 +36,4 @@ class PackageTypeFileController extends AbstractController
         return $this->responseHelper->createResponse($packageTypes, ['admin']);
     }
 
-    #[Route(path: '/stats', name: 'package_types_file.stats', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN')")]
-    public function stats(): Response
-    {
-        $stats = $this->em->getRepository(PackageTypeFile::class)->stats();
-
-        return $this->json($stats);
-    }
 }

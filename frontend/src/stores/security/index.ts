@@ -11,9 +11,9 @@ interface LoginPayload {
 // todo: refactor localstorage functions in utils
 function setMe (me: Me|null) {
     if (me === null) {
-        localStorage.removeItem('me')
+        sessionStorage.removeItem('me')
     }
-    localStorage.setItem('me', JSON.stringify(me || (new Me())))
+    sessionStorage.setItem('me', JSON.stringify(me || (new Me())))
 }
 
 // todo: define actions in separate file when thie issue is closed: https://github.com/vuejs/pinia/issues/802

@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\RepositoryPackageTypeFile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -43,5 +44,19 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
             ->orderBy('rptf.routine3At', 'desc')
             ->getQuery()
             ->getArrayResult();
+    }
+
+    public function stats(): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('routine3Count', 'routine3Count', 'integer');
+        $rsm->addScalarResult('routine3DoneCount', 'routine3DoneCount', 'integer');
+        $rsm->addScalarResult('routine3ErrorCount', 'routine3ErrorCount', 'integer');
+        $sql = "SELECT count(1) routine3Count, sum(routine3_at IS NOT NULL) routine3DoneCount, sum(routine_error IS NOT NULL) routine3ErrorCount
+            FROM dw_repository_package_type_file
+        ";
+
+        return $this->getEntityManager()->createNativeQuery($sql, $rsm)
+            ->getScalarResult()[0];
     }
 }

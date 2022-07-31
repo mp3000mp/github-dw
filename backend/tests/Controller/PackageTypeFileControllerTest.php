@@ -13,8 +13,6 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
         $pft = $this->getPackageTypeByFile('composer.json');
         $this->client->request('PUT', '/api/package-type-files/'.$pft->getId().'/priority');
         $this->assertResponseCode(401);
-        $this->client->request('GET', '/api/package-type-files/stats');
-        $this->assertResponseCode(401);
     }
 
     public function testIndex(): void
@@ -38,20 +36,6 @@ class PackageTypeFileControllerTest extends AbstractControllerTest
         self::assertCount(2, $jsonResponse);
         self::assertEquals(false, $jsonResponse[0]['priority']);
         self::assertEquals(true, $jsonResponse[1]['priority']);
-    }
-
-    public function testStats(): void
-    {
-        $this->loginUser($this->client);
-
-        $this->client->request('GET', '/api/package-type-files/stats');
-        $this->assertResponseCode(200);
-        $jsonResponse = $this->getResponseJson($this->client->getResponse());
-        $expected = [
-            ['id' => $this->getPackageTypeByFile('composer.json')->getId(), 'count' => 2],
-            ['id' => $this->getPackageTypeByFile('package.json')->getId(), 'count' => 1],
-        ];
-        self::assertEqualsCanonicalizing($expected, $jsonResponse);
     }
 
     private function getPackageTypeByFile(string $file): PackageTypeFile

@@ -155,4 +155,18 @@ class RepositoryRepository extends ServiceEntityRepository
         return $this->getEntityManager()->createNativeQuery($sql, $rsm)
             ->setParameters($params);
     }
+
+    public function stats(): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('routine2Count', 'routine2Count', 'integer');
+        $rsm->addScalarResult('routine2DoneCount', 'routine2DoneCount', 'integer');
+        $rsm->addScalarResult('routine2ErrorCount', 'routine2ErrorCount', 'integer');
+        $sql = "SELECT count(1) routine2Count, sum(routine2_at IS NOT NULL) routine2DoneCount, sum(routine_error IS NOT NULL) routine2ErrorCount
+            FROM dw_repository
+        ";
+
+        return $this->getEntityManager()->createNativeQuery($sql, $rsm)
+            ->getScalarResult()[0];
+    }
 }

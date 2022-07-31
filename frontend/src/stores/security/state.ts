@@ -2,7 +2,7 @@ import { Me, SecurityState } from './types'
 import { StoreRequest } from '@/stores/types'
 
 function initMe (): Me {
-    const json = localStorage.getItem('me')
+    const json = sessionStorage.getItem('me')
     if (json === null) {
         return new Me()
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\PackageTypeFile;
 use App\Entity\Repository;
 use App\Entity\RepositoryPackageTypeFile;
 use App\Repository\RepositoryPackageTypeFileRepository;
@@ -41,5 +42,21 @@ class AdminController extends AbstractController
         }, $routine3Errors);
 
         return $this->json(array_merge($errors2, $errors3));
+    }
+
+    #[Route(path: '/stats', name: 'admin.stats', methods: ['GET'])]
+    #[Security("is_granted('ROLE_ADMIN')")]
+    public function stats(): Response
+    {
+        $packageTypeFilesStats = $this->em->getRepository(PackageTypeFile::class)->stats();
+        $repoStats = $this->em->getRepository(Repository::class)->stats();
+        $repoPackageTypeFilesStats = $this->em->getRepository(RepositoryPackageTypeFile::class)->stats();
+
+        dump($repoStats);
+
+        return $this->json([
+            'packageTypeFiles' => $packageTypeFilesStats,
+            'routines' => array_merge(['routine1Count' => $repoStats['routine2Count']], $repoStats, $repoPackageTypeFilesStats),
+        ]);
     }
 }
