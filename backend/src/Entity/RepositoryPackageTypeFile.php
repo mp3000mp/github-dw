@@ -44,7 +44,7 @@ class RepositoryPackageTypeFile
     #[ORM\JoinColumn(nullable: false)]
     private Repository $repository;
 
-    #[ORM\ManyToOne(targetEntity: PackageTypeFile::class)]
+    #[ORM\ManyToOne(targetEntity: PackageTypeFile::class, inversedBy: 'repositoryPackageTypeFiles')]
     #[ORM\JoinColumn(nullable: false)]
     private PackageTypeFile $packageTypeFile;
 

@@ -19,12 +19,12 @@ class RepositoryController extends AbstractController
     {
         /** @var RepositoryRepository $repoRepo */
         $repoRepo = $this->em->getRepository(Repository::class);
-        $limit = 20;
 
         $search = $this->requestHelper->handleRequest($request->getContent(), 'repository_search');
         $total = $repoRepo->countWithQuery($search->search);
         $results = [];
         if ($total > 0) {
+            $limit = min(10, $search->perPage);
             $offset = ($search->page - 1) * $limit;
             $results = $repoRepo->findWithQuery($search->search, $offset, $limit);
         }

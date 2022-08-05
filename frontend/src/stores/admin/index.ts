@@ -16,6 +16,14 @@ export const useAdminStore = defineStore('admin', {
                 return Promise.reject(ApiClient.generateErrorMessage(<AxiosError|Error>err))
             }
         },
+        async getErrors () {
+            try {
+                const response = await apiRegistry.get().httpReq(this.actionRequests.getErrors)
+                this.errors = response.data
+            } catch (err) {
+                return Promise.reject(ApiClient.generateErrorMessage(<AxiosError|Error>err))
+            }
+        },
         async getStats () {
             try {
                 const response = await apiRegistry.get().httpReq(this.actionRequests.getStats)

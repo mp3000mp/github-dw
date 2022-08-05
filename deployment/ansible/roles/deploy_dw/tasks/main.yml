@@ -6,16 +6,17 @@
     group: "{{ maintainer_user }}"
     mode: '755'
 
-- name: Create directories system
-  file:
-    path: "{{ app_directory }}/dw/{{ item }}"
-    state: directory
-    owner: "{{ maintainer_user }}"
-    group: "{{ maintainer_user }}"
-    mode: '755'
-    recurse: true
-  loop:
-    - 'log'
+# todo only first time
+#- name: Create directories system
+#  file:
+#    path: "{{ app_directory }}/dw/{{ item }}"
+#    state: directory
+#    owner: "{{ maintainer_user }}"
+#    group: "{{ maintainer_user }}"
+#    mode: '755'
+#    recurse: true
+#  loop:
+#    - 'log'
 
 - name: Deploy build
   copy:

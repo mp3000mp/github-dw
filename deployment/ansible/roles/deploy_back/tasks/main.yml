@@ -46,29 +46,30 @@
     group: "{{ maintainer_user }}"
     mode: '755'
 
-- name: Create directories system
-  file:
-    path: "{{ app_directory }}/backend/{{ item }}"
-    state: directory
-    owner: "{{ maintainer_user }}"
-    group: "{{ maintainer_user }}"
-    mode: '755'
-    recurse: true
-  loop:
-    - 'var'
+# todo only first time
+#- name: Create directories system
+#  file:
+#    path: "{{ app_directory }}/backend/{{ item }}"
+#    state: directory
+#    owner: "{{ maintainer_user }}"
+#    group: "{{ maintainer_user }}"
+#    mode: '755'
+#    recurse: true
+#  loop:
+#    - 'var'
 
-# todo 777 horrible
-- name: Create directories writable
-  file:
-    path: "{{ app_directory }}/backend/{{ item }}"
-    state: directory
-    owner: "{{ maintainer_user }}"
-    group: "{{ maintainer_user }}"
-    mode: '777'
-    recurse: true
-  loop:
-    - 'var/log'
-    - 'var/cache'
+# todo only first time
+#- name: Create directories writable
+#  file:
+#    path: "{{ app_directory }}/backend/{{ item }}"
+#    state: directory
+#    owner: "{{ maintainer_user }}"
+#    group: "{{ maintainer_user }}"
+#    mode: '755'
+#    recurse: true
+#  loop:
+#    - 'var/log'
+#    - 'var/cache'
 
 # not needed because we sync vendor for now
 #- name: Composer install

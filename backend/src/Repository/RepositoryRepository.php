@@ -33,7 +33,7 @@ class RepositoryRepository extends ServiceEntityRepository
         'date' => \DateTime::class,
         'url' => 'string',
     ])]
-    public function findErrors(\DateTime $from): array
+    public function findErrors(\DateTime $from, int $limit = 100): array
     {
         return $this->createQueryBuilder('r')
             ->select(['r.routineError as error', 'r.routine2At as date', 'r.url'])
@@ -41,6 +41,7 @@ class RepositoryRepository extends ServiceEntityRepository
             ->andWhere('r.routineError >= :from')
             ->setParameter('from', $from)
             ->orderBy('r.routine2At', 'desc')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
     }
@@ -70,7 +71,7 @@ class RepositoryRepository extends ServiceEntityRepository
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
 
-        $sqlSelect = 'SELECT r.id, r.name, r.url, r.description, r.forks_count, r.open_issues_count, r.stargazers_count, r.created_at, r.pushed_at';
+        $sqlSelect = 'SELECT r.id, r.full_name, r.name, r.url, r.license_name, r.description, r.forks_count, r.open_issues_count, r.stargazers_count, r.created_at, r.pushed_at';
         $sqlFrom = 'FROM dw_repository r';
         $sqlJoins = [];
         $sqlWhere = ' WHERE r.routine2_at IS NOT NULL AND r.routine_error IS NULL ';

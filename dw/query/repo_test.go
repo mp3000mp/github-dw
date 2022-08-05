@@ -17,9 +17,9 @@ func TestQueryRepo(t *testing.T) {
 	mockedUser := github.User{Login: github.String("user")}
 	mockedLicense := github.License{Name: github.String("license")}
 	ts := github.Timestamp{Time: time.Date(2022, time.July, 16, 1, 0, 0, 0, time.UTC)}
-	languages := make(map[string]int, 0)
-	languages["PHP"] = 10
-	languages["go"] = 20
+// 	languages := make(map[string]int, 0)
+// 	languages["PHP"] = 10
+// 	languages["go"] = 20
 	topics := []string{"topicA", "topicB"}
 
 	mockedClient := mock.NewMockedHTTPClient(
@@ -43,10 +43,10 @@ func TestQueryRepo(t *testing.T) {
 				Topics: topics,
 			},
 		),
-		mock.WithRequestMatch(
-			mock.GetReposLanguagesByOwnerByRepo,
-			languages,
-		),
+// 		mock.WithRequestMatch(
+// 			mock.GetReposLanguagesByOwnerByRepo,
+// 			languages,
+// 		),
 	)
 	ctx := context.Background()
 	queryContext := Context{Client: github.NewClient(mockedClient), Context: &ctx}
@@ -60,7 +60,7 @@ func TestQueryRepo(t *testing.T) {
 		ForksCount: 1,
 		FullName: "fullName",
 		ID: 1000,
-		Languages: languages,
+// 		Languages: languages,
 		LicenseName: "license",
 		MainLanguage: "PHP",
 		Name: "repo",

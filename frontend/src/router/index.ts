@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () =>
         import('../views/AdminPage.vue'),
     beforeEnter: (to, from, next) => {
-      if (securityState.me.roles.includes('ROLE_USER')) {
+      if (securityState.me.roles.includes('ROLE_ADMIN')) {
         next()
       } else {
         next({ name: 'home' })

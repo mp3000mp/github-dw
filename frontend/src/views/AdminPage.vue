@@ -4,22 +4,17 @@ import {useAdminStore} from '@/stores/admin'
 import {useSecurityStore} from '@/stores/security'
 import dayjs from 'dayjs'
 import Chart, {ChartItem} from 'chart.js/auto'
+import {LanguageColorEnum} from '@/stores/search/types'
 
 const adminStore = useAdminStore()
 const securityStore = useSecurityStore()
-
-const languageColors = [
-  {language: 'Go', color: '#00a7d0'},
-  {language: 'Javascript', color: '#efd81d'},
-  {language: 'PHP', color: '#7377ad'},
-  {language: 'Python', color: '#3571a3'},
-]
 
 const camembert = ref(null) as Ref<ChartItem|null>
 
 const adminRequests = computed(() => adminStore.actionRequests)
 const packageTypeFiles = computed(() => adminStore.packageTypeFiles)
 const stats = computed(() => adminStore.stats)
+const errors = computed(() => adminStore.errors)
 const tableData = computed(() => {
   return packageTypeFiles.value.map(ptf => {
     ptf.count = 0
@@ -40,6 +35,7 @@ onMounted(() => {
   if (securityStore.getIsAuth) {
     adminStore.getAll()
     adminStore.getStats()
+    adminStore.getErrors()
   }
 })
 
@@ -53,12 +49,11 @@ watch(stats, () => {
       label: 'total',
       data: tableData.value.map(p => p.count),
       backgroundColor: tableData.value.map(p => {
-        const color = languageColors.find(lc => lc.language === p.language)
-        return color ? color.color : '#000000'
+        return LanguageColorEnum[p.language] ?? '#000000'
       })
     }]
   }
-  const chart = new Chart(camembert.value, {
+  new Chart(camembert.value, {
     type: 'pie',
     data
   })
@@ -67,7 +62,7 @@ watch(stats, () => {
 
 <template>
   <div class="container">
-    <div v-if="adminRequests.getAll.isLoading">...</div>
+    <div v-if="!stats || adminRequests.getAll.isLoading">...</div>
     <div v-else>
       <div class="row app-block mb-2 p-3">
         <h2>Package file types</h2>
@@ -110,13 +105,46 @@ watch(stats, () => {
 
       <div class="row app-block p-3">
         <h2>Waiting lists</h2>
-
         <h3>Routine1</h3>
-
+        <div class="col-md-4">
+          Done: {{ stats.routines.routine1Count }}
+        </div>
         <h3>Routine2</h3>
-
+        <div class="col-md-4">
+          Done: {{ stats.routines.routine2DoneCount }}
+        </div>
+        <div class="col-md-4">
+          Todo: {{ stats.routines.routine2Count-stats.routines.routine2DoneCount }}
+        </div>
+        <div class="col-md-4">
+          Errors: {{ stats.routines.routine2ErrorCount }}
+        </div>
         <h3>Routine3</h3>
+        <div class="col-md-4">
+          Done: {{ stats.routines.routine3DoneCount }}
+        </div>
+        <div class="col-md-4">
+          Todo: {{ stats.routines.routine3Count-stats.routines.routine3DoneCount }}
+        </div>
+        <div class="col-md-4">
+          Errors: {{ stats.routines.routine3ErrorCount }}
+        </div>
+      </div>
 
+      <div class="row app-block p-3">
+        <h2>Waiting lists</h2>
+        <h3>Routine2 ({{ errors.routine2.length }})</h3>
+          <ul>
+            <li v-for="error in errors.routine2" :key="error.date">
+              {{ dayjs(error.date).format('YYYY-MM-DD HH:mm:ss') }} - {{ error.error }} ({{ error.url }})
+            </li>
+          </ul>
+        <h3>Routine3 ({{ errors.routine3.length }})</h3>
+        <ul>
+          <li v-for="error in errors.routine3" :key="error.date">
+            {{ dayjs(error.date).format('YYYY-MM-DD HH:mm:ss') }} - {{ error.error }} ({{ error.url }} - {{ error.path }})
+          </li>
+        </ul>
       </div>
     </div>
   </div>

@@ -8,6 +8,11 @@ module.exports = {
         'eslint:recommended',
         '@vue/typescript/recommended',
     ],
+    globals: {
+        defineEmits: true,
+        defineProps: true,
+        withDefaults: true
+    },
     parserOptions: {
         ecmaVersion: 2020,
     },

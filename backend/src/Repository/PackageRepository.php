@@ -6,6 +6,8 @@ namespace App\Repository;
 
 use App\Entity\Package;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -26,21 +28,23 @@ class PackageRepository extends ServiceEntityRepository
         parent::__construct($registry, Package::class);
     }
 
-    #[ArrayShape([
-        'id' => 'int',
-        'name' => 'string',
-    ])]
+    /**
+     * Caution: DQL partial is used here
+     *
+     * @return Package[]
+     */
     public function autocomplete(string $language, string $text): array
     {
         // todo use levenstein ?
-        return $this->createQueryBuilder('p')
-            ->select(['p.id', 'p.name'])
-            ->innerJoin('p.packageTypeFile', 'ptf')
-            ->where('ptf.language = :language')
-            ->andWhere('p.name like :text_like')
+        $q = $this->getEntityManager()->createQuery('
+            SELECT partial p.{id,name} FROM App\Entity\Package p
+            JOIN p.packageTypeFile ptf
+            WHERE ptf.language = :language
+            AND p.name LIKE :text_like
+        ')
             ->setParameter('language', $language)
-            ->setParameter('text_like', "$text%")
-            ->getQuery()
-            ->getArrayResult();
+            ->setParameter('text_like', "$text%");
+
+        return $q->getResult();
     }
 }

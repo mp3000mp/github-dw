@@ -32,7 +32,6 @@ class Repository
     private string $username;
 
     #[ORM\Column(type: 'string', length: 50)]
-    #[Groups(['all'])]
     private ?string $mainLanguage;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -40,13 +39,14 @@ class Repository
     private string $url;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['all'])]
     private ?string $fullName;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['admin'])]
     private ?string $routineError;
 
-    #[ORM\Column(type: 'string', length: 1000, nullable: true)]
+    #[ORM\Column(type: 'string', length: 4000, nullable: true)]
     #[Groups(['all'])]
     private ?string $description;
 
@@ -111,8 +111,16 @@ class Repository
      */
     #[ORM\OneToMany(mappedBy: 'repository', targetEntity: RepositoryPackageTypeFile::class)]
     #[ORM\JoinColumn]
-    #[Groups(['all'])]
+    #[Groups(['admin'])]
     private Collection $repositoryPackageTypeFiles;
+
+    /**
+     * @var Collection<int, RepositoryPackage>
+     */
+    #[ORM\OneToMany(mappedBy: 'repository', targetEntity: RepositoryPackage::class)]
+    #[ORM\JoinColumn]
+    #[Groups(['admin'])]
+    private Collection $repositoryPackages;
 
     public function __construct()
     {
@@ -360,5 +368,13 @@ class Repository
         if ($this->repositoryPackageTypeFiles->contains($packageTypeFile)) {
             $this->repositoryPackageTypeFiles->removeElement($packageTypeFile);
         }
+    }
+
+    /**
+     * @return Collection<int, RepositoryPackage>
+     */
+    public function getRepositoryPackages(): Collection
+    {
+        return $this->repositoryPackages;
     }
 }

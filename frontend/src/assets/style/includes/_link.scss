@@ -1,9 +1,10 @@
-a {
+a, .link {
   color: $link-color;
   border-bottom: 1px;
   transition: 350ms color ease-in-out;
   position: relative;
   text-decoration: none;
+  cursor: pointer;
 
   &:before,
   &:after {

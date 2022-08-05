@@ -21,12 +21,13 @@ func QueryRepo(context *Context, userName string, repoName string) (Repository, 
 		return Repository{}, err
 	}
 
-	WaitBeforeQuery(context.RateLimiter, "core", true)
-	context.RateLimiter.CoreLastQuery = time.Now()
-	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Context, userName, repoName)
-	if !CheckResponse(err, &context.RateLimiter, "core") {
-		return Repository{}, err
-	}
+	// not used anymore because it costs one query
+// 	WaitBeforeQuery(context.RateLimiter, "core", true)
+// 	context.RateLimiter.CoreLastQuery = time.Now()
+// 	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Context, userName, repoName)
+// 	if !CheckResponse(err, &context.RateLimiter, "core") {
+// 		return Repository{}, err
+// 	}
 
 	mainLanguage := ""
 	if githubRepo.Language != nil {
@@ -42,7 +43,7 @@ func QueryRepo(context *Context, userName string, repoName string) (Repository, 
     	ForksCount: *githubRepo.ForksCount,
     	FullName: *githubRepo.FullName,
     	ID: *githubRepo.ID,
-    	Languages: githubLanguages,
+//    	Languages: githubLanguages,
     	MainLanguage: mainLanguage,
     	Name: *githubRepo.Name,
     	OpenIssuesCount: *githubRepo.OpenIssuesCount,

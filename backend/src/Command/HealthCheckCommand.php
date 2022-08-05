@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:health-check', description: 'Create new user.')]
+#[AsCommand(name: 'app:health-check', description: 'Check external services.')]
 class HealthCheckCommand extends Command
 {
     private EntityManagerInterface $em;
@@ -22,7 +22,6 @@ class HealthCheckCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Health check.');
         $this->setHelp('This command checks services are available.');
     }
 

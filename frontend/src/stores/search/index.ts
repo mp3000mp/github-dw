@@ -14,22 +14,25 @@ interface AutocompletePayload {
 export const useSearchStore = defineStore('search', {
     state: () => state,
     actions: {
-        async search (search: Search) {
+        async packageAutocomplete (payload: AutocompletePayload) {
             try {
-                // this.search = search // todo
-                const response = await apiRegistry.get().httpReq(this.actionRequests.search, {data: search})
-                this.repositories = response.data
+                const response = await apiRegistry.get().httpReq(this.actionRequests.packageAutocomplete, {data: payload})
+                this.packageOptions = response.data
             } catch (err) {
                 return Promise.reject(ApiClient.generateErrorMessage(<AxiosError|Error>err))
             }
         },
-        async packageAutocomplete (payload: AutocompletePayload) {
+        resetPackageOptions () {
+            this.packageOptions = []
+        },
+        async search (search: Search) {
             try {
-                const response = await apiRegistry.get().httpReq(this.actionRequests.packageAutocomplete, {data: payload})
-                this.packages = response.data
+                const response = await apiRegistry.get().httpReq(this.actionRequests.search, {data: search})
+                this.totalRepositories = response.data.total
+                this.repositories = response.data.results
             } catch (err) {
                 return Promise.reject(ApiClient.generateErrorMessage(<AxiosError|Error>err))
             }
-        }
+        },
     }
 })

@@ -6,11 +6,7 @@ import { createPinia } from 'pinia'
 import variables from '../config/variables.json'
 import apiRegistry from './helpers/apiRegistry'
 import {AxiosResponse} from 'axios'
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCircleExclamation, faEllipsis, faHandSparkles, faQuestion, faRightFromBracket, faTrashCan, faWandMagicSparkles,  } from '@fortawesome/free-solid-svg-icons'
-library.add(faCircleExclamation, faEllipsis, faHandSparkles, faQuestion, faRightFromBracket, faTrashCan, faWandMagicSparkles)
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import FontAwesomeIcon from '@/utils/fontAwesome'
 
 import './assets/style/app.scss'
 

@@ -18,6 +18,7 @@ class RepositoryControllerTest extends AbstractControllerTest
         unset($package);
         $query = [
             'page' => 1,
+            'perPage' => 10,
             'search' => $query,
         ];
         $this->client->request('POST', '/api/repositories/search', [], [], [], json_encode($query));

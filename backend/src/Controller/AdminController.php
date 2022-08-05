@@ -29,19 +29,10 @@ class AdminController extends AbstractController
         $routine2Errors = $repoRepo->findErrors($d);
         $routine3Errors = $repoPackageRepo->findErrors($d);
 
-        $errors2 = array_map(function (array $error) {
-            $error['path'] = null;
-            $error['routine'] = 2;
-
-            return $error;
-        }, $routine2Errors);
-        $errors3 = array_map(function (array $error) {
-            $error['routine'] = 3;
-
-            return $error;
-        }, $routine3Errors);
-
-        return $this->json(array_merge($errors2, $errors3));
+        return $this->json([
+            'routine2' => $routine2Errors,
+            'routine3' => $routine3Errors,
+        ]);
     }
 
     #[Route(path: '/stats', name: 'admin.stats', methods: ['GET'])]
@@ -51,8 +42,6 @@ class AdminController extends AbstractController
         $packageTypeFilesStats = $this->em->getRepository(PackageTypeFile::class)->stats();
         $repoStats = $this->em->getRepository(Repository::class)->stats();
         $repoPackageTypeFilesStats = $this->em->getRepository(RepositoryPackageTypeFile::class)->stats();
-
-        dump($repoStats);
 
         return $this->json([
             'packageTypeFiles' => $packageTypeFilesStats,

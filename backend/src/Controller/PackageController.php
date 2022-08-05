@@ -22,6 +22,6 @@ class PackageController extends AbstractController
         $search = $this->requestHelper->handleRequest($request->getContent(), 'package_autocomplete');
         $results = $repoPackageRepo->autocomplete($search->language, $search->text);
 
-        return $this->json($results);
+        return $this->responseHelper->createResponse($results, ['autocomplete']);
     }
 }

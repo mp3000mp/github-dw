@@ -15,11 +15,11 @@ class Package
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
-    #[Groups(['all'])]
+    #[Groups(['all', 'autocomplete'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['all'])]
+    #[Groups(['all', 'autocomplete'])]
     private string $name;
 
     #[ORM\ManyToOne(targetEntity: PackageTypeFile::class)]

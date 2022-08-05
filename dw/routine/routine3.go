@@ -77,6 +77,7 @@ func RunRoutine3(queryContext *query.Context) {
 		}
 
 		// check if package exists or create it
+		dbPackage = model.Package{}
 		r := queryContext.DB.Where("package_type_file_id = ? AND name = ?", repoPackageFile.PackageTypeFileID, pkgItem.Name).Limit(1).Find(&dbPackage)
 		if (r.RowsAffected == 0) {
 			dbPackage = model.Package{

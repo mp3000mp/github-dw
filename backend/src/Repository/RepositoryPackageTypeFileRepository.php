@@ -33,7 +33,7 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
         'path' => 'string',
         'url' => 'string',
     ])]
-    public function findErrors(\DateTime $from): array
+    public function findErrors(\DateTime $from, int $limit = 100): array
     {
         return $this->createQueryBuilder('rptf')
             ->select(['rptf.routineError as error', 'rptf.routine3At as date', 'rptf.path', 'r.url'])
@@ -42,6 +42,7 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
             ->andWhere('rptf.routineError >= :from')
             ->setParameter('from', $from)
             ->orderBy('rptf.routine3At', 'desc')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
     }

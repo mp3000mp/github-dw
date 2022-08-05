@@ -1,8 +1,19 @@
 import { AbstractState } from '@/stores/types'
 
-export interface Dependency {
+export enum LanguageColorEnum {
+    Go = '#00a7d0',
+    Javascript = '#efd81d',
+    PHP = '#7377ad',
+    Python = '#3571a3'
+}
+
+export interface SelectOption {
     id: number;
     name: string;
+}
+interface Topic {
+    id: number;
+    topic: string;
 }
 interface Repository {
     id: number;
@@ -17,24 +28,26 @@ interface Repository {
     stargazersCount: number;
     createdAt: string;
     pushedAt: string;
+    topics: Topic[];
 }
 interface SearchPackage {
     id: number,
-    minVersion: string,
-    maxVersion: string,
+    minVersion: string|null,
+    maxVersion: string|null,
 }
 export interface Search {
-    name: string;
-    description: string;
+    name: string|null;
+    description: string|null;
     packages: SearchPackage[];
 }
 
 export class SearchState extends AbstractState {
-    packages: Dependency[] = [];
+    packageOptions: SelectOption[] = [];
     search: Search = {
-        name: '',
-        description: '',
+        name: null,
+        description: null,
         packages: [],
     };
+    totalRepositories = 0;
     repositories: Repository[] = [];
 }

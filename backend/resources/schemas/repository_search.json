@@ -4,15 +4,22 @@
   "description": "repository_search",
   "type": "object",
   "properties": {
-    "page": {"type":  "integer"},
+    "page": {"type":  "integer", "minimum": 0},
+    "perPage": {"type":  "integer", "minimum": 1},
     "search": {
       "type": "object",
       "properties": {
         "name": {
-          "type": ["string", "null"]
+          "oneOf": [
+            { "type": "string", "pattern": "^[^\\s]{3,}$" },
+            { "type": "null" }
+          ]
         },
         "description": {
-          "type": ["string", "null"]
+          "oneOf": [
+            { "type": "string", "pattern": "^[^\\s]{3,}$" },
+            { "type": "null" }
+          ]
         },
         "packages": {
           "type": "array",
@@ -23,12 +30,16 @@
                 "type": "integer"
               },
               "minVersion": {
-                "type": ["string", "null"],
-                "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$"
+                "oneOf": [
+                  { "type": "string", "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$" },
+                  { "type": "null" }
+                ]
               },
               "maxVersion": {
-                "type": ["string", "null"],
-                "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$"
+                "oneOf": [
+                  { "type": "string", "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$" },
+                  { "type": "null" }
+                ]
               }
             },
             "required": ["id", "minVersion", "maxVersion"]

@@ -31,11 +31,15 @@ func RunRoutine2(queryContext *query.Context) {
 	for _, topic := range searchResult.Topics {
 		topics = append(topics, model.RepositoryTopic{RepositoryID: repo.ID, Topic: topic})
 	}
-	languages := make([]model.RepositoryLanguage, 0)
-	for language, weight := range searchResult.Languages {
-		languages = append(languages, model.RepositoryLanguage{RepositoryID: repo.ID, Language: language, Weight: uint(weight)})
-	}
+	// not used anymore because it costs one query
+// 	languages := make([]model.RepositoryLanguage, 0)
+// 	for language, weight := range searchResult.Languages {
+// 		languages = append(languages, model.RepositoryLanguage{RepositoryID: repo.ID, Language: language, Weight: uint(weight)})
+// 	}
 
+	if len(searchResult.Description) > 4000 {
+		searchResult.Description = fmt.Sprintf("%s...", searchResult.Description[:3996])
+	}
 	queryContext.DB.Model(&repo).Updates(model.Repository{
 		Description: searchResult.Description,
 		MainLanguage: searchResult.MainLanguage,
@@ -53,14 +57,14 @@ func RunRoutine2(queryContext *query.Context) {
 	// relations
 	_ = queryContext.DB.Model(&repo).Association("Topics").Clear()
 	_ = queryContext.DB.Model(&repo).Association("Topics").Append(topics)
-	_ = queryContext.DB.Model(&repo).Association("Languages").Clear()
-	_ = queryContext.DB.Model(&repo).Association("Languages").Append(languages)
+	// not used anymore because it costs one query
+// 	_ = queryContext.DB.Model(&repo).Association("Languages").Clear()
+// 	_ = queryContext.DB.Model(&repo).Association("Languages").Append(languages)
 
 	endRoutine2(&queryContext.Routine2Running, queryContext.Routine2Queue)
 }
 
 func endRoutine2(isRunning *bool, queue *[]model.Repository) {
-	// todo sync ?
 	*queue = (*queue)[1:]
 	*isRunning = false
 	log.Println("End routine 2")

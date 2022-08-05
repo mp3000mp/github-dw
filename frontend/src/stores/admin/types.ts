@@ -1,5 +1,13 @@
 import { AbstractState } from '@/stores/types'
 
+export interface RoutineError {
+    error: string;
+    date: string;
+    url: string;
+}
+export interface Routine3Error extends RoutineError {
+    path :string;
+}
 export interface PackageTypeFiles {
     id: number;
     file: string;
@@ -25,6 +33,7 @@ export interface Stats {
 }
 
 export class AdminState extends AbstractState {
+    errors: {routine2: RoutineError[], routine3: Routine3Error[]} = {routine2: [], routine3: []};
     packageTypeFiles: PackageTypeFiles[] = [];
     stats: Stats|null = null;
 }

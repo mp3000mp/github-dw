@@ -7,6 +7,25 @@ body {
   color: $body-color;
 }
 
+p {
+  margin: 0;
+}
+
 .app-block {
   background-color: $block-bg;
+}
+
+.card {
+  background-color: $body-bg;
+  color: $body-color;
+  border-color: rgba($body-color, .5);
+
+  .card-header {
+    background-color: darken($body-bg, 3%);
+    padding: 0;
+  }
+
+  .card-body {
+    padding: 0;
+  }
 }
