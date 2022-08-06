@@ -22,6 +22,8 @@ func TestGetValidRange(t *testing.T) {
 		{Expected: "Not valid.", Case: ">v one"},
 		{Expected: "Not valid.", Case: "<0"},
 		{Expected: ">=1.2.0 <2.0.0", Case: "^1.2.0"},
+		{Expected: ">=1.2.0 <2.0.0", Case: "^1.2.0-0"},
+		{Expected: ">=1.2.0 <2.0.0", Case: "^1.2.0-2"},
 		{Expected: ">=1.2.0 <1.3.0", Case: "~1.2.0"},
 		{Expected: ">=1.2.1 <65535.65535.65535", Case: ">1.2.0"},
 		{Expected: ">=1.2.0 <65535.65535.65535", Case: ">=1.2.0"},

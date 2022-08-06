@@ -55,9 +55,9 @@ type PackageTypeFile struct {
 
 type RepositoryPackageTypeFile struct {
 	ID uint                                `gorm:"primaryKey"`
-	RepositoryID uint                      `gorm:"not null"`
-	PackageTypeFileID uint 	               `gorm:"not null"`
-	Path string                            `gorm:"size:255;not null"`
+	RepositoryID uint                      `gorm:"uniqueIndex:idx_uniq;not null"`
+	PackageTypeFileID uint 	               `gorm:"uniqueIndex:idx_uniq;not null"`
+	Path string                            `gorm:"uniqueIndex:idx_uniq;size:255;not null"`
 	RoutineError string                    `gorm:"size:255"`
 	SHA string                             `gorm:"size:100;not null"`
 	Routine1At time.Time                   `gorm:"type:DATETIME(0);not null"`
@@ -67,16 +67,16 @@ type RepositoryPackageTypeFile struct {
 
 type Package struct {
 	ID uint                                `gorm:"primaryKey"`
-	PackageTypeFileID uint                 `gorm:"not null"`
-	Name string                            `gorm:"size:100;not null;index"`
+	PackageTypeFileID uint                 `gorm:"uniqueIndex:idx_uniq;not null"`
+	Name string                            `gorm:"uniqueIndex:idx_uniq;size:100;not null;index"`
 	RepositoryPackages []RepositoryPackage `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 type RepositoryPackage struct {
 	ID uint                          `gorm:"primaryKey"`
-	RepositoryPackageTypeFileID uint `gorm:"not null"`
+	RepositoryPackageTypeFileID uint `gorm:"not null"` // no unique index because of OR version pattern
 	PackageID uint                   `gorm:"not null"`
-	RepositoryID uint                `gorm:"not null"`
+	RepositoryID uint                `gorm:"not null"` // not necessary but boost search perf
 	VersionStr string                `gorm:"size:55;not null"`
 	VersionMinMajor uint16           `gorm:"not null;index"`
 	VersionMinMinor uint16           `gorm:"not null;index"`
@@ -125,11 +125,13 @@ func InitDatabase(db *gorm.DB) error {
 	}
 
 	packageTypes := []PackageTypeFile{
-		PackageTypeFile{Language: "PHP", Name: "Composer", File: "composer.json", Priority: true},
-		PackageTypeFile{Language: "Javascript", Name: "npm", File: "package.json"},
-		PackageTypeFile{Language: "Go", Name: "Go", File: "go.mod"},
-		PackageTypeFile{Language: "Python", Name: "pip", File: "requirements.txt"},
-		PackageTypeFile{Language: "Python", Name: "pip", File: "setup.py"},
+		PackageTypeFile{Language: "PHP", Name: "Composer", File: "composer.json", GithubCurrentSize: 500, Priority: true},
+		PackageTypeFile{Language: "Javascript", Name: "npm", File: "package.json", GithubCurrentSize: 1000},
+		PackageTypeFile{Language: "Go", Name: "Go", File: "go.mod", GithubCurrentSize: 500},
+		PackageTypeFile{Language: "Python", Name: "pip", File: "requirements.txt", GithubCurrentSize: 400},
+//		PackageTypeFile{Language: "Python", Name: "pip", File: "setup.py", GithubCurrentSize: 300}, // python interpreter needed
+//		PackageTypeFile{Language: "Python", Name: "pip", File: "pyproject.toml", GithubCurrentSize: 300},
+//		PackageTypeFile{Language: "Python", Name: "pip", File: "Pipfile", GithubCurrentSize: 300},
 	}
 	for _, pack := range packageTypes {
 		db.Clauses(clause.OnConflict{DoNothing: true}).Create(&pack)

@@ -1,7 +1,6 @@
 a, .link {
   color: $link-color;
-  border-bottom: 1px;
-  transition: 350ms color ease-in-out;
+  transition: color 350ms ease-in-out;
   position: relative;
   text-decoration: none;
   cursor: pointer;
@@ -14,7 +13,7 @@ a, .link {
     bottom: -5px;
     width: 0;
     height: 2px;
-    transition: all 350ms ease-in-out;
+    transition: width 350ms ease-in-out, color 350ms ease-in-out, opacity 350ms ease-in-out;
     background-color: $link-color-hover;
   }
 
@@ -35,14 +34,12 @@ a, .link {
       width: 50%;
     }
   }
-}
 
-.btn {
-  &.btn-primary {
-    background-color: $link-color;
-    border-color: $body-color;
-    &:hover {
-      background-color: $link-color-hover;
+  &.no-deco {
+    &:before,
+    &:after {
+      opacity: 0;
+      width: 0;
     }
   }
 }

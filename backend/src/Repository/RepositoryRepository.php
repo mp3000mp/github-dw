@@ -163,11 +163,47 @@ class RepositoryRepository extends ServiceEntityRepository
         $rsm->addScalarResult('routine2Count', 'routine2Count', 'integer');
         $rsm->addScalarResult('routine2DoneCount', 'routine2DoneCount', 'integer');
         $rsm->addScalarResult('routine2ErrorCount', 'routine2ErrorCount', 'integer');
-        $sql = "SELECT count(1) routine2Count, sum(routine2_at IS NOT NULL) routine2DoneCount, sum(routine_error IS NOT NULL) routine2ErrorCount
+        $sql = '
+            SELECT count(1) routine2Count, sum(routine2_at IS NOT NULL) routine2DoneCount, sum(routine_error IS NOT NULL) routine2ErrorCount
             FROM dw_repository
-        ";
+        ';
 
         return $this->getEntityManager()->createNativeQuery($sql, $rsm)
             ->getScalarResult()[0];
+    }
+
+    public function timelineRoutine1(\DateTime $minDate): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('label', 'label', 'string');
+        $rsm->addScalarResult('done', 'done', 'integer');
+        $sql = "
+            SELECT DATE_FORMAT(routine1_at, '%Y-%m-%d') label, count(1) done
+            FROM dw_repository
+            WHERE routine1_at > :min_date
+            GROUP BY DATE_FORMAT(routine1_at, '%Y-%m-%d')
+        ";
+
+        return $this->getEntityManager()->createNativeQuery($sql, $rsm)
+            ->setParameter('min_date', $minDate)
+            ->getScalarResult();
+    }
+
+    public function timelineRoutine2(\DateTime $minDate): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('label', 'label', 'string');
+        $rsm->addScalarResult('done', 'done', 'integer');
+        $rsm->addScalarResult('errors', 'errors', 'integer');
+        $sql = "
+            SELECT DATE_FORMAT(routine2_at, '%Y-%m-%d') label, count(1) done, sum(routine_error IS NOT NULL) errors
+            FROM dw_repository
+            WHERE routine2_at > :min_date
+            GROUP BY DATE_FORMAT(routine2_at, '%Y-%m-%d')
+        ";
+
+        return $this->getEntityManager()->createNativeQuery($sql, $rsm)
+            ->setParameter('min_date', $minDate)
+            ->getScalarResult();
     }
 }

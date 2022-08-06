@@ -83,17 +83,25 @@ class DwFixtures extends Fixture
         $this->createRepositoryPackage('C', 'B', '1.0.0', '2.0.0');
         $this->createRepositoryPackage('C', 'C', '1.0.0', '2.0.0');
 
+        // not done
+        $this->createRepository('T');
+        $this->repositories['T']->setRoutine2At(null);
+        $this->createRepositoryPackageTypeFile('T', 'PHP');
+        $this->repositoryPackageTypeFiles['T_PHP']->setRoutine3At(null);
+
         // errors
         $this->repositories['err'] = new Repository();
+        $this->repositories['err']->setRoutine1At(new \DateTime('-3 days'));
+        $this->repositories['err']->setRoutine2At(new \DateTime('-1 days'));
         $this->repositories['err']->setName('nameErr');
         $this->repositories['err']->setUsername('usernameErr');
         $this->repositories['err']->setRoutineError('error2');
         $this->repositories['err']->setUrl('https://err.github.com');
-        $this->repositories['err']->setRoutine1At(new \DateTime('2022-07-22 06:00:00'));
         $manager->persist($this->repositories['err']);
 
         $this->repositoryPackageTypeFiles['err_err'] = new RepositoryPackageTypeFile();
-        $this->repositoryPackageTypeFiles['err_err']->setRoutine1At(new \DateTime('2022-07-22 04:30:00'));
+        $this->repositoryPackageTypeFiles['err_err']->setRoutine1At(new \DateTime('-6 days'));
+        $this->repositoryPackageTypeFiles['err_err']->setRoutine3At(new \DateTime('-2 days'));
         $this->repositoryPackageTypeFiles['err_err']->setPath('path/err');
         $this->repositoryPackageTypeFiles['err_err']->setSha('sha_err');
         $this->repositoryPackageTypeFiles['err_err']->setRepository($this->repositories['err']);
@@ -111,8 +119,8 @@ class DwFixtures extends Fixture
         $this->repositories[$repoRef]->setDescription("description$repoRef");
         $this->repositories[$repoRef]->setUsername("username$repoRef");
         $this->repositories[$repoRef]->setUrl("https://$repoRef.github.com");
-        $this->repositories[$repoRef]->setRoutine1At(new \DateTime('2022-07-22 02:00:00'));
-        $this->repositories[$repoRef]->setRoutine2At(new \DateTime('2022-07-22 02:30:00'));
+        $this->repositories[$repoRef]->setRoutine1At(new \DateTime('-5 days'));
+        $this->repositories[$repoRef]->setRoutine2At(new \DateTime('-4 days'));
         $this->em->persist($this->repositories[$repoRef]);
     }
 
@@ -120,7 +128,8 @@ class DwFixtures extends Fixture
     {
         $ref = $repoRef.'_'.$packageTypeFileRef;
         $this->repositoryPackageTypeFiles[$ref] = new RepositoryPackageTypeFile();
-        $this->repositoryPackageTypeFiles[$ref]->setRoutine1At(new \DateTime('2022-07-22 02:30:00'));
+        $this->repositoryPackageTypeFiles[$ref]->setRoutine1At(new \DateTime('-5 days'));
+        $this->repositoryPackageTypeFiles[$ref]->setRoutine3At(new \DateTime('-3 days'));
         $this->repositoryPackageTypeFiles[$ref]->setPath("path/$ref");
         $this->repositoryPackageTypeFiles[$ref]->setSha("sha_$ref");
         $this->repositoryPackageTypeFiles[$ref]->setRepository($this->repositories[$repoRef]);

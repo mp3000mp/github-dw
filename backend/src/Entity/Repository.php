@@ -127,6 +127,7 @@ class Repository
         $this->languages = new ArrayCollection();
         $this->topics = new ArrayCollection();
         $this->repositoryPackageTypeFiles = new ArrayCollection();
+        $this->repositoryPackages = new ArrayCollection();
     }
 
     public function getId(): ?int

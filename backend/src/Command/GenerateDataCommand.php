@@ -8,6 +8,8 @@ use App\Entity\Repository;
 use App\Entity\RepositoryPackage;
 use App\Entity\RepositoryPackageTypeFile;
 use Doctrine\ORM\EntityManagerInterface;
+use Faker\Factory;
+use Faker\Generator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -15,8 +17,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Faker\Factory;
-use Faker\Generator;
 
 #[AsCommand(name: 'app:generate-data', description: 'Generate dev data.')]
 class GenerateDataCommand extends Command
@@ -58,7 +58,7 @@ class GenerateDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($this->parameterBag->get('app.env') !== 'dev') {
+        if ('dev' !== $this->parameterBag->get('app.env')) {
             $output->writeln('This command should be used in DEV env only.');
 
             return Command::FAILURE;
@@ -72,7 +72,7 @@ class GenerateDataCommand extends Command
 
         $this->faker = Factory::create();
         $output->writeln(sprintf('Generating %d package files...', $repositoryNumber));
-        $pb = new ProgressBar($output, $repositoryNumber, 1/8);
+        $pb = new ProgressBar($output, $repositoryNumber, 1 / 8);
         $pb->start();
 
         $allPackageTypeFiles = $this->em->getRepository(PackageTypeFile::class)->findAll();
@@ -80,7 +80,7 @@ class GenerateDataCommand extends Command
         $allUrls = array_unique(array_map(function (Repository $repository) {
             return $repository->getUrl();
         }, $this->em->getRepository(Repository::class)->findAll()));
-        for ($i = 0; $i < $repositoryNumber; $i++) {
+        for ($i = 0; $i < $repositoryNumber; ++$i) {
             $pb->advance();
 
             // routine 1
@@ -96,7 +96,7 @@ class GenerateDataCommand extends Command
             $repoPackageTypeFile->setRepository($repo);
             $repoPackageTypeFile->setPackageTypeFile($packageTypeFile);
             $repoPackageTypeFile->setRoutine1At($repo->getRoutine1At());
-            $repoPackageTypeFile->setPath('/' . implode('/', $this->faker->words($this->faker->numberBetween(0, 2))));
+            $repoPackageTypeFile->setPath('/'.implode('/', $this->faker->words($this->faker->numberBetween(0, 2))));
             $repoPackageTypeFile->setSha($this->faker->sha256());
             $this->em->persist($repoPackageTypeFile);
 
@@ -135,8 +135,8 @@ class GenerateDataCommand extends Command
             if (count($allPackages) >= 100) {
                 $packages = $this->faker->randomElements($allPackages, $this->packagePerRepo, false);
             }
-            for ($j = 0; $j < $this->packagePerRepo; $j++) {
-                if (count($packages) === 0 || $this->alea($this->createPackageRatio)) {
+            for ($j = 0; $j < $this->packagePerRepo; ++$j) {
+                if (0 === count($packages) || $this->alea($this->createPackageRatio)) {
                     $package = $this->genPackage($packageTypeFile);
                 } else {
                     $package = array_pop($allPackages);
@@ -186,7 +186,7 @@ class GenerateDataCommand extends Command
             $repoPackage->setVersionMinMajor($v);
             $repoPackage->setVersionMinMinor(0);
             $repoPackage->setVersionMinPatch(0);
-            $repoPackage->setVersionMaxMajor($v+1);
+            $repoPackage->setVersionMaxMajor($v + 1);
             $repoPackage->setVersionMaxMinor(0);
             $repoPackage->setVersionMaxPatch(0);
         }

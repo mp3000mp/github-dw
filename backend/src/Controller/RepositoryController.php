@@ -8,6 +8,7 @@ use App\Entity\Repository;
 use App\Repository\RepositoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -15,8 +16,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RepositoryController extends AbstractController
 {
     #[Route(path: '/search', name: 'repositories.search', methods: ['POST'])]
-    public function search(Request $request, SerializerInterface $serializer): Response
+    public function search(Request $request, SerializerInterface $serializer, RateLimiterFactory $searchRouteLimiter): Response
     {
+        $limiter = $searchRouteLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            return $this->json([
+                'message' => 'You are limited to 60 search requests per hour, please try later.',
+            ], Response::HTTP_TOO_MANY_REQUESTS);
+        }
+
         /** @var RepositoryRepository $repoRepo */
         $repoRepo = $this->em->getRepository(Repository::class);
 

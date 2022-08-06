@@ -17,6 +17,10 @@ func ParseGoMod(rawContent string) ([]Package, error) {
 	for _, row := range data {
 		trimed := strings.Trim(strings.TrimSpace(row), "\t")
 
+		if strings.HasSuffix(trimed, "// indirect") {
+			continue
+		}
+
 		goVersion := goRegex.FindString(trimed)
 		if goVersion != "" {
 			pkg := strings.Split(goVersion, " ")

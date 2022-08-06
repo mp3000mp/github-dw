@@ -6,10 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Package;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @method Package|null find($id, $lockMode = null, $lockVersion = null)
@@ -29,7 +26,7 @@ class PackageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Caution: DQL partial is used here
+     * Caution: DQL partial is used here.
      *
      * @return Package[]
      */

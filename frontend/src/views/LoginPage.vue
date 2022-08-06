@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, computed, onMounted} from 'vue'
+import {ref, computed} from 'vue'
 import { useSecurityStore } from '@/stores/security'
 import { useRouter } from 'vue-router'
 
@@ -25,12 +25,6 @@ async function login () {
     router.push({ name: 'admin' })
   }
 }
-
-onMounted(() => {
-  if (securityStore.getIsAuth) {
-    router.push({ name: 'admin' })
-  }
-})
 </script>
 
 <template>
@@ -44,8 +38,8 @@ onMounted(() => {
           <input required="required" class="form-control" id="password" type="password" placeholder="Password" v-model="password" />
         </div>
         <div class="form-group">
-          <input class="btn btn-primary fa-pull-right" type="submit" :disabled="securityRequests.login.loading" value="Log in" />
-          <div v-if="securityRequests.login.message.length > 0" class="alert alert-danger mt-2">{{ securityRequests.login.message }}</div>
+          <input class="btn fa-pull-right" type="submit" :disabled="securityRequests.login.loading" value="Log in" />
+          <div v-if="securityRequests.login.isError" class="danger mt-2">{{ securityRequests.login.message }}</div>
         </div>
       </form>
     </div>

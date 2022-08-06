@@ -5,6 +5,7 @@ namespace App\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
@@ -16,10 +17,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class Authenticator extends AbstractLoginFormAuthenticator
 {
     private SerializerInterface $serializer;
+    private RateLimiterFactory $loginRouteLimiter;
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, RateLimiterFactory $loginRouteLimiter)
     {
         $this->serializer = $serializer;
+        $this->loginRouteLimiter = $loginRouteLimiter;
     }
 
     public function start(Request $request, AuthenticationException $authException = null): Response
@@ -36,6 +39,11 @@ class Authenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
+        $limiter = $this->loginRouteLimiter->create($request->getClientIp());
+        if (!$limiter->consume(1)->isAccepted()) {
+            throw new AuthenticationException('Too many attempts, please try later.');
+        }
+
         $content = json_decode($request->getContent(), true);
         $password = $request->request->get('password')
             ?? $content['password'] ?? null;
@@ -64,6 +72,6 @@ class Authenticator extends AbstractLoginFormAuthenticator
     {
         return new JsonResponse([
             'message' => $exception->getMessage(),
-        ], Response::HTTP_UNAUTHORIZED);
+        ], 'Too many attempts, please try later.' === $exception->getMessage() ? Response::HTTP_TOO_MANY_REQUESTS : Response::HTTP_UNAUTHORIZED);
     }
 }

@@ -1,7 +1,20 @@
 table {
   tr {
+    transition: background-color 200ms ease-in-out;
     &:hover {
-      background-color: $block-bg;
+      background-color: $body-bg;
+    }
+  }
+  th {
+    text-align: center;
+    border-bottom: $grey solid 1px;;
+  }
+  td {
+    text-align: center;
+    border-left: $grey solid 1px;
+
+    &:first-child {
+      border-left: none;
     }
   }
 }

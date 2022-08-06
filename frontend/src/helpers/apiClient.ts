@@ -1,13 +1,5 @@
-import axios, {AxiosError, AxiosInstance, AxiosResponse} from 'axios'
 import { StoreRequest } from '@/stores/types'
 import {CallbackOnError} from '@/helpers/apiRegistry'
-
-const debugMode = false
-function debug (msg: string) {
-    if (debugMode) {
-        console.log(msg) // eslint-disable-line
-    }
-}
 
 interface ErrorResponseSchemas {
     message?: string;
@@ -25,19 +17,15 @@ interface ApiRequestConfig {
 
 export class ApiClient {
     baseUrl: string;
-    private axios: AxiosInstance;
-    private nbRefreshTokenRetry = 0;
+    headers = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+    }
     onError: CallbackOnError;
 
     constructor (baseURL: string, onError: CallbackOnError) {
         this.baseUrl = baseURL
         this.onError = onError
-        this.axios = axios.create({
-            baseURL,
-            headers: {
-                'content-type': 'application/json'
-            }
-        })
     }
 
     private static generateUrl (url: string, urlParams: {[key: string]: string}): string {
@@ -51,58 +39,44 @@ export class ApiClient {
         return url
     }
 
-    public static generateErrorMessage (err: AxiosError<ErrorResponseSchemas>|Error): string {
-        if (err instanceof AxiosError && err.response) {
-            return err.response.data.message ||
-                err.response.data.detail ||
-                `Unexpected error ${err.response.status}: ${err.response.statusText}`
-            // return msg.replaceAll('\n', '<br />')
-        }
-        return 'unexpected err'
+    public static generateErrorMessage (responseJson: ErrorResponseSchemas): string {
+        return responseJson.message ||
+            responseJson.detail ||
+            'Unexpected error'
     }
 
     /**
      * if response status is different than 2xx, promise will be rejected with an error containing the response
      */
-    async httpReq (request: StoreRequest, options: ApiRequestConfig = {}): Promise<AxiosResponse> {
+    async httpReq (request: StoreRequest, options: ApiRequestConfig = {}): Promise<any> { // eslint-disable-line
+        const url = this.baseUrl + ApiClient.generateUrl(request.url, options.urlParams || {})
         const config = {
-            data: options.data || {},
-            headers: options.headers || {},
+            body: options.data ? JSON.stringify(options.data) : null,
+            credentials: 'include' as RequestCredentials,
+            headers: {...this.headers, ...options.headers || {}},
             method: request.method,
-            url: ApiClient.generateUrl(request.url, options.urlParams || {}),
-            withCredentials: true
         }
-        // if (request.auth) {
-        //     // cookie sent in headers
-        // }
 
-        debug(`req start: ${config.method} ${config.url}`)
         request.start()
+        let errorMsg = ''
         try {
-            const response = await this.axios.request(config)
+            const response = await fetch(url, config)
+            const responseJson = await response.json()
 
-            this.nbRefreshTokenRetry = 0
-            debug(`req ok: ${config.method} ${config.url}`)
-            request.end(response.status, response.data.message || '')
-            return response
+            if (!response.ok || response.status < 200 || response.status >= 300) {
+                errorMsg = ApiClient.generateErrorMessage(responseJson)
+                this.onError(response.status)
+                request.end(response.status, errorMsg)
+                throw new Error(errorMsg)
+            }
+
+            request.end(response.status, responseJson.message || '')
+            return responseJson
         } catch (err) {
-            if (err instanceof AxiosError && err.response) {
-                debug(`req ${err.response.status}: ${config.method} ${config.url}`)
-
-                // tru refresh token
-                if (err.response.status === 401 && err.response.data.message === 'Expired JWT Token' && this.nbRefreshTokenRetry === 0) {
-                    this.nbRefreshTokenRetry++
-                    debug(`req ${err.response.status}: ${config.method} ${config.url}`)
-                    request.end(err.response.status, ApiClient.generateErrorMessage(err))
-                    this.onError(err.response)
-                    throw err
-                }
-                this.onError(err.response)
-                request.end(err.response.status, ApiClient.generateErrorMessage(err))
-            } else {
-                debug(`unexpected err: ${config.method} ${config.url}`)
-                debug(String(err))
-                request.end(500, 'Unexpected request error')
+            if (!errorMsg) {
+                errorMsg = String(err)
+                this.onError(500)
+                request.end(500, errorMsg)
             }
             throw err
         }

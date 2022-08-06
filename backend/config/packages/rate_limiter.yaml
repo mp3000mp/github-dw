@@ -1,0 +1,24 @@
+framework:
+  rate_limiter:
+    login_route:
+      # use 'sliding_window' if you prefer that policy
+      policy: 'fixed_window'
+      limit: 10
+      interval: '60 minutes'
+    search_route:
+      policy: 'fixed_window'
+      limit: 60
+      interval: '60 minutes'
+
+when@test:
+  framework:
+    rate_limiter:
+      login_route:
+        # use 'sliding_window' if you prefer that policy
+        policy: 'fixed_window'
+        limit: 99999
+        interval: '60 minutes'
+      search_route:
+        policy: 'fixed_window'
+        limit: 99999
+        interval: '60 minutes'

@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RepositoryPackageTypeFileRepository::class)]
 #[ORM\Table(name: 'dw_repository_package_type_file')]
+#[ORM\UniqueConstraint(name: 'idx_uniq', columns: ['repository_id', 'package_type_file_id', 'path'])]
 class RepositoryPackageTypeFile
 {
     #[ORM\Id]
@@ -40,7 +41,7 @@ class RepositoryPackageTypeFile
     #[Groups(['admin'])]
     private ?DateTime $routine3At;
 
-    #[ORM\ManyToOne(targetEntity: Repository::class)]
+    #[ORM\ManyToOne(targetEntity: Repository::class, inversedBy: 'repositoryPackageTypeFiles')]
     #[ORM\JoinColumn(nullable: false)]
     private Repository $repository;
 

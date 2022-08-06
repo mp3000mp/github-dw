@@ -49,7 +49,7 @@ class RepositoryPackage
     #[Groups(['all'])]
     private bool $valid;
 
-    #[ORM\ManyToOne(targetEntity: RepositoryPackageTypeFile::class)]
+    #[ORM\ManyToOne(targetEntity: RepositoryPackageTypeFile::class, inversedBy: 'repositoryPackages')]
     #[ORM\JoinColumn(nullable: false)]
     private RepositoryPackageTypeFile $repositoryPackageTypeFile;
 
@@ -58,7 +58,7 @@ class RepositoryPackage
     #[Groups(['all'])]
     private Package $package;
 
-    #[ORM\ManyToOne(targetEntity: Repository::class)]
+    #[ORM\ManyToOne(targetEntity: Repository::class, inversedBy: 'repositoryPackages')]
     #[ORM\JoinColumn(nullable: false)]
     private Repository $repository;
 

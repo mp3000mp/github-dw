@@ -1,12 +1,17 @@
 // vars
 @import './includes/vars';
 
-@import '~bootstrap';
+@import "~bootstrap/scss/bootstrap-reboot";
+@import '~bootstrap/scss/bootstrap-grid';
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/forms";
 
 // custom
 @import './includes/structure';
 @import './includes/link';
+@import './includes/button';
 @import './includes/footer';
 @import './includes/header';
 @import './includes/form';
+@import './includes/table';
 @import './includes/utils';

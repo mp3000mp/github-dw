@@ -26,8 +26,8 @@ export const useSecurityStore = defineStore('security', {
     actions: {
         async login (data: LoginPayload) {
             try {
-                const response = await apiRegistry.get().httpReq(this.actionRequests.login, { data })
-                this.me = response.data.me
+                const responseJson = await apiRegistry.get().httpReq(this.actionRequests.login, { data })
+                this.me = responseJson.me
             } catch (err) {
                 this.me = new Me()
             } finally {
@@ -44,8 +44,7 @@ export const useSecurityStore = defineStore('security', {
         },
         async getMe () {
             try {
-                const response = await apiRegistry.get().httpReq(this.actionRequests.getMe)
-                this.me = response.data
+                this.me = await apiRegistry.get().httpReq(this.actionRequests.getMe)
             } catch (err) {
                 this.me = new Me()
             } finally {

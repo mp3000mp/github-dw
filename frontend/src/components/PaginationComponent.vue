@@ -40,10 +40,11 @@ function goto(page: number) {
 <template>
   <div class="pages">
     <strong>Page: </strong>
-    <span class="mx-1 link" v-if="currentPage-displayedLinks > 1" @click="goto(1)">1</span>
+    <span class="mx-1" v-if="maxPage === 0">0</span>
+    <span class="mx-1 link no-deco" v-if="currentPage-displayedLinks > 1" @click="goto(1)">1</span>
     <span class="mx-1" v-if="currentPage-displayedLinks > 2">...</span>
-    <span class="mx-1" :class="{link: link.isLink}" v-for="link in links" :key="link.page" @click="goto(link.page)">{{ link.page }}</span>
+    <span class="mx-1 no-deco" :class="{link: link.isLink}" v-for="link in links" :key="link.page" @click="goto(link.page)">{{ link.page }}</span>
     <span class="mx-1" v-if="currentPage+displayedLinks < maxPage-1">...</span>
-    <span class="mx-1 link" v-if="currentPage+displayedLinks < maxPage" @click="goto(maxPage)">{{ maxPage }}</span>
+    <span class="mx-1 link no-deco" v-if="currentPage+displayedLinks < maxPage" @click="goto(maxPage)">{{ maxPage }}</span>
   </div>
 </template>

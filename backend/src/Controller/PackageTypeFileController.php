@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\PackageTypeFile;
-use App\Entity\Repository;
-use App\Entity\RepositoryPackageTypeFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,5 +33,4 @@ class PackageTypeFileController extends AbstractController
 
         return $this->responseHelper->createResponse($packageTypes, ['admin']);
     }
-
 }

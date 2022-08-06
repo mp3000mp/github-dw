@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PackageRepository::class)]
 #[ORM\Table(name: 'dw_package')]
+#[ORM\UniqueConstraint(name: 'idx_uniq', columns: ['package_type_file_id', 'name'])]
 class Package
 {
     #[ORM\Id]

@@ -26,7 +26,7 @@ func TestParseComposerJson(t *testing.T) {
 		{Name: "pkgC", Version: "^1.7"},
 		{Name: "pkgC", Version: "^2.0.0-0"},
 	}
-	r, err = ParseComposerJson(`{"require": {"pkgA": "^1.0.0", "pkgB": "1.1.*"}, "require-dev": {"pkgC": "^1.7 || ^2.0.0-0"}}`)
+	r, err = ParseComposerJson(`{"require": {"pkgA": "^1.0.0", "pkgB": "1.1.*"}, "require-dev": {"pkgC": "^1.7 | ^2.0.0-0"}}`)
 	assert.Equal(nil, err)
 	assert.ElementsMatch(expected, r)
 }

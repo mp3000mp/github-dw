@@ -35,6 +35,11 @@ interface SearchPackage {
     minVersion: string|null,
     maxVersion: string|null,
 }
+export interface SearchQuery {
+    page: number;
+    perPage: number;
+    search: Search;
+}
 export interface Search {
     name: string|null;
     description: string|null;

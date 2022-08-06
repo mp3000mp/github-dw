@@ -21,7 +21,7 @@ class RepositoryTopic
     #[Groups(['all'])]
     private string $topic;
 
-    #[ORM\ManyToOne(targetEntity: Repository::class)]
+    #[ORM\ManyToOne(targetEntity: Repository::class, inversedBy: 'topics')]
     #[ORM\JoinColumn(nullable: false)]
     private Repository $repository;
 

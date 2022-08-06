@@ -43,7 +43,7 @@ func GetVersionRange(v string) VersionRange {
 	}
 
 	// handle hyphenated range
-	hyphenatedRegex := regexp.MustCompile(`(^|[^\d])(\d{1,5}(?:\.\d{1,5})?(?:\.\d{1,5})?)\s*-\s*v?(\d{1,5}(?:\.\d{1,5})?(?:\.\d{1,5})?)`)
+	hyphenatedRegex := regexp.MustCompile(`(^|[^\d=<>\^~\.])(\d{1,5}(?:\.\d{1,5})?(?:\.\d{1,5})?)\s*-\s*v?(\d{1,5}(?:\.\d{1,5})?(?:\.\d{1,5})?)`)
 	rs := hyphenatedRegex.FindStringSubmatch(v)
 
 	if len(rs) > 0 {
@@ -63,10 +63,11 @@ func GetVersionRange(v string) VersionRange {
 		vr.MaxMinor = tmpVr.MaxMinor
 		vr.MaxPatch = tmpVr.MaxPatch
 		vr.Valid = IsValidRange(vr)
+
 		return vr
 	}
 
-	// handle combining ranges (only AND)
+	// handle combining ranges (only AND, OR must be split before)
 	combiningRangesRegex := regexp.MustCompile(`([=<>]+v?\d{1,5}(?:\.\d{1,5})?(?:\.\d{1,5})?)([=<>]+v?\d{1,5}(?:\.\d{1,5})?(?:\.\d{1,5})?)`)
 	rs = combiningRangesRegex.FindStringSubmatch(v)
 

@@ -53,11 +53,29 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
         $rsm->addScalarResult('routine3Count', 'routine3Count', 'integer');
         $rsm->addScalarResult('routine3DoneCount', 'routine3DoneCount', 'integer');
         $rsm->addScalarResult('routine3ErrorCount', 'routine3ErrorCount', 'integer');
-        $sql = "SELECT count(1) routine3Count, sum(routine3_at IS NOT NULL) routine3DoneCount, sum(routine_error IS NOT NULL) routine3ErrorCount
+        $sql = 'SELECT count(1) routine3Count, sum(routine3_at IS NOT NULL) routine3DoneCount, sum(routine_error IS NOT NULL) routine3ErrorCount
             FROM dw_repository_package_type_file
-        ";
+        ';
 
         return $this->getEntityManager()->createNativeQuery($sql, $rsm)
             ->getScalarResult()[0];
+    }
+
+    public function timelineRoutine3(\DateTime $minDate): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('label', 'label', 'string');
+        $rsm->addScalarResult('done', 'done', 'integer');
+        $rsm->addScalarResult('errors', 'errors', 'integer');
+        $sql = "
+            SELECT DATE_FORMAT(routine3_at, '%Y-%m-%d') label, count(1) done, sum(routine_error IS NOT NULL) errors
+            FROM dw_repository_package_type_file
+            WHERE routine3_at > :min_date
+            GROUP BY DATE_FORMAT(routine3_at, '%Y-%m-%d')
+        ";
+
+        return $this->getEntityManager()->createNativeQuery($sql, $rsm)
+            ->setParameter('min_date', $minDate)
+            ->getScalarResult();
     }
 }

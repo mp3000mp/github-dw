@@ -3,6 +3,7 @@ package routine
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"main/model"
@@ -27,6 +28,10 @@ func RunRoutine3(queryContext *query.Context) {
 		msg := fmt.Sprintf("Routine 3 => Error while querying blob %s file %s: %s", repo.URL, repoPackageFile.Path, err.Error())
 		log.Println(msg)
 		endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
+		if strings.Contains(err.Error(), "404 Not found") {
+			queryContext.DB.Delete(&repoPackageFile)
+			return
+		}
 	 	queryContext.DB.Model(&repoPackageFile).Updates(model.RepositoryPackageTypeFile{ID: repoPackageFile.ID, Routine3At: time.Now(), RoutineError: msg})
 		return
 	}
@@ -41,7 +46,7 @@ func RunRoutine3(queryContext *query.Context) {
 		packages, err = parser.ParseGoMod(blob.Content)
 	} else if queryContext.Routine1PackageType.File == "requirements.txt" {
 		packages, err = parser.ParseRequirementsTxt(blob.Content)
-// todo
+// todo ?
 //	} else if queryContext.Routine1PackageType.File == "setup.py" {
 //		packages, err = parser.ParseSetupPy(blob.Content)
 	} else {
@@ -50,6 +55,12 @@ func RunRoutine3(queryContext *query.Context) {
 	if err != nil {
 		msg := fmt.Sprintf("Routine 3 => Error while parsing package file: %s", err.Error())
 		log.Println(msg)
+		// invalid file
+		if strings.Contains(msg, "invalid character") || strings.Contains(msg, "unexpected end of JSON") || strings.Contains(msg, "cannot unmarshal object") {
+			queryContext.DB.Delete(&repoPackageFile)
+			endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
+			return
+		}
 		endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
 	 	queryContext.DB.Model(&repoPackageFile).Updates(model.RepositoryPackageTypeFile{ID: repoPackageFile.ID, Routine3At: time.Now(), RoutineError: msg})
 		return
@@ -113,7 +124,6 @@ func RunRoutine3(queryContext *query.Context) {
 }
 
 func endRoutine3(isRunning *bool, queue *[]model.RepositoryPackageTypeFile) {
-	// todo sync ?
 	*queue = (*queue)[1:]
 	*isRunning = false
 	log.Println("End routine 3")

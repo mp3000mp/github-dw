@@ -13,6 +13,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'login',
     component: LoginPage,
+    beforeEnter: (to, from, next) => {
+      if (securityState.me.roles.includes('ROLE_ADMIN')) {
+        next({ name: 'admin' })
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/admin',
@@ -21,6 +28,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () =>
         import('../views/AdminPage.vue'),
     beforeEnter: (to, from, next) => {
+      console.log(securityState.me)
       if (securityState.me.roles.includes('ROLE_ADMIN')) {
         next()
       } else {

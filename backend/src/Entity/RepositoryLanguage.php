@@ -25,7 +25,7 @@ class RepositoryLanguage
     #[Groups(['admin'])]
     private int $weight;
 
-    #[ORM\ManyToOne(targetEntity: Repository::class)]
+    #[ORM\ManyToOne(targetEntity: Repository::class, inversedBy: 'languages')]
     #[ORM\JoinColumn(nullable: false)]
     private Repository $repository;
 

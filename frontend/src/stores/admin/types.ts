@@ -31,9 +31,23 @@ export interface Stats {
         routine3ErrorCount: number;
     }
 }
+export interface Routine1Timeline {
+    label: string;
+    done: number;
+}
+export interface RoutineTimeline extends Routine1Timeline {
+    errors: number;
+}
+export interface Timeline {
+    labels: string[];
+    routine1: Routine1Timeline[]
+    routine2: RoutineTimeline[]
+    routine3: RoutineTimeline[]
+}
 
 export class AdminState extends AbstractState {
     errors: {routine2: RoutineError[], routine3: Routine3Error[]} = {routine2: [], routine3: []};
     packageTypeFiles: PackageTypeFiles[] = [];
     stats: Stats|null = null;
+    timeline: Timeline|null = null;
 }

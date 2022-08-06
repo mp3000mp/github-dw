@@ -22,15 +22,19 @@ func ParseComposerJson(rawContent string) ([]Package, error) {
 
 	// find packages
 	for pkg, version := range data.Require {
-		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "||")
+		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "|")
 		for _, v := range versions {
-			packages = append(packages, Package{Name: pkg, Version: v})
+			if v != "" {
+				packages = append(packages, Package{Name: pkg, Version: v})
+			}
 		}
 	}
 	for pkg, version := range data.DevRequire {
-		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "||")
+		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "|")
 		for _, v := range versions {
-			packages = append(packages, Package{Name: pkg, Version: v})
+			if v != "" {
+				packages = append(packages, Package{Name: pkg, Version: v})
+			}
 		}
 	}
 

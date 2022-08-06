@@ -22,6 +22,7 @@ func TestParseGoMod(t *testing.T) {
 	require (
 		pkgA v1.0.0
 		pkgB v1.1.0
+		pkgZ v1.1.0 // indirect
 	)
 
 	require pkgC v1.2.0`)

@@ -32,10 +32,10 @@ func RunRoutine1(queryContext *query.Context) {
 		} else {
 			queryContext.DB.Where("URL = ?", repo.URL).First(&repo)
 		}
-		// insert package file routine1At=now
+		// insert package file routine1At=now (remove if already exists because it means an update may have occured)
 		repoPackageFile := model.RepositoryPackageTypeFile{RepositoryID: repo.ID, PackageTypeFileID: queryContext.Routine1PackageType.ID, Path: code.Path, SHA: code.SHA, Routine1At: time.Now()}
 		queryContext.DB.Where("repository_id = ? AND package_type_file_id = ? AND path = ?", repoPackageFile.RepositoryID, repoPackageFile.PackageTypeFileID, repoPackageFile.Path).Delete(&repoPackageFile)
-		queryContext.DB.Clauses(clause.OnConflict{DoNothing: true}).Create(&repoPackageFile)
+		queryContext.DB.Select("RepositoryID", "PackageTypeFileID", "Path", "SHA", "Routine1At").Create(&repoPackageFile)
 		*queryContext.Routine3Queue = append(*queryContext.Routine3Queue, repoPackageFile)
 	}
 

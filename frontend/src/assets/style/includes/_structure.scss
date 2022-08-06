@@ -3,6 +3,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  font-size: 0.95rem;
+
   background-color: $body-bg;
   color: $body-color;
 }
@@ -21,11 +23,19 @@ p {
   border-color: rgba($body-color, .5);
 
   .card-header {
-    background-color: darken($body-bg, 3%);
+    background-color: darken($body-bg, 2%);
     padding: 0;
   }
 
   .card-body {
     padding: 0;
+
+    p {
+      font-size: 0.90rem;
+    }
+  }
+
+  .card-footer {
+    background-color: darken($body-bg, 2%);
   }
 }

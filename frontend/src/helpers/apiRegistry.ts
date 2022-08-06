@@ -1,7 +1,6 @@
 import { ApiClient } from '@/helpers/apiClient'
-import {AxiosResponse} from 'axios'
 
-export type CallbackOnError = (error: AxiosResponse) => void
+export type CallbackOnError = (status: number) => void
 
 class ApiClientRegistry {
     private registry: {
