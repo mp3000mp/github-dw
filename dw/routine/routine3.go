@@ -28,7 +28,7 @@ func RunRoutine3(queryContext *query.Context) {
 		msg := fmt.Sprintf("Routine 3 => Error while querying blob %s file %s: %s", repo.URL, repoPackageFile.Path, err.Error())
 		log.Println(msg)
 		endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
-		if strings.Contains(err.Error(), "404 Not found") {
+		if strings.Contains(err.Error(), "404 Not Found") {
 			queryContext.DB.Delete(&repoPackageFile)
 			return
 		}
@@ -56,7 +56,7 @@ func RunRoutine3(queryContext *query.Context) {
 		msg := fmt.Sprintf("Routine 3 => Error while parsing package file: %s", err.Error())
 		log.Println(msg)
 		// invalid file
-		if strings.Contains(msg, "invalid character") || strings.Contains(msg, "unexpected end of JSON") || strings.Contains(msg, "cannot unmarshal object") {
+		if strings.Contains(msg, "invalid character") || strings.Contains(msg, "unexpected end of JSON") || strings.Contains(msg, "cannot unmarshal") {
 			queryContext.DB.Delete(&repoPackageFile)
 			endRoutine3(&queryContext.Routine3Running, queryContext.Routine3Queue)
 			return

@@ -3,3 +3,15 @@
     project_src: "{{ app_directory }}/docker"
     state: present
     build: true
+
+- name: Composer cache clear
+  shell:
+    cmd: docker-compose exec backend bash -l -c "php bin/console cache:clear"
+    chdir: "{{ app_directory }}/docker"
+
+- name: Composer migration
+  shell:
+    cmd: docker-compose exec backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"
+    chdir: "{{ app_directory }}/docker"
+
+# todo if first deployment create first user with command

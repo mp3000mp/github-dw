@@ -1,27 +1,45 @@
-- name: Create .env
+- name: Create dw .env
   template:
     src: templates/.env.j2
-    dest: "/{{ app_directory }}/dw/.env"
+    dest: "{{ app_directory }}/dw/.env"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '755'
+    mode: '640'
 
-# todo only first time
-#- name: Create directories system
-#  file:
-#    path: "{{ app_directory }}/dw/{{ item }}"
-#    state: directory
-#    owner: "{{ maintainer_user }}"
-#    group: "{{ maintainer_user }}"
-#    mode: '755'
-#    recurse: true
-#  loop:
-#    - 'log'
+- name: Create dw directories
+  file:
+    path: "{{ app_directory }}/dw/{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '750'
+  loop:
+    - 'log'
 
-- name: Deploy build
+- name: Deploy dw build
   copy:
     src: '{{ playbook_dir }}/../../dw/bin/main'
     dest: '{{ app_directory }}/dw/main'
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '755'
+    mode: '740'
+
+- name: Copy restart dw script
+  template:
+    src: templates/restart.sh.j2
+    dest: "{{ app_directory }}/docker/restart.sh"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '750'
+
+- name: Set restart dw cronjob
+  ansible.builtin.cron:
+    name: "Restart ghf dw container"
+    state: present
+    minute: "*/5"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: "{{ maintainer_user }}"
+    job: "{{ app_directory }}/docker/restart.sh"

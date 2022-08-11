@@ -1,10 +1,11 @@
 version: '3'
 
-# this config is for DEV use only
+# caution: this config is for DEV use only
 
 services:
   mariadb:
     image: mariadb:10.6
+    user: "1000:1000"
     environment:
       MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
       MYSQL_DATABASE: "$MYSQL_DATABASE"
@@ -17,6 +18,7 @@ services:
 
   mariadb_test:
     image: mariadb:10.6
+    user: "1000:1000"
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: github_finder_test
@@ -50,14 +52,10 @@ services:
 
   adminer:
     image: adminer
+    user: "1000:1000"
     ports:
       - '5001:8080'
     depends_on:
       - mariadb
       - mariadb_test
       - backend
-
-  maildev:
-    image: maildev/maildev
-    ports:
-      - "1080:80"

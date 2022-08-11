@@ -21,7 +21,7 @@ func QueryRepo(context *Context, userName string, repoName string) (Repository, 
 		return Repository{}, err
 	}
 
-	// not used anymore because it costs one query
+	// not used anymore because it costs one query per repo
 // 	WaitBeforeQuery(context.RateLimiter, "core", true)
 // 	context.RateLimiter.CoreLastQuery = time.Now()
 // 	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Context, userName, repoName)

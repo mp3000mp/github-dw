@@ -1,4 +1,4 @@
-- name: Deploy directories
+- name: Rsync backend directories
   synchronize:
     delete: true
     src: '{{ playbook_dir }}/../../backend/{{ item }}'
@@ -6,7 +6,7 @@
     recursive: true
     rsync_opts:
       - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
-      - '--chmod=0755'
+      - '--chmod=0750'
   loop:
     - 'bin'
     - 'config'
@@ -18,74 +18,48 @@
     - 'translations'
     - 'vendor'
 
-- name: Remove files
+- name: Remove backendfiles
   file:
     state: absent
     path: "{{ app_directory }}/backend/{{ item }}"
   loop:
     - 'bin/phpunit'
 
-- name: Deploy files
+- name: Deploy backend files
   copy:
     src: '{{ playbook_dir }}/../../backend/{{ item }}'
     dest: "{{ app_directory }}/backend/"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '755'
+    mode: '640'
   loop:
     - '.env'
     - 'composer.json'
     - 'composer.lock'
     - 'symfony.lock'
 
-- name: Create .env.local
+- name: Create backend .env.local
   template:
     src: templates/.env.j2
-    dest: "/{{ app_directory }}/backend/.env.local"
+    dest: "{{ app_directory }}/backend/.env.local"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '755'
+    mode: '640'
 
-# todo only first time
-#- name: Create directories system
-#  file:
-#    path: "{{ app_directory }}/backend/{{ item }}"
-#    state: directory
-#    owner: "{{ maintainer_user }}"
-#    group: "{{ maintainer_user }}"
-#    mode: '755'
-#    recurse: true
-#  loop:
-#    - 'var'
-
-# todo only first time
-#- name: Create directories writable
-#  file:
-#    path: "{{ app_directory }}/backend/{{ item }}"
-#    state: directory
-#    owner: "{{ maintainer_user }}"
-#    group: "{{ maintainer_user }}"
-#    mode: '755'
-#    recurse: true
-#  loop:
-#    - 'var/log'
-#    - 'var/cache'
+- name: Create backend directories
+  file:
+    path: "{{ app_directory }}/backend/{{ item }}"
+    state: directory
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '750'
+  loop:
+    - 'var'
+    - 'var/log'
+    - 'var/cache'
 
 # not needed because we sync vendor for now
 #- name: Composer install
 #  shell:
 #    cmd: docker-compose exec backend bash -l -c "composer install"
 #    chdir: "{{ app_directory }}/docker"
-
-- name: Composer cache clear
-  shell:
-    cmd: docker-compose exec backend bash -l -c "php bin/console cache:clear"
-    chdir: "{{ app_directory }}/docker"
-
-# todo access denied on volume ?
-- name: Composer migration
-  shell:
-    cmd: docker-compose exec backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"
-    chdir: "{{ app_directory }}/docker"
-
-# todo if first deployment create first user with command

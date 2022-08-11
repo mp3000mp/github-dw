@@ -7,7 +7,7 @@
     dest: "/etc/apache2/sites-available/{{ back_server_name }}.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '0644'
+    mode: '0640'
 
 - name: Create vhosts back ssl
   become: true
@@ -17,7 +17,7 @@
     dest: "/etc/apache2/sites-available/{{ back_server_name }}-le-ssl.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '0644'
+    mode: '0640'
 
 - name: Create vhosts front
   become: true
@@ -27,7 +27,7 @@
     dest: "/etc/apache2/sites-available/{{ front_server_name }}.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '0644'
+    mode: '0640'
 
 - name: Create vhosts ssl
   become: true
@@ -37,7 +37,7 @@
     dest: "/etc/apache2/sites-available/{{ front_server_name }}-le-ssl.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '0644'
+    mode: '0640'
 
 - name: Enable site
   become: true

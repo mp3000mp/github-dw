@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd "{{ app_directory }}/docker"
+
+line=$( /usr/local/bin/docker-compose ps | grep dw | grep Up)
+
+if [ -z "$line" ];then
+	 /usr/local/bin/docker-compose up -d dw
+fi

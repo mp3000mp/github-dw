@@ -231,7 +231,7 @@ watch(maxVersion, () => {
         <div v-for="repo in searchResults" :key="repo.id" class="card mb-2">
           <div class="card-header p-3">
             <div class="row">
-              <h3 class="col-md-6"><a :href="repo.url">{{ repo.fullName }}</a></h3>
+              <h3 class="col-md-6"><a :href="repo.url" target="_blank">{{ repo.fullName }}</a></h3>
               <div class="col-md-6 text-end">
                 <span class="mx-2">
                   <tooltip-popper content="License" :hover="true" :arrow="true">

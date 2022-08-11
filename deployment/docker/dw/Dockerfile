@@ -2,8 +2,6 @@ FROM alpine:3.16
 
 RUN apk update
 
-RUN mkdir -p /usr/src/app \
-	&& mkdir -p /usr/src/app/log \
-	&& chmod -R 755 /usr/src/app
+USER 1000:1000
 
 WORKDIR /usr/src/app

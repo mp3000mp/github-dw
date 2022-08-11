@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# remove backpu > x days
+# dump database in local folder
+# zip and encrypt dump
+# send it to remote server
+
+# caution: remote user has to be set independently of this repo
+
+NOW=$(date +"%y%m%d%H%M%S")
+SRC_DIR="{{ app_directory }}"
+REMOTE_DIR="{{ backup_remote_directory }}/{{ mysql_database }}"
+DEST_DIR="${REMOTE_DIR}/$NOW"
+DEST_DB_DIR="${DEST_DIR}/db"
+REMOTE_HOST="{{ backup_remote_host }}"
+
+SQL_USER="root"
+SQL_PASSWORD="{{ mysql_root_password }}"
+SQL_DB="{{ mysql_database }}"
+TMP_DIR="${SRC_DIR}/backup/tmp"
+TMP_LOCALE_BACKUP="${TMP_DIR}/${SQL_DB}.dump"
+
+if [ ! -d "${SRC_DIR}" ]; then
+	echo "Directory ${SRC_DIR} unfound."
+	exit 1
+fi
+
+ssh ${REMOTE_HOST} "mkdir -p ${REMOTE_DIR}"
+ssh ${REMOTE_HOST} "mkdir -p ${DEST_DIR}"
+ssh ${REMOTE_HOST} "mkdir -p ${DEST_DB_DIR}"
+ssh ${REMOTE_HOST} "find ${REMOTE_DIR}/* -maxdepth 0 -type d -mtime +30 -exec rm -r {} +"
+
+cd ${SRC_DIR}/docker
+/usr/local/bin/docker-compose exec -T mariadb mysqldump --user ${SQL_USER} --password=${SQL_PASSWORD} ${SQL_DB} > ${TMP_LOCALE_BACKUP}
+tar czf ${TMP_LOCALE_BACKUP}.tar.gz ${TMP_LOCALE_BACKUP}
+openssl enc -aes-256-cbc -pbkdf2 -iter 20060 -pass file:${SRC_DIR}/backup/.backup_key -in ${TMP_LOCALE_BACKUP}.tar.gz -out ${TMP_LOCALE_BACKUP}.tar.gz.enc
+# decrypt
+# openssl enc -d -aes-256-cbc -pbkdf2 -iter 20060 -pass file:${SRC_DIR}/backup/.backup_key -in ${TMP_LOCALE_BACKUP}.tar.gz.enc -out ${TMP_LOCALE_BACKUP}.tar.gz.new
+# tar xzf ${TMP_LOCALE_BACKUP}.tar.gz.new
+
+scp -r ${TMP_LOCALE_BACKUP}.tar.gz.enc ${REMOTE_HOST}:${DEST_DB_DIR}/
+rm -f ${TMP_LOCALE_BACKUP}*

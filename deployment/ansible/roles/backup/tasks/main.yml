@@ -1,0 +1,38 @@
+- name: Create/reset backup tmp directory
+  file:
+    path: "{{ app_directory }}/backup/tmp"
+    state: "{{ item }}"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '750'
+  loop:
+    - 'absent'
+    - 'directory'
+
+- name: Create backup key
+  template:
+    src: templates/.backup_key.j2
+    dest: "{{ app_directory }}/backup/.backup_key"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '640'
+
+- name: Create backup script
+  template:
+    src: templates/backup.sh.j2
+    dest: "{{ app_directory }}/backup/backup.sh"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '750'
+
+- name: Set restart cronjob
+  ansible.builtin.cron:
+    name: "Daily ghf backup"
+    state: present
+    minute: "0"
+    hour: "4"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: "{{ maintainer_user }}"
+    job: "{{ app_directory }}/backup/backup.sh >> {{ app_directory }}/backup/tmp.log 2>$1"

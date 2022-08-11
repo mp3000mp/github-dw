@@ -21,7 +21,7 @@ func RunRoutine2(queryContext *query.Context) {
 		msg := fmt.Sprintf("Routine 2 => Error while querying repo %s: %s", repo.URL, err.Error())
 		log.Println(msg)
 		endRoutine2(&queryContext.Routine2Running, queryContext.Routine2Queue)
-		if strings.Contains(err.Error(), "404 Not found") {
+		if strings.Contains(err.Error(), "404 Not Found") {
 			queryContext.DB.Delete(&repo)
 			return
 		}

@@ -5,10 +5,11 @@
   vars_files:
     - vars.yml
   roles:
-#    - files
-#    - docker
+    - files
+    - docker
     - deploy_dw
     - deploy_back
     - deploy_front
 #    - apache
-#    - launch
+    - backup
+    - launch

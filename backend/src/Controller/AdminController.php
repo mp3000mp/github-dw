@@ -26,7 +26,7 @@ class AdminController extends AbstractController
         /** @var RepositoryPackageTypeFileRepository $repoPackageRepo */
         $repoPackageRepo = $this->em->getRepository(RepositoryPackageTypeFile::class);
 
-        $d = new \DateTime('-30 days');
+        $d = new \DateTime('-7 days');
         $routine2Errors = $repoRepo->findErrors($d);
         $routine3Errors = $repoPackageRepo->findErrors($d);
 

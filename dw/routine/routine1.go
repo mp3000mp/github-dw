@@ -20,6 +20,7 @@ func RunRoutine1(queryContext *query.Context) {
 	codes, maxPage, err := query.QuerySearchCodes(queryContext, queryContext.Routine1PackageType.File, int(queryContext.Routine1PackageType.GithubCurrentSize), int(queryContext.Routine1PackageType.GithubCurrentPage), nbPerPage)
 	if err != nil {
 		log.Printf("Routine 1 => Error while querying codes: %s", err.Error())
+		endRoutine1(&queryContext.Routine1Running)
 		return
 	}
 
@@ -50,6 +51,10 @@ func RunRoutine1(queryContext *query.Context) {
 	queryContext.Routine1PackageType.UpdatedAt = time.Now()
 	queryContext.DB.Save(queryContext.Routine1PackageType)
 
-	queryContext.Routine1Running = false
+	endRoutine1(&queryContext.Routine1Running)
+}
+
+func endRoutine1(isRunning *bool) {
+	*isRunning = false
 	log.Println("End routine 1")
 }

@@ -3,6 +3,7 @@ version: '3'
 services:
   mariadb:
     image: mariadb:10.6
+    user: "1000:1000"
     environment:
       MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
       MYSQL_DATABASE: "$MYSQL_DATABASE"
@@ -34,6 +35,7 @@ services:
 
 #  adminer:
 #    image: adminer
+#    user: "1000:1000"
 #    ports:
 #      - '8002:8080'
 #    depends_on:

@@ -20,13 +20,11 @@ RUN docker-php-ext-install iconv pdo_mysql intl \
     && echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 # todo: attention pas de xdebug en prod
 
-RUN mkdir -p /var/www/html/var \
-    && mkdir -p /var/www/html/var/log /var/www/html/var/cache \
-    && chmod -R 755 /var/www/html/var
-
 # config apache
 RUN a2enmod rewrite \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && echo 'alias ll="ls -la"' >> ~/.bashrc
+
+USER 1000:1000
 
 WORKDIR /var/www/html

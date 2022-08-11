@@ -1,24 +1,15 @@
-- name: Create directories
+- name: Create frontend directories
   file:
     path: "{{ app_directory }}/frontend/{{ item }}"
     state: directory
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
-    mode: '644'
+    mode: '755'
   loop:
     - 'dist'
     - 'log'
 
-# handled by local_build.sh
-#- name: Create variables.json
-#  template:
-#    src: templates/variables.json.j2
-#    dest: "/{{ app_directory }}/frontend/config/variables.json"
-#    owner: "{{ maintainer_user }}"
-#    group: "{{ maintainer_user }}"
-#    mode: '755'
-
-- name: Deploy directories
+- name: Deploy frontend dist
   synchronize:
     delete: true
     src: '{{ playbook_dir }}/../../frontend/{{ item }}'
