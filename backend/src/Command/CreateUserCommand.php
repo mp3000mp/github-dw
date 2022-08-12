@@ -23,7 +23,7 @@ class CreateUserCommand extends Command
     {
         $this->em = $em;
         $this->passwordHasher = $passwordHasher;
-        parent::__construct(self::$defaultName);
+        parent::__construct();
     }
 
     protected function configure(): void

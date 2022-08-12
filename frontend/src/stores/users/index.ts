@@ -7,11 +7,7 @@ export const useUsersStore = defineStore('users', {
     state: () => state,
     actions: {
         async getAll () {
-            try {
-                this.users = await apiRegistry.get().httpReq(this.actionRequests.getAll)
-            } catch (err) {
-                throw err
-            }
+            this.users = await apiRegistry.get().httpReq(this.actionRequests.getAll)
         },
     }
 })

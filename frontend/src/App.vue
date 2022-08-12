@@ -15,9 +15,12 @@ const frontVersion = variables.APP_VERSION
 </script>
 
 <template>
-  <header>
-    <h1 class="d-inline"><router-link :to="{name: 'home'}">Github Finder</router-link></h1>
-    <font-awesome v-if="securityStore.getIsAuth" @click="logout" class="ml-auto cp" icon="right-from-bracket" />
+  <header class="row align-items-center">
+    <h1 class="col-auto mr-auto"><router-link :to="{name: 'home'}">Github Finder</router-link></h1>
+    <div class="col-auto" v-if="securityStore.getIsAuth">
+      <router-link :to="{name: 'admin'}" class="mr-3">Admin</router-link>
+      <font-awesome @click="logout" class="cp" icon="right-from-bracket" />
+    </div>
   </header>
   <router-view />
   <footer>

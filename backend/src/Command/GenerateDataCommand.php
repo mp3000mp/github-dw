@@ -32,6 +32,7 @@ class GenerateDataCommand extends Command
     private float $validPackageVersionRatio;
     private int $packagePerRepo;
     private float $createPackageRatio;
+    private array $packageUniq = [];
 
     public function __construct(EntityManagerInterface $em, ParameterBagInterface $parameterBag)
     {
@@ -77,6 +78,10 @@ class GenerateDataCommand extends Command
 
         $allPackageTypeFiles = $this->em->getRepository(PackageTypeFile::class)->findAll();
         $allPackages = $this->em->getRepository(Package::class)->findAll();
+        foreach ($allPackages as $package) {
+            $uniq = sprintf('%d__%s', $package->getPackageTypeFile()->getId(), $package->getName());
+            $this->packageUniq[$uniq] = $package;
+        }
         $allUrls = array_unique(array_map(function (Repository $repository) {
             return $repository->getUrl();
         }, $this->em->getRepository(Repository::class)->findAll()));
@@ -139,7 +144,7 @@ class GenerateDataCommand extends Command
                 if (0 === count($packages) || $this->alea($this->createPackageRatio)) {
                     $package = $this->genPackage($packageTypeFile);
                 } else {
-                    $package = array_pop($allPackages);
+                    $package = array_pop($packages);
                 }
                 $this->genRepoPackage($repoPackageTypeFile, $package);
             }
@@ -154,10 +159,17 @@ class GenerateDataCommand extends Command
 
     private function genPackage(PackageTypeFile $packageTypeFile): Package
     {
+        $name = implode('_', $this->faker->words(2));
+        $uniq = sprintf('%d__%s', $packageTypeFile->getId(), $name);
+        if (array_key_exists($uniq, $this->packageUniq)) {
+            return $this->packageUniq[$uniq];
+        }
+
         $package = new Package();
-        $package->setName($this->faker->domainWord());
+        $package->setName($name);
         $package->setPackageTypeFile($packageTypeFile);
         $this->em->persist($package);
+        $this->packageUniq[$uniq] = $package;
 
         return $package;
     }

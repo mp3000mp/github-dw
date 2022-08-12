@@ -2,8 +2,7 @@
 /dw/pkg
 /dw/output
 /dw/log
-
-.env
+/dw/.env
 
 /deployment/ansible/vars.yml
 /deployment/ansible/roles/*/vars.yml

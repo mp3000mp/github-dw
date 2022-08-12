@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref, Ref, watch} from 'vue'
 import {useAdminStore} from '@/stores/admin'
-import {useSecurityStore} from '@/stores/security'
 import tooltipPopper from 'vue3-popper'
 import dayjs from 'dayjs'
 import Chart, {ChartItem} from 'chart.js/auto'
@@ -9,7 +8,6 @@ import {LanguageColorEnum} from '@/stores/search/types'
 import {Routine1Timeline, RoutineTimeline} from '@/stores/admin/types'
 
 const adminStore = useAdminStore()
-const securityStore = useSecurityStore()
 
 const camembertRef = ref(null) as Ref<ChartItem|null>
 const timelineRef = ref(null) as Ref<ChartItem|null>
@@ -36,12 +34,10 @@ function setPriority(id: number) {
 }
 
 onMounted(() => {
-  if (securityStore.getIsAuth) {
-    adminStore.getAll()
-    adminStore.getStats()
-    adminStore.getErrors()
-    adminStore.getTimeline()
-  }
+  adminStore.getStats()
+  adminStore.getTimeline()
+  adminStore.getAll()
+  adminStore.getErrors()
 })
 
 watch(tableData, () => {

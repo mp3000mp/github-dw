@@ -55,9 +55,9 @@ type PackageTypeFile struct {
 
 type RepositoryPackageTypeFile struct {
 	ID uint                                `gorm:"primaryKey"`
-	RepositoryID uint                      `gorm:"uniqueIndex:idx_uniq;not null"`
-	PackageTypeFileID uint 	               `gorm:"uniqueIndex:idx_uniq;not null"`
-	Path string                            `gorm:"uniqueIndex:idx_uniq;size:255;not null"`
+	RepositoryID uint                      `gorm:"uniqueIndex:idx_uniq_rptf;not null"`
+	PackageTypeFileID uint 	               `gorm:"uniqueIndex:idx_uniq_rptf;not null"`
+	Path string                            `gorm:"uniqueIndex:idx_uniq_rptf;size:255;not null"`
 	RoutineError string                    `gorm:"size:255"`
 	SHA string                             `gorm:"size:100;not null"`
 	Routine1At time.Time                   `gorm:"type:DATETIME(0);not null"`
@@ -67,8 +67,8 @@ type RepositoryPackageTypeFile struct {
 
 type Package struct {
 	ID uint                                `gorm:"primaryKey"`
-	PackageTypeFileID uint                 `gorm:"uniqueIndex:idx_uniq;not null"`
-	Name string                            `gorm:"uniqueIndex:idx_uniq;size:100;not null;index"`
+	PackageTypeFileID uint                 `gorm:"uniqueIndex:idx_uniq_p;not null"`
+	Name string                            `gorm:"uniqueIndex:idx_uniq_p;size:100;not null;index"`
 	RepositoryPackages []RepositoryPackage `gorm:"constraint:OnDelete:CASCADE"`
 }
 

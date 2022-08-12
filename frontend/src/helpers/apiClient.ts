@@ -65,7 +65,7 @@ export class ApiClient {
 
             if (!response.ok || response.status < 200 || response.status >= 300) {
                 errorMsg = ApiClient.generateErrorMessage(responseJson)
-                this.onError(response.status)
+                await this.onError(response.status)
                 request.end(response.status, errorMsg)
                 throw new Error(errorMsg)
             }
@@ -73,9 +73,9 @@ export class ApiClient {
             request.end(response.status, responseJson.message || '')
             return responseJson
         } catch (err) {
-            if (!errorMsg) {
+            if (errorMsg === '') {
                 errorMsg = String(err)
-                this.onError(500)
+                await this.onError(500)
                 request.end(500, errorMsg)
             }
             throw err

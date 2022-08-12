@@ -28,7 +28,7 @@ class Authenticator extends AbstractLoginFormAuthenticator
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return new JsonResponse([
-            'Access denied.',
+            'message' => 'Access denied.',
         ], Response::HTTP_UNAUTHORIZED);
     }
 
