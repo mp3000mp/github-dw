@@ -27,6 +27,7 @@ class UselessDataCleanupCommand extends Command
     {
         $this->setHelp('This command clean up useless data.');
         $this->addOption('force-flush', 'f', InputOption::VALUE_NONE, 'Force flush');
+        $this->addOption('min-packages', '-m', InputOption::VALUE_REQUIRED, 'Minimum packages');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -34,16 +35,14 @@ class UselessDataCleanupCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->text('Computing useless data...');
 
-        $step1Min = 6;
-        $step2Min = 6;
-        $step3Min = 6;
         $dryRun = !$input->getOption('force-flush');
+        $minPackages = (int) $input->getOption('min-packages');
         $rows = [];
 
         if ($dryRun) {
-            $io->info('DRY RUN MODE');
+            $io->info('DRY RUN MODE - MIN='.$minPackages);
         } else {
-            $io->warning('FLUSH MODE');
+            $io->warning('FLUSH MODE - MIN='.$minPackages);
         }
         $io->createProgressBar(3 + !$dryRun);
         $io->progressStart();
@@ -60,7 +59,7 @@ class UselessDataCleanupCommand extends Command
             SELECT package_id id, COUNT(1) 
             FROM dw_repository_package 
             GROUP BY package_id 
-            HAVING COUNT(1) < $step1Min        
+            HAVING COUNT(1) < $minPackages        
         ";
             $ids = $this->getIds($sql);
             $rows[] = $this->getRow('Packages', count($ids), $sqlTotal);
@@ -79,7 +78,7 @@ class UselessDataCleanupCommand extends Command
             LEFT JOIN dw_repository_package ON dw_repository_package_type_file.id = dw_repository_package.repository_package_type_file_id '.
                 ($dryRun && count($ids) > 0 ? 'AND dw_repository_package.package_id NOT IN (:ids)' : '')
                 ." GROUP BY dw_repository_package_type_file.id 
-            HAVING COUNT(1) < $step2Min        
+            HAVING COUNT(1) < $minPackages        
         ";
             $ids = $this->getIds($sql, $ids);
             $rows[] = $this->getRow('Repo package type files', count($ids), $sqlTotal);
@@ -98,7 +97,7 @@ class UselessDataCleanupCommand extends Command
             LEFT JOIN dw_repository_package ON dw_repository.id = dw_repository_package.repository_id '.
                 ($dryRun && count($ids) ? 'AND repository_package_type_file_id NOT IN (:ids)' : '')
                 ." GROUP BY dw_repository.id 
-            HAVING COUNT(1) < $step3Min        
+            HAVING COUNT(1) < $minPackages        
         ";
             $ids = $this->getIds($sql, $ids);
             $rows[] = $this->getRow('Repositories', count($ids), $sqlTotal);

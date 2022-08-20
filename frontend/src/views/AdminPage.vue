@@ -185,13 +185,13 @@ watch(timeline, () => {
         </div>
         <div class="col-md-4">
           <h3>Routine2</h3>
-          <span class="mx-1">Done: {{ stats.routines.routine2DoneCount }}</span>
+          <span class="mx-1">Done: {{ stats.routines.routine2DoneCount }} ({{ Math.round((stats.routines.routine2DoneCount/stats.routines.routine2Count)*100*100)/100 }}%)</span>
           <span class="mx-1">Todo: {{ stats.routines.routine2Count-stats.routines.routine2DoneCount }}</span>
           <span class="mx-1">Errors: {{ stats.routines.routine2ErrorCount }} ({{ Math.round((stats.routines.routine2ErrorCount/stats.routines.routine2DoneCount)*100*100)/100 }}%)</span>
         </div>
         <div class="col-md-4">
           <h3>Routine3</h3>
-          <span class="mx-1">Done: {{ stats.routines.routine3DoneCount }}</span>
+          <span class="mx-1">Done: {{ stats.routines.routine3DoneCount }} ({{ Math.round((stats.routines.routine3DoneCount/stats.routines.routine3Count)*100*100)/100 }}%)</span>
           <span class="mx-1">Todo: {{ stats.routines.routine3Count-stats.routines.routine3DoneCount }}</span>
           <span class="mx-1">Errors: {{ stats.routines.routine3ErrorCount }} ({{ Math.round((stats.routines.routine3ErrorCount/stats.routines.routine3DoneCount)*100*100)/100 }}%)</span>
         </div>

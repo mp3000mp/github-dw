@@ -37,6 +37,7 @@ const perPage = ref(8)
 const shownPackages = computed(() => dependencies.value)
 const autocompleteResults = computed(() => searchStore.packageOptions)
 const searchRequest = computed(() => searchStore.actionRequests.search)
+const autocompleteRequest = computed(() => searchStore.actionRequests.packageAutocomplete)
 const searchResults = computed(() => searchStore.repositories)
 const totalResults = computed(() => searchStore.totalRepositories)
 const autocompleteOptions = computed(() => autocompleteResults.value.map(ar => ({value: ar.id, label: ar.name})))
@@ -147,6 +148,7 @@ watch(maxVersion, () => {
             <autocomplete-select
                 :disabled="language === ''"
                 :input-id="'dependency-name'"
+                :is-loading="autocompleteRequest.loading"
                 :options="autocompleteOptions"
                 :placeholder="'Dependency name'"
                 v-model="dependencyName"
@@ -192,10 +194,10 @@ watch(maxVersion, () => {
           </div>
           <div v-else class="mb-2">
             <span v-for="dependency in shownPackages" :key="dependency.idx" class="badge mx-1" :style="{'background-color': LanguageColorEnum[dependency.language], color: dependency.language === 'Javascript' ? '#000000' : 'inherit'}">
-              <tooltip-popper  :content="dependency.language" :hover="true" :arrow="true">
+              <tooltip-popper :content="dependency.language" :hover="true" :arrow="true">
                 <span>{{ getDependencyLabel(dependency) }}</span>
               </tooltip-popper>
-              <tooltip-popper content="Remove" :hover="true" :arrow="true">
+              <tooltip-popper content="Remove" :hover="true" :arrow="true" class="pl-1">
                 <font-awesome icon="trash-can" class="cp danger" @click="removeDependency(dependency.id)" />
               </tooltip-popper>
             </span>
@@ -231,16 +233,16 @@ watch(maxVersion, () => {
         <div v-for="repo in searchResults" :key="repo.id" class="card mb-2">
           <div class="card-header p-3">
             <div class="row">
-              <h3 class="col-md-6"><a :href="repo.url" target="_blank">{{ repo.fullName }}</a></h3>
-              <div class="col-md-6 text-end">
-                <span class="mx-2">
+              <h3 class="col-md-6 mb-2 mb-md-0"><a :href="repo.url" target="_blank">{{ repo.fullName }}</a></h3>
+              <div class="col-md-6 text-md-end">
+                <span class="mr-2">
                   <tooltip-popper content="License" :hover="true" :arrow="true">
                     <span>
                       <font-awesome icon="scale-balanced" /> {{ repo.licenceName ?? 'Unknown' }}
                     </span>
                   </tooltip-popper>
                 </span>
-                <span class="mx-2">
+                <span class="ml-2">
                   <tooltip-popper content="Last pushed at" :hover="true" :arrow="true">
                     <span>
                       <font-awesome icon="clock-rotate-left" /> {{ dayjs(repo.pushedAt).format('YYYY-MM-DD') }}
@@ -250,7 +252,7 @@ watch(maxVersion, () => {
               </div>
             </div>
           </div>
-          <div class="card-body p-3">
+          <div class="card-body p-3 fs-09">
             <p><strong>Description</strong>: {{ repo.description }}</p>
             <div v-if="repo.topics.length > 0">
               Topics: <span class="badge" v-for="topic in repo.topics" :key="topic.topic">{{ topic.topic }}</span>
@@ -270,6 +272,12 @@ watch(maxVersion, () => {
                 </span>
               </tooltip-popper>
             </span>
+          </div>
+        </div>
+        <div class="row justify-content-between pt-0 p-3" v-if="searchResults.length > 3">
+          <h2 class="col-auto">Results ({{ totalResults }})</h2>
+          <div class="col-auto">
+            <pagination-component :max-page="maxPage" :current-page="currentPage" @select-page="selectPage" />
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import {Option} from './types'
 const props = withDefaults(defineProps<{
   disabled?: boolean;
   inputId: string;
+  isLoading: false;
   modelValue: string;
   options: Option[];
   placeholder?: string;
@@ -64,7 +65,8 @@ watch(() => props.modelValue, () => {
         @blur="isFocused = false"
         @input="onInput($event.target.value)"
     />
-    <ul v-if="showOptions" @mouseenter="isOptionsHovered = true" @mouseleave="isOptionsHovered = false" class="acs-options">
+    <ul v-if="showOptions || isLoading" @mouseenter="isOptionsHovered = true" @mouseleave="isOptionsHovered = false" class="acs-options">
+      <li v-if="isLoading" class="acs-loading text-center">...</li>
       <li v-for="option in options" :key="option.value" @click="selectOption(option)" class="option" :class="{selected: option.value === selectedOption}">
         {{ option.label }}
       </li>
@@ -82,11 +84,15 @@ watch(() => props.modelValue, () => {
   padding: 0;
   list-style: none;
   position: absolute;
+  margin-top: -5px;
   width: 100%;
   cursor: pointer;
   max-height: 160px;
   overflow-y: auto;
   background-color: #001229;
+  border: 1px solid rgba(222, 222, 222, 0.5);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
   .option {
     padding: 0.2rem 0.5rem;
     &:hover {

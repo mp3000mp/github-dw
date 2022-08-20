@@ -22,13 +22,17 @@ const frontVersion = variables.APP_VERSION
       <font-awesome @click="logout" class="cp" icon="right-from-bracket" />
     </div>
   </header>
-  <router-view />
-  <footer>
-    <font-awesome icon="magic-wand-sparkles" /> Invoked from the magic kingdom by
-    <a href="https://github.com/mp3000mp">
-      mp3000
-      <font-awesome icon="hand-sparkles" />
-    </a>
-    <div>v{{ frontVersion }}</div>
+  <main>
+    <router-view />
+  </main>
+  <footer class="row mt-3">
+    <div class="col-auto mx-auto">
+      <font-awesome icon="magic-wand-sparkles" /> Invoked from the magic kingdom by
+      <a href="https://github.com/mp3000mp">
+        mp3000
+        <font-awesome icon="hand-sparkles" />
+      </a>
+      <div>v{{ frontVersion }}</div>
+    </div>
   </footer>
 </template>

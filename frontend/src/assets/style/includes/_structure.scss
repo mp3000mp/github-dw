@@ -1,3 +1,17 @@
+html, body, #app {
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
 body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -29,10 +43,6 @@ p {
 
   .card-body {
     padding: 0;
-
-    p {
-      font-size: 0.90rem;
-    }
   }
 
   .card-footer {
