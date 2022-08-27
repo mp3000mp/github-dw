@@ -32,7 +32,7 @@ class PackageRepository extends ServiceEntityRepository
      */
     public function autocomplete(string $language, string $text): array
     {
-        // todo use levenstein ?
+        // todo use levenstein to sort ?
         $q = $this->getEntityManager()->createQuery('
             SELECT partial p.{id,name} FROM App\Entity\Package p
             JOIN p.packageTypeFile ptf
@@ -40,7 +40,7 @@ class PackageRepository extends ServiceEntityRepository
             AND p.name LIKE :text_like
         ')
             ->setParameter('language', $language)
-            ->setParameter('text_like', "$text%");
+            ->setParameter('text_like', "%$text%");
 
         return $q->getResult();
     }

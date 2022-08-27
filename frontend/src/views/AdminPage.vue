@@ -10,7 +10,9 @@ import {Routine1Timeline, RoutineTimeline} from '@/stores/admin/types'
 const adminStore = useAdminStore()
 
 const camembertRef = ref(null) as Ref<ChartItem|null>
+let camembertGraph = null as Chart|null
 const timelineRef = ref(null) as Ref<ChartItem|null>
+let timelineGraph = null as Chart|null
 
 const adminRequests = computed(() => adminStore.actionRequests)
 const packageTypeFiles = computed(() => adminStore.packageTypeFiles)
@@ -29,15 +31,24 @@ const tableData = computed(() => {
   })
 })
 
+function percent(part: number, total: number): string {
+  if (total === 0) {
+    return 'NA'
+  }
+  return Math.round((part/total)*100*100)/100 + '%'
+}
 function setPriority(id: number) {
   adminStore.setPriority(id)
 }
 
-onMounted(() => {
+function refresh() {
   adminStore.getStats()
   adminStore.getTimeline()
   adminStore.getAll()
   adminStore.getErrors()
+}
+onMounted(() => {
+  refresh()
 })
 
 watch(tableData, () => {
@@ -51,10 +62,22 @@ watch(tableData, () => {
       data: tableData.value.map(p => p.count),
       backgroundColor: tableData.value.map(p => {
         return LanguageColorEnum[p.language] ?? '#000000'
-      })
+      }),
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            let total = ctx.dataset.data.reduce((p: number, c: number) => p+c, 0)
+            console.log(total)
+            return ctx.label + ': ' + ctx.formattedValue + ' (' + percent(ctx.raw, total) + ')'
+          }
+        }
+      }
     }]
   }
-  new Chart(camembertRef.value, {
+  if (camembertGraph) {
+    camembertGraph.destroy()
+  }
+  camembertGraph = new Chart(camembertRef.value, {
     type: 'pie',
     data,
     options: {
@@ -117,10 +140,41 @@ watch(timeline, () => {
       order: 1
     }]
   }
-  new Chart(timelineRef.value, {
+  if (timelineGraph) {
+    timelineGraph.destroy()
+  }
+  timelineGraph = new Chart(timelineRef.value, {
     type: 'bar',
     data,
     options: {
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            footer: function(items) {
+              let sumError = 0
+              let sumDone = 0
+              let data = []
+              for (const item of items) {
+                data[item.datasetIndex] = item.parsed.y
+                if (item.datasetIndex < 3) {
+                  sumDone += item.parsed.y
+                } else {
+                  sumError += item.parsed.y
+                }
+              }
+              console.log(data)
+              return 'Total done: ' + sumDone +
+                '\n' + 'Total errors: ' + sumError +
+                '\n' + '% error2: ' + percent(data[3], data[1]) +
+                '\n' + '% error3: ' + percent(data[4], data[2])
+            }
+          }
+        }
+      },
       responsive: true,
       scales: {
         x: {stacked: true},
@@ -134,10 +188,10 @@ watch(timeline, () => {
 
 <template>
   <div class="container">
-    <div v-if="!stats || adminRequests.getAll.isLoading" class="text-center">...</div>
+    <div v-if="!stats || adminRequests.getStats.isLoading" class="text-center">...</div>
     <div v-else>
       <div class="row app-block mb-2 p-3">
-        <h2 class="mb-2">Package file types</h2>
+        <h2 class="mb-2">Package file types <span><font-awesome class="cp" icon="refresh" @click="refresh" /></span></h2>
         <div class="col-md-8">
           <table>
             <thead>
@@ -179,21 +233,21 @@ watch(timeline, () => {
 
       <div class="row app-block p-3 mb-2">
         <h2 class="mb-2">Waiting lists</h2>
-        <div class="col-md-4">
+        <div class="col-md-2">
           <h3>Routine1</h3>
           <span class="mx-1">Done: {{ stats.routines.routine1Count }}</span>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
           <h3>Routine2</h3>
-          <span class="mx-1">Done: {{ stats.routines.routine2DoneCount }} ({{ Math.round((stats.routines.routine2DoneCount/stats.routines.routine2Count)*100*100)/100 }}%)</span>
+          <span class="mx-1">Done: {{ stats.routines.routine2DoneCount }} ({{ percent(stats.routines.routine2DoneCount, stats.routines.routine2Count) }})</span>
           <span class="mx-1">Todo: {{ stats.routines.routine2Count-stats.routines.routine2DoneCount }}</span>
-          <span class="mx-1">Errors: {{ stats.routines.routine2ErrorCount }} ({{ Math.round((stats.routines.routine2ErrorCount/stats.routines.routine2DoneCount)*100*100)/100 }}%)</span>
+          <span class="mx-1">Errors: {{ stats.routines.routine2ErrorCount }} ({{ percent(stats.routines.routine2ErrorCount, stats.routines.routine2DoneCount) }})</span>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
           <h3>Routine3</h3>
-          <span class="mx-1">Done: {{ stats.routines.routine3DoneCount }} ({{ Math.round((stats.routines.routine3DoneCount/stats.routines.routine3Count)*100*100)/100 }}%)</span>
+          <span class="mx-1">Done: {{ stats.routines.routine3DoneCount }} ({{ percent(stats.routines.routine3DoneCount, stats.routines.routine3Count) }})</span>
           <span class="mx-1">Todo: {{ stats.routines.routine3Count-stats.routines.routine3DoneCount }}</span>
-          <span class="mx-1">Errors: {{ stats.routines.routine3ErrorCount }} ({{ Math.round((stats.routines.routine3ErrorCount/stats.routines.routine3DoneCount)*100*100)/100 }}%)</span>
+          <span class="mx-1">Errors: {{ stats.routines.routine3ErrorCount }} ({{ percent(stats.routines.routine3ErrorCount, stats.routines.routine3DoneCount) }})</span>
         </div>
         <div class="col-12 mt-3">
           <canvas class="mx-auto" ref="timelineRef" id="timeline"></canvas>
