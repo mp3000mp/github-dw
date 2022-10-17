@@ -1,4 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
     faCircleExclamation,
     faCircleDot,
@@ -14,6 +15,7 @@ import {
     faTrashCan,
     faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons'
+
 library.add(
     faCircleExclamation,
     faCircleDot,
@@ -29,6 +31,5 @@ library.add(
     faTrashCan,
     faWandMagicSparkles
 )
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 export default FontAwesomeIcon

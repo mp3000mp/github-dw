@@ -1,33 +1,27 @@
 <script lang="ts" setup>
-import dayjs from 'dayjs'
 import {computed, ref, watch} from 'vue'
+import {formatVersion, validVersion, validVersions} from '@/utils/version'
 import {useSearchStore} from '@/stores/search'
 import AutocompleteSelect from '@/components/AutocompleteSelect.vue'
 import PaginationComponent from '@/components/PaginationComponent.vue'
-import {LanguageColorEnum} from '@/stores/search/types'
+import SelectedDependency from '@/views/home/SelectedDependency.vue'
+import RepositoryItem from '@/views/home/RepositoryItem.vue'
+import {Dependency} from '@/stores/search/types'
 import tooltipPopper from 'vue3-popper'
 const searchStore = useSearchStore()
 
 let packageIdx = 1
-interface Package {
-  idx: number;
-  language: string;
-  name: string|null;
-  id: number;
-  minVersion: string|null;
-  maxVersion: string|null;
-}
 
 const languages = ref(['Go', 'Javascript', 'PHP', 'Python'])
 
 const showAdvancedSearch = ref(false)
 const repoName = ref('')
 const description = ref('')
-const dependencies = ref([] as Package[])
+const dependencies = ref([] as Dependency[])
 
 const language = ref('')
 const dependencyName = ref('')
-const selectedDependency = ref(0)
+const selectedDependencyId = ref(0)
 const minVersion = ref('')
 const maxVersion = ref('')
 
@@ -41,12 +35,23 @@ const autocompleteRequest = computed(() => searchStore.actionRequests.packageAut
 const searchResults = computed(() => searchStore.repositories)
 const totalResults = computed(() => searchStore.totalRepositories)
 const autocompleteOptions = computed(() => autocompleteResults.value.map(ar => ({value: ar.id, label: ar.name})))
-const isAlreadyInSearch = computed(() => dependencies.value.findIndex(d => d.id === selectedDependency.value) >= 0)
+const isAlreadyInSearch = computed(() => dependencies.value.findIndex(d => d.id === selectedDependencyId.value) >= 0)
 const maxPage = computed(() => Math.ceil(totalResults.value/perPage.value))
+
+const areValidVersions = ref(true)
+let t = null as number|null
+function refreshValidVersions() {
+  if (t !== null) {
+    clearTimeout(t)
+  }
+  t = setTimeout(() => {
+    areValidVersions.value = validVersions(minVersion.value, maxVersion.value)
+  }, 500)
+}
 
 function resetFields() {
   dependencyName.value = ''
-  selectedDependency.value = 0
+  selectedDependencyId.value = 0
   searchStore.resetPackageOptions()
   minVersion.value = ''
   maxVersion.value = ''
@@ -56,15 +61,23 @@ function addDependency() {
     idx: packageIdx,
     language: language.value,
     name: dependencyName.value,
-    id: selectedDependency.value,
-    minVersion: minVersion.value === '' ? null : minVersion.value,
-    maxVersion: maxVersion.value === '' ? null : maxVersion.value,
+    id: selectedDependencyId.value,
+    minVersion: formatVersion(minVersion.value),
+    maxVersion: formatVersion(maxVersion.value),
   })
   packageIdx++
   resetFields()
 }
 function removeDependency(id: number) {
   dependencies.value = dependencies.value.filter(p => p.id !== id)
+}
+function updateDependencyVersions({id, minVersion, maxVersion}) {
+  console.log({id, minVersion, maxVersion})
+  const currentDep = dependencies.value.find(p => p.id === id)
+  if (currentDep) {
+    currentDep.minVersion = formatVersion(minVersion)
+    currentDep.maxVersion = formatVersion(maxVersion)
+  }
 }
 function search() {
   const query = {
@@ -85,7 +98,7 @@ function search() {
   searchStore.search(query)
 }
 function selectDependency(id: number) {
-  selectedDependency.value = id
+  selectedDependencyId.value = id
 }
 function searchDependencies(search: string) {
   searchStore.packageAutocomplete({
@@ -101,34 +114,19 @@ function onLanguageChange() {
   resetFields()
 }
 
-function getDependencyLabel(pkg: Package): string {
-  let label = [pkg.name]
-  if (pkg.minVersion) {
-    label.push('>='+pkg.minVersion)
-  }
-  if (pkg.minVersion) {
-    label.push('<'+pkg.maxVersion)
-  }
-  return label.join(' ')
-}
-
-function correctVersion(version: string): string {
-  if (!version.substring(version.length-1).match(/[\d.]/)) {
-    version = version.substring(0, version.length-1)
-  }
-  return version
-}
-watch(minVersion, () => {
-  if (minVersion.value === '') {
+watch(minVersion, (newValue, oldValue) => {
+  if (!validVersion(minVersion.value)) {
+    minVersion.value = oldValue
     return
   }
-  minVersion.value = correctVersion(minVersion.value)
+  refreshValidVersions()
 })
-watch(maxVersion, () => {
-  if (maxVersion.value === '') {
+watch(maxVersion, (newValue, oldValue) => {
+  if (!validVersion(maxVersion.value)) {
+    maxVersion.value = oldValue
     return
   }
-  maxVersion.value = correctVersion(maxVersion.value)
+  refreshValidVersions()
 })
 </script>
 
@@ -161,17 +159,33 @@ watch(maxVersion, () => {
         <div class="row mb-2">
           <div class="form-group col-md-6 mb-md-0 mb-2">
             <div class="input-group">
-              <input :disabled="selectedDependency === 0" autocomplete="off" class="form-control" id="min-version" type="text" placeholder="Dependency min version (x.y.z)" v-model="minVersion" />
-                <span class="input-group-text">
-                  <tooltip-popper content="Greater or equal" :hover="true" :arrow="true">
-                    <font-awesome icon="question" />
-                  </tooltip-popper>
-                </span>
+              <input
+                :disabled="selectedDependencyId === 0"
+                autocomplete="off"
+                class="form-control"
+                id="min-version"
+                type="text"
+                placeholder="Dependency min version (x.y.z)"
+                v-model="minVersion"
+              />
+              <span class="input-group-text">
+                <tooltip-popper content="Greater or equal" :hover="true" :arrow="true">
+                  <font-awesome icon="question" />
+                </tooltip-popper>
+              </span>
             </div>
           </div>
           <div class="form-group col-md-6">
             <div class="input-group">
-              <input :disabled="selectedDependency === 0" autocomplete="off" class="form-control" id="max-version" type="text" placeholder="Dependency max version (x.y.z)" v-model="maxVersion" />
+              <input
+                :disabled="selectedDependencyId === 0"
+                autocomplete="off"
+                class="form-control"
+                id="max-version"
+                type="text"
+                placeholder="Dependency max version (x.y.z)"
+                v-model="maxVersion"
+              />
               <span class="input-group-text">
                 <tooltip-popper content="Strictly lower" :hover="true" :arrow="true">
                   <font-awesome icon="question" />
@@ -181,8 +195,10 @@ watch(maxVersion, () => {
           </div>
         </div>
         <div class="form-group">
-          <input :disabled="selectedDependency === 0 || dependencies.length > 4 || isAlreadyInSearch" class="btn fa-pull-right" type="submit" value="Add" @click.prevent="addDependency" />
+          <input :disabled="selectedDependencyId === 0 || dependencies.length > 4 || isAlreadyInSearch || !areValidVersions" class="btn fa-pull-right" type="submit" value="Add" @click.prevent="addDependency" />
           <div v-if="isAlreadyInSearch" class="danger mb-0 p-2">This dependency is already selected.</div>
+          <div v-if="!areValidVersions" class="danger mb-0 p-2">Max version must be greater than min version.</div>
+
         </div>
       </div>
 
@@ -193,14 +209,13 @@ watch(maxVersion, () => {
             None
           </div>
           <div v-else class="mb-2">
-            <span v-for="dependency in shownPackages" :key="dependency.idx" class="badge mx-1" :style="{'background-color': LanguageColorEnum[dependency.language], color: dependency.language === 'Javascript' ? '#000000' : 'inherit'}">
-              <tooltip-popper :content="dependency.language" :hover="true" :arrow="true">
-                <span>{{ getDependencyLabel(dependency) }}</span>
-              </tooltip-popper>
-              <tooltip-popper content="Remove" :hover="true" :arrow="true" class="pl-1">
-                <font-awesome icon="trash-can" class="cp danger" @click="removeDependency(dependency.id)" />
-              </tooltip-popper>
-            </span>
+            <selected-dependency
+                v-for="dependency in shownPackages"
+                :key="dependency.idx"
+                :dependency="dependency"
+                @remove="removeDependency"
+                @updateVersions="updateDependencyVersions"
+            />
           </div>
         </div>
         <div v-if="showAdvancedSearch" class="row mt-2">
@@ -230,50 +245,12 @@ watch(maxVersion, () => {
             <pagination-component :max-page="maxPage" :current-page="currentPage" @select-page="selectPage" />
           </div>
         </div>
-        <div v-for="repo in searchResults" :key="repo.id" class="card mb-2">
-          <div class="card-header p-3">
-            <div class="row">
-              <h3 class="col-md-6 mb-2 mb-md-0"><a :href="repo.url" target="_blank">{{ repo.fullName }}</a></h3>
-              <div class="col-md-6 text-md-end">
-                <span class="mr-2">
-                  <tooltip-popper content="License" :hover="true" :arrow="true">
-                    <span>
-                      <font-awesome icon="scale-balanced" /> {{ repo.licenceName ?? 'Unknown' }}
-                    </span>
-                  </tooltip-popper>
-                </span>
-                <span class="ml-2">
-                  <tooltip-popper content="Last pushed at" :hover="true" :arrow="true">
-                    <span>
-                      <font-awesome icon="clock-rotate-left" /> {{ dayjs(repo.pushedAt).format('YYYY-MM-DD') }}
-                    </span>
-                  </tooltip-popper>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="card-body p-3 fs-09">
-            <p><strong>Description</strong>: {{ repo.description }}</p>
-            <div v-if="repo.topics.length > 0">
-              Topics: <span class="badge" v-for="topic in repo.topics" :key="topic.topic">{{ topic.topic }}</span>
-            </div>
-          </div>
-          <div class="card-footer p-3">
-          <span class="mx-2">
-            <font-awesome icon="star" /> {{ repo.stargazersCount ?? 0 }} stars
-          </span>
-          <span class="mx-2">
-            <font-awesome icon="code-fork" /> {{ repo.forksCount ?? 0 }} forks
-          </span>
-            <span class="mx-2">
-              <tooltip-popper content="Open issues" :hover="true" :arrow="true">
-                <span>
-                  <font-awesome icon="circle-dot" /> {{ repo.openIssuesCount ?? 0 }} issues
-                </span>
-              </tooltip-popper>
-            </span>
-          </div>
-        </div>
+        <Repository-item
+            v-for="repo in searchResults"
+            :key="repo.id"
+            class="mb-2"
+            :repository="repo"
+        />
         <div class="row justify-content-between pt-0 p-3" v-if="searchResults.length > 3">
           <h2 class="col-auto">Results ({{ totalResults }})</h2>
           <div class="col-auto">

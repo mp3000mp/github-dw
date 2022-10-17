@@ -15,7 +15,7 @@ interface Topic {
     id: number;
     topic: string;
 }
-interface Repository {
+export interface Repository {
     id: number;
     name: string;
     username: string;
@@ -34,6 +34,14 @@ interface SearchPackage {
     id: number,
     minVersion: string|null,
     maxVersion: string|null,
+}
+export interface Dependency {
+    idx: number;
+    language: string;
+    name: string|null;
+    id: number;
+    minVersion: string|null;
+    maxVersion: string|null;
 }
 export interface SearchQuery {
     page: number;
