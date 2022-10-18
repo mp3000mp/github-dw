@@ -2,8 +2,18 @@
   background-color: $body-bg;
 }
 
-.form-control {
+.form-control, .form-select {
   &:disabled {
     background-color: $grey;
   }
+}
+
+.form-select {
+  &:disabled {
+    color: #616b75;
+  }
+}
+
+.form-control, .form-select, .input-group-text, .btn {
+  padding: .2rem .4rem;
 }

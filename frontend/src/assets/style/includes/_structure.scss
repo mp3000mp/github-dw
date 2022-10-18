@@ -23,12 +23,31 @@ body {
   color: $body-color;
 }
 
+h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
 p {
   margin: 0;
 }
 
 .app-block {
   background-color: $block-bg;
+
+  ul {
+    margin: 0;
+    padding-left: 15px;
+  }
+
+  p {
+    text-align: justify;
+  }
 }
 
 .card {

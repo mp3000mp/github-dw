@@ -20,7 +20,7 @@ $aligns: ("start": left, "center": center, "end": right);
 }
 
 // colors
-$colors: ("danger": $danger-color, "success": $success-color);
+$colors: ("danger": $danger-color, "success": $success-color, "warning": $warning-color);
 @each $colork, $colorv in $colors {
   .#{$colork} {
     color: $colorv;

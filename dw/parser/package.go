@@ -23,16 +23,24 @@ func ParsePackageJson(rawContent string) ([]Package, error) {
 
 	// find packages
 	for pkg, version := range data.Require {
-		packages = append(packages, Package{Name: pkg, Version: version})
+		if IsPackage(pkg) {
+			packages = append(packages, Package{Name: pkg, Version: version})
+		}
 	}
 	for pkg, version := range data.DevRequire {
-		packages = append(packages, Package{Name: pkg, Version: version})
+		if IsPackage(pkg) {
+			packages = append(packages, Package{Name: pkg, Version: version})
+		}
 	}
 	for pkg, version := range data.PeerRequire {
-		packages = append(packages, Package{Name: pkg, Version: version})
+		if IsPackage(pkg) {
+			packages = append(packages, Package{Name: pkg, Version: version})
+		}
 	}
 	for pkg, version := range data.Engines {
-		packages = append(packages, Package{Name: pkg, Version: version})
+		if IsPackage(pkg) {
+			packages = append(packages, Package{Name: pkg, Version: version})
+		}
 	}
 
 	return packages, nil

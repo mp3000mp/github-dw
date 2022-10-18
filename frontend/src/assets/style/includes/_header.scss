@@ -1,7 +1,7 @@
 header {
   background-color: $block-bg;
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 1rem .5rem;
 }
 
 h1 {
@@ -24,14 +24,4 @@ h1 {
       }
     }
   }
-}
-
-h2 {
-  font-size: 1.2rem;
-  margin: 0;
-}
-
-h3 {
-  font-size: 1.1rem;
-  margin: 0;
 }

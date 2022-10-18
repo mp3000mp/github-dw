@@ -27,7 +27,9 @@ func ParseRequirementsTxt(rawContent string) ([]Package, error) {
 			version := strings.ReplaceAll(strings.ReplaceAll(rs[2], " ", ""), "#", "")
 			versions := strings.Split(version, ",")
 			for _, v := range versions {
-				packages = append(packages, Package{Name: pkg, Version: v})
+				if IsPackage(pkg) {
+					packages = append(packages, Package{Name: pkg, Version: v})
+				}
 			}
 			continue
 		}

@@ -9,7 +9,6 @@ import (
 )
 
 type TestGetValidRangeCase struct {
-	Msg string
 	Expected string
 	Case string
 }
@@ -52,7 +51,6 @@ func TestGetValidRange(t *testing.T) {
 }
 
 type TestCoerceCase struct {
-	Msg string
 	Expected string
 	Case string
 	PatchMin bool
