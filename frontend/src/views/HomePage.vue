@@ -12,7 +12,7 @@ const searchStore = useSearchStore()
 
 let packageIdx = 1
 
-const languages = ref(['Go', 'Javascript', 'PHP'/*, 'Python'*/])
+const languages = ref(['Go', 'Javascript', 'PHP', 'Python'])
 
 const showAdvancedSearch = ref(false)
 const repoName = ref('')

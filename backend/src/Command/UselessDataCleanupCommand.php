@@ -26,8 +26,8 @@ class UselessDataCleanupCommand extends Command
     protected function configure(): void
     {
         $this->setHelp('This command clean up useless data.');
-        $this->addOption('force-flush', 'f', InputOption::VALUE_NONE, 'Force flush');
-        $this->addOption('min-packages', '-m', InputOption::VALUE_REQUIRED, 'Minimum packages');
+        $this->addOption('force-flush', 'f', InputOption::VALUE_NONE, 'Force flush', false);
+        $this->addOption('min-packages', '-m', InputOption::VALUE_REQUIRED, 'Minimum packages', 2);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

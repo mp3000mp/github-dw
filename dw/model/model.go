@@ -68,7 +68,7 @@ type RepositoryPackageTypeFile struct {
 type Package struct {
 	ID uint                                `gorm:"primaryKey"`
 	PackageTypeFileID uint                 `gorm:"uniqueIndex:idx_uniq_p;not null"`
-	Name string                            `gorm:"uniqueIndex:idx_uniq_p;size:100;not null;index"`
+	Name string                            `gorm:"uniqueIndex:idx_uniq_p;size:100;not null;index;class:FULLTEXT"`
 	RepositoryPackages []RepositoryPackage `gorm:"constraint:OnDelete:CASCADE"`
 }
 

@@ -32,7 +32,7 @@ services:
   dw:
     image: golang:1.18
     # command: go run main.go
-    command: go run main.go migrate
+    # command: go run main.go migrate
     working_dir: /usr/src/app
     volumes:
       - ../../dw:/usr/src/app

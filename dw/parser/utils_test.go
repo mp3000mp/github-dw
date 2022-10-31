@@ -1,16 +1,13 @@
 package parser
 
 import (
-	"errors"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 type TestIsPackageCase struct {
-	Expected string
+	Expected bool
 	Case string
 }
 

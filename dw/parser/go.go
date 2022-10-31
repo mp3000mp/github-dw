@@ -35,6 +35,7 @@ func ParseGoMod(rawContent string) ([]Package, error) {
 			pkg := strings.Split(trimed, " ")
 			if len(pkg) >= 3 && pkg[0] == "require" && strings.HasPrefix(pkg[2], "v") {
 				if IsPackage(pkg[1]) {
+					pkg[1] = strings.Replace(pkg[1], "\"", "", -1)
 					packages = append(packages, Package{Name: pkg[1], Version: pkg[2]})
 					continue
 				}
@@ -49,6 +50,7 @@ func ParseGoMod(rawContent string) ([]Package, error) {
 			pkg := strings.Split(trimed, " ")
 			if len(pkg) >= 2 && strings.HasPrefix(pkg[1], "v") {
 				if IsPackage(pkg[0]) {
+					pkg[0] = strings.Replace(pkg[0], "\"", "", -1)
 					packages = append(packages, Package{Name: pkg[0], Version: pkg[1]})
 				}
 			}

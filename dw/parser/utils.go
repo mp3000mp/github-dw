@@ -8,7 +8,7 @@ func IsPackage(name string) bool {
 	if len(name) < 2 {
 		return false
 	}
-	forbidden = []string{
+	forbidden := []string{
 		"#",
 		"//",
 		"/*",
