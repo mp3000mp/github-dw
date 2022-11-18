@@ -58,4 +58,3 @@ services:
     depends_on:
       - mariadb
       - mariadb_test
-      - backend

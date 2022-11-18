@@ -18,6 +18,7 @@ func TestGetValidRange(t *testing.T) {
 	assert := assert.New(t)
 
 	cases := []TestGetValidRangeCase{
+		{Expected: "Not valid.", Case: ""},
 		{Expected: "Not valid.", Case: ">v one"},
 		{Expected: "Not valid.", Case: "<0"},
 		{Expected: ">=1.2.0 <2.0.0", Case: "^1.2.0"},
@@ -31,6 +32,7 @@ func TestGetValidRange(t *testing.T) {
 		{Expected: ">=0.0.0 <1.2.1", Case: "<=1.2.0"},
 		{Expected: ">=1.2.0 <1.2.1", Case: "1.2.0"},
 		{Expected: ">=1.2.0 <1.2.1", Case: "=1.2.0"},
+		{Expected: ">=1.2.0 <1.2.1", Case: "==1.2.0"},
 		{Expected: ">=1.2.0 <1.3.0", Case: "1.2.*"},
 		{Expected: ">=1.0.0 <2.0.0", Case: "1.*"},
 		{Expected: ">=1.2.1 <1.4.6", Case: ">=1.2.1 <=1.4.5"},

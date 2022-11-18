@@ -97,9 +97,11 @@ func GetVersionRange(v string) VersionRange {
 	// handle other
 	semverRegex := regexp.MustCompile(`([=<>\^~]*)(.+)`)
 	rs = semverRegex.FindStringSubmatch(v)
+	if len(rs) < 3 {
+		return vr
+	}
 
-
-	if rs[1] == "=" || rs[1] == "" {
+	if rs[1] == "=" || rs[1] == "==" || rs[1] == "" {
 		min := Coerce(rs[2], true)
 		max := Coerce(rs[2], false)
 		vr.MinMajor = min.Major

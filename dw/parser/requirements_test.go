@@ -16,6 +16,7 @@ func TestParseRequirementsTxt(t *testing.T) {
 		{Name: "pkgD", Version: ">=1.1.0"},
 		{Name: "pkgD", Version: ">=2.0.0"},
 		{Name: "pkgE", Version: "==1.0.*"},
+		{Name: "pkgF", Version: "==8.0.20"},
 	}
 	r, _ := ParseRequirementsTxt(`# comment
 	pkgA
@@ -23,6 +24,7 @@ func TestParseRequirementsTxt(t *testing.T) {
 	pkgB == 1.0.0
 	pkgC>=1.1.0 # comment
 	pkgD >= 1.1.0, >=2.0.0
-	pkgE == 1.0.*`)
+	pkgE == 1.0.*
+	pkgF==8.0.20`)
 	assert.ElementsMatch(expected, r)
 }
