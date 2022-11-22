@@ -1,5 +1,16 @@
 <script lang="ts" setup>
+import {ref} from 'vue'
 
+const isEmailShown = ref(false)
+const email = ref('my email')
+
+function animateEmail() {
+  isEmailShown.value = true
+  email.value = 'moussadedijon@gmail.com'
+  // setTimeout(() => {
+  //   email.value = 'moussadedijon@gmail.com'
+  // }, 400)
+}
 </script>
 
 <template>
@@ -27,7 +38,7 @@
         <h3>Is this project open source ?</h3>
         <p>Not yet because it's dirty. But maybe one day and you'll be able to find it by looking for <a href="https://symfony.com/doc/current/index.html" title="awesome backend framework">Symfony</a> and <a href="https://vuejs.org/guide/introduction.html" title="awesome frontend framework">Vue.js</a> dependencies.</p>
         <h3>I have more questions, what can I do ?</h3>
-        <p>Please don't panic and contact me at <a href="mailto:moussadedijon@gmail.com" title="please no spam">moussadedijon@gmail.com</a>.</p>
+        <p>Please don't panic and contact me at <span class="btn cp" @click="animateEmail" :class="isEmailShown ? ['hidden'] : ['shown']">my email</span><a href="mailto:moussadedijon@gmail.com" title="Please no spam" :class="!isEmailShown ? ['hidden'] : ['shown']">{{ email }}</a>.</p>
         <div class="text-end">
           <router-link :to="{name: 'home'}">Go back to form</router-link>
         </div>
@@ -44,5 +55,13 @@ h2 {
 
 h3 {
   margin-top: 20px;
+}
+
+.shown {
+  display: inline;
+}
+
+.hidden {
+  display: none;
 }
 </style>
