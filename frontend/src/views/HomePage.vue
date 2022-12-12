@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
+import {computed, ref} from 'vue'
 import {formatVersion, validVersion, validVersions} from '@/utils/version'
 import {useSearchStore} from '@/stores/search'
 import AutocompleteSelect from '@/components/AutocompleteSelect.vue'
@@ -38,17 +38,17 @@ const autocompleteOptions = computed(() => autocompleteResults.value.map(ar => (
 const isAlreadyInSearch = computed(() => dependencies.value.findIndex(d => d.id === selectedDependencyId.value) >= 0)
 const maxPage = computed(() => Math.ceil(totalResults.value/perPage.value))
 const maxDependenciesReached = computed(() => dependencies.value.length >= 4)
-
-const areValidVersions = ref(true)
-let t = null as number|null
-function refreshValidVersions() {
-  if (t !== null) {
-    clearTimeout(t)
+const validMinVersion = computed(() => validVersion(minVersion.value))
+const validMaxVersion = computed(() => validVersion(maxVersion.value))
+const areValidVersions = computed(() => {
+  if (!validVersion(minVersion.value) || !validVersion(maxVersion.value)) {
+    return true
   }
-  t = setTimeout(() => {
-    areValidVersions.value = validVersions(minVersion.value, maxVersion.value)
-  }, 500)
-}
+  return validVersions(minVersion.value, maxVersion.value)
+})
+const canAddDependency = computed(() => {
+  return selectedDependencyId.value > 0 && !maxDependenciesReached.value && !isAlreadyInSearch.value && areValidVersions.value && validMinVersion.value &validMaxVersion.value
+})
 
 function resetFields() {
   dependencyName.value = ''
@@ -76,12 +76,17 @@ function addDependency() {
 function removeDependency(id: number) {
   dependencies.value = dependencies.value.filter(p => p.id !== id)
 }
-function updateDependencyVersions({id, minVersion, maxVersion}) {
-  console.log({id, minVersion, maxVersion})
-  const currentDep = dependencies.value.find(p => p.id === id)
+
+interface updateDependencyVersionsPayload {
+  id: number;
+  minVersion: string;
+  maxVersion: string;
+}
+function updateDependencyVersions(payload: updateDependencyVersionsPayload) {
+  const currentDep = dependencies.value.find(p => p.id === payload.id)
   if (currentDep) {
-    currentDep.minVersion = formatVersion(minVersion)
-    currentDep.maxVersion = formatVersion(maxVersion)
+    currentDep.minVersion = formatVersion(payload.minVersion)
+    currentDep.maxVersion = formatVersion(payload.maxVersion)
   }
 }
 function search() {
@@ -105,8 +110,8 @@ function search() {
 function selectDependency(id: number) {
   selectedDependencyId.value = id
 }
-function searchDependencies(search: string) {
-  searchStore.packageAutocomplete({
+async function searchDependencies(search: string) {
+  await searchStore.packageAutocomplete({
     language: language.value,
     text: search,
   })
@@ -118,21 +123,6 @@ function selectPage(page: number) {
 function onLanguageChange() {
   resetFields()
 }
-
-watch(minVersion, (newValue, oldValue) => {
-  if (!validVersion(minVersion.value)) {
-    minVersion.value = oldValue
-    return
-  }
-  refreshValidVersions()
-})
-watch(maxVersion, (newValue, oldValue) => {
-  if (!validVersion(maxVersion.value)) {
-    maxVersion.value = oldValue
-    return
-  }
-  refreshValidVersions()
-})
 </script>
 
 <template>
@@ -188,6 +178,7 @@ watch(maxVersion, (newValue, oldValue) => {
                 type="text"
                 placeholder="Dependency min version (x.y.z)"
                 v-model="minVersion"
+                :class="validMinVersion ? [] : ['is-invalid']"
               />
               <span class="input-group-text">
                 <tooltip-popper content="Greater or equal" :hover="true" :arrow="true">
@@ -206,6 +197,7 @@ watch(maxVersion, (newValue, oldValue) => {
                 type="text"
                 placeholder="Dependency max version (x.y.z)"
                 v-model="maxVersion"
+                :class="validMaxVersion ? [] : ['is-invalid']"
               />
               <span class="input-group-text">
                 <tooltip-popper content="Strictly lower" :hover="true" :arrow="true">
@@ -216,7 +208,7 @@ watch(maxVersion, (newValue, oldValue) => {
           </div>
         </div>
         <div class="form-group">
-          <input :disabled="selectedDependencyId === 0 || maxDependenciesReached || isAlreadyInSearch || !areValidVersions" class="btn fa-pull-right" type="submit" value="Add" @click.prevent="addDependency" />
+          <input :disabled="!canAddDependency" class="btn fa-pull-right" type="submit" value="Add" @click.prevent="addDependency" />
           <div v-if="isAlreadyInSearch" class="danger mb-0 p-2">This dependency is already selected.</div>
           <div v-if="!areValidVersions" class="danger mb-0 p-2">Max version must be greater than min version.</div>
           <div v-if="maxDependenciesReached" class="warning mb-0 p-2">You cannot search for more than 4 dependencies.</div>
@@ -235,7 +227,7 @@ watch(maxVersion, (newValue, oldValue) => {
                 :key="dependency.idx"
                 :dependency="dependency"
                 @remove="removeDependency"
-                @updateVersions="updateDependencyVersions"
+                @update-versions="updateDependencyVersions"
             />
           </div>
         </div>

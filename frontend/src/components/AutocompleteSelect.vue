@@ -19,17 +19,15 @@ const emit = defineEmits(['reset-options', 'search', 'select-option', 'update:mo
 
 const selectedOption = ref(null) as Ref<null|string|number>
 const isFocused = ref(false)
-const isOptionsHovered = ref(false)
-const showOptions = computed(() => props.options.length > 0 && (isFocused.value || isOptionsHovered.value))
+const showOptions = computed(() => props.options.length > 0 && isFocused.value)
 
 function selectOption(option: Option) {
   selectedOption.value = option.value
   emit('update:modelValue', option.label)
   emit('select-option', selectedOption.value)
-  isOptionsHovered.value = false
 }
 
-let timeout = null
+let timeout = null as number|null
 function onInput(value: string) {
   emit('update:modelValue', value)
   if (timeout !== null) {
@@ -65,9 +63,16 @@ watch(() => props.modelValue, () => {
         @blur="isFocused = false"
         @input="onInput($event.target.value)"
     />
-    <ul v-if="showOptions || isLoading" @mouseenter="isOptionsHovered = true" @mouseleave="isOptionsHovered = false" class="acs-options">
+    <ul v-if="showOptions || isLoading" class="acs-options">
       <li v-if="isLoading" class="acs-loading text-center">...</li>
-      <li v-for="option in options" :key="option.value" @click="selectOption(option)" class="option" :class="{selected: option.value === selectedOption}">
+      <li
+          v-else
+          v-for="option in options"
+          :key="option.value"
+          @mousedown="selectOption(option)"
+          class="option"
+          :class="{selected: option.value === selectedOption}"
+      >
         {{ option.label }}
       </li>
     </ul>

@@ -67,7 +67,6 @@ watch(tableData, () => {
         callbacks: {
           label: function(ctx) {
             let total = ctx.dataset.data.reduce((p: number, c: number) => p+c, 0)
-            console.log(total)
             return ctx.label + ': ' + ctx.formattedValue + ' (' + percent(ctx.raw, total) + ')'
           }
         }
@@ -166,7 +165,6 @@ watch(timeline, () => {
                   sumError += item.parsed.y
                 }
               }
-              console.log(data)
               return 'Total done: ' + sumDone +
                 '\n' + 'Total errors: ' + sumError +
                 '\n' + '% error2: ' + percent(data[3], data[1]) +

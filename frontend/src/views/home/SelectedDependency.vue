@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {onMounted, Ref, ref, watch} from 'vue'
+import {computed, onMounted, Ref, ref} from 'vue'
 import {validVersion, validVersions} from '@/utils/version'
 import tooltipPopper from 'vue3-popper'
 import {LanguageColorEnum, Dependency} from '@/stores/search/types'
@@ -14,9 +14,16 @@ const minVersionValue = ref('') as Ref<string|null>
 const maxVersionEdit = ref(false)
 const maxVersionValue = ref('') as Ref<string|null>
 
+const validMinVersion = computed(() => validVersion(minVersionValue.value))
+const validMaxVersion = computed(() => validVersion(maxVersionValue.value))
+const areValidVersions = computed(() => {
+  if (!validVersion(minVersionValue.value) || !validVersion(maxVersionValue.value)) {
+    return true
+  }
+  return validVersions(minVersionValue.value, maxVersionValue.value)
+})
+
 function updateVersions(minVersion: string, maxVersion: string) {
-  console.log(minVersion)
-  console.log(maxVersion)
   if (validVersions(minVersion, maxVersion)) {
     emit('update-versions', {id: props.dependency.id, minVersion, maxVersion})
   }
@@ -27,19 +34,6 @@ function updateVersions(minVersion: string, maxVersion: string) {
 onMounted(() => {
   minVersionValue.value = props.dependency.minVersion
   maxVersionValue.value = props.dependency.maxVersion
-})
-
-watch(minVersionValue, (newValue, oldValue) => {
-  if (!validVersion(minVersionValue.value)) {
-    minVersionValue.value = oldValue
-    return
-  }
-})
-watch(maxVersionValue, (newValue, oldValue) => {
-  if (!validVersion(maxVersionValue.value)) {
-    maxVersionValue.value = oldValue
-    return
-  }
 })
 </script>
 
@@ -57,6 +51,7 @@ watch(maxVersionValue, (newValue, oldValue) => {
       id="min-version"
       type="text"
       v-model="minVersionValue"
+      :class="validMinVersion && areValidVersions ? [] : ['is-invalid']"
       @blur="updateVersions(minVersionValue, dependency.maxVersion)"
     />
     <span v-if="dependency.maxVersion">&nbsp;&lt;&nbsp;</span>
@@ -68,6 +63,7 @@ watch(maxVersionValue, (newValue, oldValue) => {
       id="max-version"
       type="text"
       v-model="maxVersionValue"
+      :class="validMaxVersion && areValidVersions ? [] : ['is-invalid']"
       @blur="updateVersions(dependency.minVersion, maxVersionValue)"
     />
     <tooltip-popper content="Remove" :hover="true" :arrow="true" class="pl-1">
@@ -80,5 +76,11 @@ watch(maxVersionValue, (newValue, oldValue) => {
 .editable-version {
   width: 40px;
   height: 15px;
+}
+
+input {
+  &.is-invalid {
+    border: 1px solid red;
+  }
 }
 </style>
