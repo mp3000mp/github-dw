@@ -27,8 +27,8 @@ class AdminController extends AbstractController
         $repoPackageRepo = $this->em->getRepository(RepositoryPackageTypeFile::class);
 
         $d = new \DateTime('-7 days');
-        $routine2Errors = $repoRepo->findErrors($d);
-        $routine3Errors = $repoPackageRepo->findErrors($d);
+        $routine2Errors = $repoRepo->findErrors($d, 10);
+        $routine3Errors = $repoPackageRepo->findErrors($d, 10);
 
         return $this->json([
             'routine2' => $routine2Errors,

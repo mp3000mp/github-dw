@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Package;
+use App\Entity\PackageTypeFile;
 use App\Repository\PackageRepository;
+use App\Repository\PackageTypeFileRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,9 +20,12 @@ class PackageController extends AbstractController
     {
         /** @var PackageRepository $repoPackageRepo */
         $repoPackageRepo = $this->em->getRepository(Package::class);
+        /** @var PackageTypeFileRepository $packageTypeFileRepo */
+        $packageTypeFileRepo = $this->em->getRepository(PackageTypeFile::class);
 
         $search = $this->requestHelper->handleRequest($request->getContent(), 'package_autocomplete');
-        $results = $repoPackageRepo->autocomplete($search->language, $search->text);
+        $packageTypeFile = $packageTypeFileRepo->findOneBy(['language' => $search->language]);
+        $results = $repoPackageRepo->autocomplete($packageTypeFile, $search->text);
 
         return $this->responseHelper->createResponse($results, ['autocomplete']);
     }

@@ -1,24 +1,7 @@
 <VirtualHost *:80>
 	ServerName {{ front_server_name }}
-	DocumentRoot "{{ app_directory }}/frontend/dist"
 
-	<Directory /var/www/{{ app_directory }}/frontend/dist/>
-		Options Indexes FollowSymLinks MultiViews
-		AllowOverride all
-		Require all granted
-		Order allow,deny
-		allow from all
-		RewriteEngine on
-		RewriteBase /
-		RewriteRule ^index\.html$ - [L]
-		RewriteCond %{REQUEST_FILENAME} !-f
-		RewriteCond %{REQUEST_FILENAME} !-d
-		RewriteRule . /index.html [L]
-	</Directory>
-
-	ErrorLog "{{ app_directory }}/frontend/log/apache_error.log"
-	CustomLog "{{ app_directory }}/frontend/log/apache_access.log" combined
-
-	RewriteCond %{SERVER_NAME} ={{ front_server_name }}
-	RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+	RewriteEngine On
+    RewriteCond %{SERVER_PORT} !443
+    RewriteRule ^(/(.*))?$ https://%{HTTP_HOST}/$1 [R=301,L]
 </VirtualHost>

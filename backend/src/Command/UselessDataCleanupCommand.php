@@ -25,9 +25,9 @@ class UselessDataCleanupCommand extends Command
 
     protected function configure(): void
     {
-        $this->setHelp('This command clean up useless data.');
-        $this->addOption('force-flush', 'f', InputOption::VALUE_NONE, 'Force flush', false);
-        $this->addOption('min-packages', '-m', InputOption::VALUE_REQUIRED, 'Minimum packages', 2);
+        $this->setHelp('This command clean up useless data (and compute package usage).');
+        $this->addOption('force-flush', 'f', InputOption::VALUE_NONE, 'Force flush');
+        $this->addOption('min-packages', '-m', InputOption::VALUE_REQUIRED, 'Minimum packages usage to be kept', 2);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -44,22 +44,37 @@ class UselessDataCleanupCommand extends Command
         } else {
             $io->warning('FLUSH MODE - MIN='.$minPackages);
         }
-        $io->createProgressBar(3 + !$dryRun);
+        $io->createProgressBar(4 + (int) !$dryRun);
         $io->progressStart();
         if (!$dryRun) {
             $this->em->getConnection()->beginTransaction();
         }
 
         try {
+            // usage
+            $io->progressAdvance();
+
+            $sql = "
+                UPDATE dw_package p
+                INNER JOIN (
+                  SELECT package_id, COUNT(1) AS pCount
+                  FROM dw_repository_package
+                  GROUP BY package_id
+                ) j
+                ON j.package_id = p.id
+                SET p.nb = j.pCount
+            ";
+            $this->em->getConnection()->executeQuery($sql);
+
+
             // packages
             $io->progressAdvance();
 
             $sqlTotal = 'SELECT COUNT(1) total FROM dw_package';
             $sql = "
-            SELECT package_id id, COUNT(1) 
-            FROM dw_repository_package 
-            GROUP BY package_id 
-            HAVING COUNT(1) < $minPackages        
+            SELECT id 
+            FROM dw_package 
+            WHERE dw_package.nb < $minPackages        
         ";
             $ids = $this->getIds($sql);
             $rows[] = $this->getRow('Packages', count($ids), $sqlTotal);
@@ -67,6 +82,7 @@ class UselessDataCleanupCommand extends Command
                 $sqlDelete = 'DELETE FROM dw_package WHERE id IN (:ids)';
                 $this->doDelete($sqlDelete, $ids);
             }
+
 
             // repo package type files
             $io->progressAdvance();
@@ -87,6 +103,7 @@ class UselessDataCleanupCommand extends Command
                 $this->doDelete($sqlDelete, $ids);
             }
 
+
             // repositories
             $io->progressAdvance();
 
@@ -102,6 +119,8 @@ class UselessDataCleanupCommand extends Command
             $ids = $this->getIds($sql, $ids);
             $rows[] = $this->getRow('Repositories', count($ids), $sqlTotal);
             if (!$dryRun && count($ids) > 0) {
+                $sqlDelete = 'DELETE FROM dw_repository_package WHERE repository_id IN (:ids)';
+                $this->doDelete($sqlDelete, $ids);
                 $sqlDelete = 'DELETE FROM dw_repository WHERE id IN (:ids)';
                 $this->doDelete($sqlDelete, $ids);
             }
@@ -117,6 +136,7 @@ class UselessDataCleanupCommand extends Command
             $io->progressAdvance();
             $this->em->getConnection()->commit();
         }
+
 
         $io->progressFinish();
         $io->success('SUCCESS');

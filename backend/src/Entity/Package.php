@@ -27,6 +27,9 @@ class Package
     #[ORM\JoinColumn(nullable: false)]
     private PackageTypeFile $packageTypeFile;
 
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    private int $nb = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -50,5 +53,15 @@ class Package
     public function setPackageTypeFile(PackageTypeFile $packageTypeFile): void
     {
         $this->packageTypeFile = $packageTypeFile;
+    }
+
+    public function getNb(): int
+    {
+        return $this->nb;
+    }
+
+    public function setNb(int $nb): void
+    {
+        $this->nb = $nb;
     }
 }

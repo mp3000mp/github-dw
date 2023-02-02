@@ -1,8 +1,7 @@
 <VirtualHost *:80>
 	ServerName {{ back_server_name }}
-	ProxyPreserveHost On
 
-	ProxyPass / http://localhost:{{ back_proxy_port }}/
-	ProxyPassReverse / http://localhost:{{ back_proxy_port }}/
-	ProxyPassReverseCookieDomain localhost {{ back_server_name }}
+	RewriteEngine On
+	RewriteCond %{SERVER_PORT} !443
+	RewriteRule ^(/(.*))?$ https://%{HTTP_HOST}/$1 [R=301,L]
 </VirtualHost>
