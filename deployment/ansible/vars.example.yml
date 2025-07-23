@@ -12,8 +12,8 @@ mysql_password: user_pwd
 github_api_key: key
 dw_version: 1.0.0
 
-back_server_name: template-back.mp3000.fr
-front_server_name: template.mp3000.fr
+backend_server_name: template-back.mp3000.fr
+frontend_server_name: template.mp3000.fr
 back_proxy_port: 5000
 
 app_version: 1.0.0

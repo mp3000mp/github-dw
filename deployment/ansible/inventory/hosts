@@ -1,2 +1,3 @@
 [prod_servers]
-vps-mp3000 ansible_user=debian
+# vps-mp3000 ansible_user=debian
+vps-ikoula ansible_user=mp3000

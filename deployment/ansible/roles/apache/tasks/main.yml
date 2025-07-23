@@ -4,7 +4,7 @@
   become_user: root
   template:
     src: "templates/vhost_back.conf.j2"
-    dest: "/etc/apache2/sites-available/{{ back_server_name }}.conf"
+    dest: "/etc/apache2/sites-available/{{ backend_server_name }}.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '0640'
@@ -14,7 +14,7 @@
   become_user: root
   template:
     src: "templates/vhost_back-le-ssl.conf.j2"
-    dest: "/etc/apache2/sites-available/{{ back_server_name }}-le-ssl.conf"
+    dest: "/etc/apache2/sites-available/{{ backend_server_name }}-le-ssl.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '0640'
@@ -24,7 +24,7 @@
   become_user: root
   template:
     src: "templates/vhost_front.conf.j2"
-    dest: "/etc/apache2/sites-available/{{ front_server_name }}.conf"
+    dest: "/etc/apache2/sites-available/{{ frontend_server_name }}.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '0640'
@@ -34,7 +34,7 @@
   become_user: root
   template:
     src: "templates/vhost_front-le-ssl.conf.j2"
-    dest: "/etc/apache2/sites-available/{{ front_server_name }}-le-ssl.conf"
+    dest: "/etc/apache2/sites-available/{{ frontend_server_name }}-le-ssl.conf"
     owner: "{{ maintainer_user }}"
     group: "{{ maintainer_user }}"
     mode: '0640'
@@ -44,8 +44,8 @@
   become_user: root
   command: a2ensite {{ item }}
   loop:
-    - "{{ back_server_name }}"
-    - "{{ front_server_name }}"
+    - "{{ backend_server_name }}"
+    - "{{ frontend_server_name }}"
 
 - name: Certbot
   become: true
@@ -55,5 +55,5 @@
     cmd: "certbot --apache --agree-tos --non-interactive -d {{ item }} -m {{ admin_email }}"
   notify: restart apache2
   loop:
-    - "{{ back_server_name }}"
-    - "{{ front_server_name }}"
+    - "{{ backend_server_name }}"
+    - "{{ frontend_server_name }}"

@@ -17,7 +17,7 @@ line=$(sed -n '/^app_version: /p' vars.yml)
 version="${BASH_REMATCH[2]}"
 
 # get backend url
-line=$(sed -n '/^back_server_name: /p' vars.yml)
+line=$(sed -n '/^backend_server_name: /p' vars.yml)
 [[ "$line" =~ $reg ]]
 url="https://${BASH_REMATCH[2]}"
 

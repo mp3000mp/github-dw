@@ -1,14 +1,14 @@
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
-	ServerName {{ back_server_name }}
+	ServerName {{ backend_server_name }}
 
 	ProxyPreserveHost On
 	ProxyPass / http://localhost:{{ back_proxy_port }}/
 	ProxyPassReverse / http://localhost:{{ back_proxy_port }}/
-	ProxyPassReverseCookieDomain localhost {{ back_server_name }}
+	ProxyPassReverseCookieDomain localhost {{ backend_server_name }}
 
-	SSLCertificateFile /etc/letsencrypt/live/{{ back_server_name }}/fullchain.pem
-	SSLCertificateKeyFile /etc/letsencrypt/live/{{ back_server_name }}/privkey.pem
+	SSLCertificateFile /etc/letsencrypt/live/{{ backend_server_name }}/fullchain.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/{{ backend_server_name }}/privkey.pem
 	Include /etc/letsencrypt/options-ssl-apache.conf
 </VirtualHost>
 </IfModule>

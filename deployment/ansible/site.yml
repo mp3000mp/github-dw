@@ -7,8 +7,8 @@
   roles:
 #    - files
 #    - docker
-#    - deploy_dw
-    - deploy_back
+    - deploy_dw
+#    - deploy_back
 #    - deploy_front
 #    - apache
 #    - backup
