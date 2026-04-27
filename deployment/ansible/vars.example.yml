@@ -3,7 +3,7 @@ admin_email: me@me.fr
 app_directory: /var/www/app
 maintainer_user: user1
 
-mysql_version: 10.6.8
+mysql_version: 11.4.5
 mysql_root_password: root_pwd
 mysql_database: template_sf
 mysql_user: user

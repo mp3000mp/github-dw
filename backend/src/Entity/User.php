@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -41,18 +40,19 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     private string $password;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?DateTime $password_updated_at;
+    private ?\DateTime $password_updated_at;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $reset_password_token;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?DateTime $reset_password_at;
+    private ?\DateTime $reset_password_at;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['admin'])]
     private bool $isEnabled = false;
 
+    /** @var string[] */
     #[ORM\Column(type: 'json')]
     #[Groups(['admin', 'me'])]
     private array $roles = [];
@@ -67,7 +67,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     }
 
     /**
-     * Returns the roles or permissions granted to the users for security.
+     * @return string[]
      */
     public function getRoles(): array
     {
@@ -80,6 +80,9 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return $roles;
     }
 
+    /**
+     * @param string[] $roles
+     */
     public function setRoles(array $roles): self
     {
         if (!in_array('ROLE_USER', $roles, true)) {
@@ -112,6 +115,9 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         ];
     }
 
+    /**
+     * @param array<int, mixed> $serialized
+     */
     public function __unserialize(array $serialized): void
     {
         [$this->id, $this->username, $this->email, $this->password, $this->isEnabled,
@@ -119,9 +125,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         ] = $serialized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         // you *may* need a real salt depending on your encoder
@@ -129,9 +132,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials(): void
     {
     }
@@ -166,12 +166,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->password = $password;
     }
 
-    public function getPasswordUpdatedAt(): ?DateTime
+    public function getPasswordUpdatedAt(): ?\DateTime
     {
         return $this->password_updated_at;
     }
 
-    public function setPasswordUpdatedAt(?DateTime $password_updated_at): void
+    public function setPasswordUpdatedAt(?\DateTime $password_updated_at): void
     {
         $this->password_updated_at = $password_updated_at;
     }
@@ -191,12 +191,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->reset_password_token = md5(random_bytes(64));
     }
 
-    public function getResetPasswordAt(): ?DateTime
+    public function getResetPasswordAt(): ?\DateTime
     {
         return $this->reset_password_at;
     }
 
-    public function setResetPasswordAt(?DateTime $reset_password_at): void
+    public function setResetPasswordAt(?\DateTime $reset_password_at): void
     {
         $this->reset_password_at = $reset_password_at;
     }

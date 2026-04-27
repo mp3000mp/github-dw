@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\RepositoryRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -76,19 +75,19 @@ class Repository
 
     #[ORM\Column(type: 'datetime')]
     #[Groups(['admin'])]
-    private DateTime $routine1At;
+    private \DateTime $routine1At;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['admin'])]
-    private ?DateTime $routine2At;
+    private ?\DateTime $routine2At;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['all'])]
-    private ?DateTime $createdAt;
+    private ?\DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['all'])]
-    private ?DateTime $pushedAt;
+    private ?\DateTime $pushedAt;
 
     /**
      * @var Collection<int, RepositoryLanguage>
@@ -265,42 +264,42 @@ class Repository
         $this->size = $size;
     }
 
-    public function getRoutine1At(): DateTime
+    public function getRoutine1At(): \DateTime
     {
         return $this->routine1At;
     }
 
-    public function setRoutine1At(DateTime $routine1At): void
+    public function setRoutine1At(\DateTime $routine1At): void
     {
         $this->routine1At = $routine1At;
     }
 
-    public function getRoutine2At(): ?DateTime
+    public function getRoutine2At(): ?\DateTime
     {
         return $this->routine2At;
     }
 
-    public function setRoutine2At(?DateTime $routine2At): void
+    public function setRoutine2At(?\DateTime $routine2At): void
     {
         $this->routine2At = $routine2At;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
-    public function getPushedAt(): ?DateTime
+    public function getPushedAt(): ?\DateTime
     {
         return $this->pushedAt;
     }
 
-    public function setPushedAt(?DateTime $pushedAt): void
+    public function setPushedAt(?\DateTime $pushedAt): void
     {
         $this->pushedAt = $pushedAt;
     }

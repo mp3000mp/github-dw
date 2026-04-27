@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api')]
 class AppController extends AbstractController
@@ -23,20 +22,20 @@ class AppController extends AbstractController
     }
 
     #[Route(path: '/me', name: 'users.me', methods: ['GET'])]
-    #[Security("is_granted('ROLE_USER')")]
+    #[IsGranted('ROLE_USER')]
     public function me(): Response
     {
         return $this->responseHelper->createResponse($this->getUser(), ['me'], 200);
     }
 
     #[Route(path: '/404', name: 'app.404', methods: ['GET'])]
-    public function error404(Request $request, DebugLoggerInterface $logger): Response
+    public function error404(Request $request): Response
     {
         $err = $request->get('exception');
 
-//        if ($this->getParameter('app.env') === 'test') {
-//            dump($err);
-//        }
+        //        if ($this->getParameter('app.env') === 'test') {
+        //            dump($err);
+        //        }
 
         $msg = 'Server error.';
         if ('prod' !== $this->getParameter('app.env')) {

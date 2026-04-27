@@ -8,13 +8,13 @@ use App\Entity\RepositoryPackageTypeFile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @method RepositoryPackageTypeFile|null find($id, $lockMode = null, $lockVersion = null)
  * @method RepositoryPackageTypeFile|null findOneBy(array $criteria, array $orderBy = null)
  * @method RepositoryPackageTypeFile[]    findAll()
  * @method RepositoryPackageTypeFile[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
  * @extends ServiceEntityRepository<RepositoryPackageTypeFile>
  */
 class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
@@ -27,12 +27,14 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
         parent::__construct($registry, RepositoryPackageTypeFile::class);
     }
 
-    #[ArrayShape([
-        'error' => 'string',
-        'date' => \DateTime::class,
-        'path' => 'string',
-        'url' => 'string',
-    ])]
+    /**
+     * @return array{
+     *     error: string,
+     *     date: \DateTime,
+     *     path: string,
+     *     url: string,
+     * }
+     */
     public function findErrors(\DateTime $from, int $limit = 100): array
     {
         return $this->createQueryBuilder('rptf')
@@ -47,6 +49,13 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
+    /**
+     * @return array{
+     *     routine3Count: int,
+     *     routine3DoneCount: int,
+     *     routine3ErrorCount: int,
+     * }
+     */
     public function stats(): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
@@ -61,6 +70,13 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
             ->getScalarResult()[0];
     }
 
+    /**
+     * @return array{
+     *     label: string,
+     *     done: int,
+     *     errors: int,
+     * }[]
+     */
     public function timelineRoutine3(\DateTime $minDate): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());

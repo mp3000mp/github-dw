@@ -8,6 +8,9 @@ class RepositoryControllerTest extends AbstractControllerTest
 {
     /**
      * @dataProvider providerSearch
+     *
+     * @param array<string, mixed> $query
+     * @param string[]             $expectedResult
      */
     public function testSearch(array $query, array $expectedResult): void
     {
@@ -28,6 +31,9 @@ class RepositoryControllerTest extends AbstractControllerTest
         self::assertEquals(count($expectedResult), $jsonResponse['total']);
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function providerSearch(): array
     {
         return [

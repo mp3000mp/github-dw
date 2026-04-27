@@ -9,13 +9,13 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @method Repository|null find($id, $lockMode = null, $lockVersion = null)
  * @method Repository|null findOneBy(array $criteria, array $orderBy = null)
  * @method Repository[]    findAll()
  * @method Repository[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
  * @extends ServiceEntityRepository<Repository>
  */
 class RepositoryRepository extends ServiceEntityRepository
@@ -28,11 +28,13 @@ class RepositoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Repository::class);
     }
 
-    #[ArrayShape([
-        'error' => 'string',
-        'date' => \DateTime::class,
-        'url' => 'string',
-    ])]
+    /**
+     * @return array{
+     *     error: string,
+     *     date: \DateTime,
+     *     url: string,
+     * }[]
+     */
     public function findErrors(\DateTime $from, int $limit = 100): array
     {
         return $this->createQueryBuilder('r')
@@ -157,6 +159,13 @@ class RepositoryRepository extends ServiceEntityRepository
             ->setParameters($params);
     }
 
+    /**
+     * @return array{
+     *     routine2Count: int,
+     *     routine2DoneCount: int,
+     *     routine2ErrorCount: int,
+     * }
+     */
     public function stats(): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
@@ -172,6 +181,12 @@ class RepositoryRepository extends ServiceEntityRepository
             ->getScalarResult()[0];
     }
 
+    /**
+     * @return array{
+     *     label: string,
+     *     done: int,
+     * }[]
+     */
     public function timelineRoutine1(\DateTime $minDate): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
@@ -189,6 +204,13 @@ class RepositoryRepository extends ServiceEntityRepository
             ->getScalarResult();
     }
 
+    /**
+     * @return array{
+     *     label: string,
+     *     done: int,
+     *     errors: int[],
+     * }[]
+     */
     public function timelineRoutine2(\DateTime $minDate): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());

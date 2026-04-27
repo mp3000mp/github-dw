@@ -14,6 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Package|null findOneBy(array $criteria, array $orderBy = null)
  * @method Package[]    findAll()
  * @method Package[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
  * @extends ServiceEntityRepository<Package>
  */
 class PackageRepository extends ServiceEntityRepository
@@ -49,7 +50,7 @@ class PackageRepository extends ServiceEntityRepository
             ->setMaxResults(100)
             ->setParameter('package_file_type', $packageTypeFile)
             ->setParameter('text', $text)
-            //->setParameter('text_like_prefix', "$text%")
+            // ->setParameter('text_like_prefix', "$text%")
             ->setParameter('text_like', "%$text%");
 
         // using match_against is not score always 0 because not natural language

@@ -1,10 +1,8 @@
-version: '3'
-
 # caution: this config is for DEV use only
 
 services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:11.4
     user: "1000:1000"
     environment:
       MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
@@ -17,7 +15,7 @@ services:
       - ./mariadb/log:/var/log/mysql
 
   mariadb_test:
-    image: mariadb:10.6
+    image: mariadb:11.4
     user: "1000:1000"
     environment:
       MYSQL_ROOT_PASSWORD: secret

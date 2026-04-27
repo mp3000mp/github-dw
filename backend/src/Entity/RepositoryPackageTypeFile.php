@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\RepositoryPackageTypeFileRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,11 +34,11 @@ class RepositoryPackageTypeFile
 
     #[ORM\Column(type: 'datetime')]
     #[Groups(['admin'])]
-    private DateTime $routine1At;
+    private \DateTime $routine1At;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['admin'])]
-    private ?DateTime $routine3At;
+    private ?\DateTime $routine3At;
 
     #[ORM\ManyToOne(targetEntity: Repository::class, inversedBy: 'repositoryPackageTypeFiles')]
     #[ORM\JoinColumn(nullable: false)]
@@ -96,22 +95,22 @@ class RepositoryPackageTypeFile
         $this->sha = $sha;
     }
 
-    public function getRoutine1At(): DateTime
+    public function getRoutine1At(): \DateTime
     {
         return $this->routine1At;
     }
 
-    public function setRoutine1At(DateTime $routine1At): void
+    public function setRoutine1At(\DateTime $routine1At): void
     {
         $this->routine1At = $routine1At;
     }
 
-    public function getRoutine3At(): ?DateTime
+    public function getRoutine3At(): ?\DateTime
     {
         return $this->routine3At;
     }
 
-    public function setRoutine3At(?DateTime $routine3At): void
+    public function setRoutine3At(?\DateTime $routine3At): void
     {
         $this->routine3At = $routine3At;
     }

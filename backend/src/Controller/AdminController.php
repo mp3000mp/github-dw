@@ -10,15 +10,15 @@ use App\Entity\RepositoryPackageTypeFile;
 use App\Repository\PackageTypeFileRepository;
 use App\Repository\RepositoryPackageTypeFileRepository;
 use App\Repository\RepositoryRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/admin')]
 class AdminController extends AbstractController
 {
     #[Route(path: '/errors', name: 'admin.errors', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN')")]
+    #[IsGranted('ROLE_ADMIN')]
     public function errors(): Response
     {
         /** @var RepositoryRepository $repoRepo */
@@ -37,7 +37,7 @@ class AdminController extends AbstractController
     }
 
     #[Route(path: '/stats', name: 'admin.stats', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN')")]
+    #[IsGranted('ROLE_ADMIN')]
     public function stats(): Response
     {
         /** @var RepositoryRepository $repoRepo */
@@ -58,7 +58,7 @@ class AdminController extends AbstractController
     }
 
     #[Route(path: '/timeline', name: 'admin.timeline', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN')")]
+    #[IsGranted('ROLE_ADMIN')]
     public function timeline(): Response
     {
         /** @var RepositoryRepository $repoRepo */

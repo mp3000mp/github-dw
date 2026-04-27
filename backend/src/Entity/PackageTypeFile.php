@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\PackageTypeFileRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -45,7 +44,7 @@ class PackageTypeFile
 
     #[ORM\Column(type: 'datetime', nullable: false)]
     #[Groups(['admin'])]
-    private DateTime $updatedAt;
+    private \DateTime $updatedAt;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     #[Groups(['admin'])]
@@ -117,12 +116,12 @@ class PackageTypeFile
         $this->githubCurrentPage = $githubCurrentPage;
     }
 
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }

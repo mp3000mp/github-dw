@@ -2,9 +2,15 @@ name: DW
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
+    paths:
+      - 'dw/**'
+      - '.github/workflows/dw.yml'
   pull_request:
-    branches: ["main"]
+    branches: [main]
+    paths:
+      - 'dw/**'
+      - '.github/workflows/dw.yml'
 
 jobs:
   ci:

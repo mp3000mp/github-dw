@@ -8,6 +8,8 @@ class CreateUserCommandTest extends AbstractCommandTest
 {
     /**
      * @dataProvider providerExecute
+     *
+     * @param string[] $expectedRoles
      */
     public function testExecute(bool $isAdmin, array $expectedRoles): void
     {
@@ -32,6 +34,9 @@ class CreateUserCommandTest extends AbstractCommandTest
         self::assertEquals($expectedRoles, $user->getRoles());
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function providerExecute(): array
     {
         return [

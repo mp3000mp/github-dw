@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\PackageTypeFile;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/package-type-files')]
 class PackageTypeFileController extends AbstractController
 {
     #[Route(path: '', name: 'package_type_files.index', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN')")]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(): Response
     {
         $packageTypes = $this->em->getRepository(PackageTypeFile::class)->findAll();
@@ -22,7 +22,7 @@ class PackageTypeFileController extends AbstractController
     }
 
     #[Route(path: '/{id}/priority', name: 'package_type_files.priority', methods: ['PUT'])]
-    #[Security("is_granted('ROLE_ADMIN')")]
+    #[IsGranted('ROLE_ADMIN')]
     public function priority(int $id): Response
     {
         $packageTypes = $this->em->getRepository(PackageTypeFile::class)->findAll();

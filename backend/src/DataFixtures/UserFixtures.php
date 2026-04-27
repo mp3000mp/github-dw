@@ -7,23 +7,16 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures extends Fixture implements ContainerAwareInterface
+class UserFixtures extends Fixture
 {
-    private ?UserPasswordHasherInterface $hasher;
-    private ?ContainerInterface $container;
-
-    public function setContainer(ContainerInterface $container = null): void
+    public function __construct(private readonly UserPasswordHasherInterface $hasher)
     {
-        $this->container = $container;
     }
 
     public function load(ObjectManager $manager): void
     {
-        $this->hasher = $this->container->get('security.user_password_hasher');
         $password = 'Test2000!';
 
         // admin

@@ -34,13 +34,12 @@ class JsonRequestHelper
     /**
      * @template T
      *
-     * @param mixed            $rawData
      * @param ?class-string<T> $class
      * @param T|null           $entity
      *
      * @return T|\stdClass
      */
-    public function handleRequest($rawData, string $schema, ?string $class = null, $entity = null)
+    public function handleRequest(string $rawData, string $schema, ?string $class = null, $entity = null)
     {
         // json schema
         $jsonData = json_decode($rawData);

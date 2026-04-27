@@ -54,7 +54,7 @@ class UselessDataCleanupCommand extends Command
             // usage
             $io->progressAdvance();
 
-            $sql = "
+            $sql = '
                 UPDATE dw_package p
                 INNER JOIN (
                   SELECT package_id, COUNT(1) AS pCount
@@ -63,9 +63,8 @@ class UselessDataCleanupCommand extends Command
                 ) j
                 ON j.package_id = p.id
                 SET p.nb = j.pCount
-            ";
+            ';
             $this->em->getConnection()->executeQuery($sql);
-
 
             // packages
             $io->progressAdvance();
@@ -82,7 +81,6 @@ class UselessDataCleanupCommand extends Command
                 $sqlDelete = 'DELETE FROM dw_package WHERE id IN (:ids)';
                 $this->doDelete($sqlDelete, $ids);
             }
-
 
             // repo package type files
             $io->progressAdvance();
@@ -102,7 +100,6 @@ class UselessDataCleanupCommand extends Command
                 $sqlDelete = 'DELETE FROM dw_repository_package_type_file WHERE id IN (:ids)';
                 $this->doDelete($sqlDelete, $ids);
             }
-
 
             // repositories
             $io->progressAdvance();
@@ -136,7 +133,6 @@ class UselessDataCleanupCommand extends Command
             $io->progressAdvance();
             $this->em->getConnection()->commit();
         }
-
 
         $io->progressFinish();
         $io->success('SUCCESS');

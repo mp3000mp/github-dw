@@ -8,13 +8,13 @@ use App\Entity\PackageTypeFile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * @method PackageTypeFile|null find($id, $lockMode = null, $lockVersion = null)
  * @method PackageTypeFile|null findOneBy(array $criteria, array $orderBy = null)
  * @method PackageTypeFile[]    findAll()
  * @method PackageTypeFile[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
  * @extends ServiceEntityRepository<PackageTypeFile>
  */
 class PackageTypeFileRepository extends ServiceEntityRepository
@@ -27,10 +27,12 @@ class PackageTypeFileRepository extends ServiceEntityRepository
         parent::__construct($registry, PackageTypeFile::class);
     }
 
-    #[ArrayShape([
-        'language' => 'string',
-        'count' => 'int',
-    ])]
+    /**
+     * @return array{
+     *     language: string,
+     *     count: int,
+     * }
+     */
     public function stats(): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());

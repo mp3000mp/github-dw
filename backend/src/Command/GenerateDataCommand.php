@@ -32,6 +32,8 @@ class GenerateDataCommand extends Command
     private float $validPackageVersionRatio;
     private int $packagePerRepo;
     private float $createPackageRatio;
+
+    /** @var array<string, Package> */
     private array $packageUniq = [];
 
     public function __construct(EntityManagerInterface $em, ParameterBagInterface $parameterBag)
@@ -211,6 +213,9 @@ class GenerateDataCommand extends Command
         return $this->faker->randomFloat(3, 0, 1) < $ratio;
     }
 
+    /**
+     * @param string[] $allUrls
+     */
     private function genUrl(array &$allUrls): string
     {
         $url = $this->faker->url();

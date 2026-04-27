@@ -1,0 +1,94 @@
+name: Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+
+jobs:
+  lint-and-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      DATABASE_URL: "mysql://user1:password1@127.0.0.1:3306/github_finder_test?serverVersion=11.4.5-MariaDB"
+
+    steps:
+      - name: Start MariaDB
+        run: |
+          docker run -d --name mariadb_test \
+            -e MARIADB_ROOT_PASSWORD=secret \
+            -e MARIADB_USER=user1 \
+            -e MARIADB_PASSWORD=password1 \
+            -e MARIADB_DATABASE=auto_entreprise_test \
+            -p 3306:3306 \
+            mariadb:11.4 \
+            --innodb-use-native-aio=0
+          echo "127.0.0.1 mariadb_test" | sudo tee -a /etc/hosts
+          until docker exec mariadb_test mariadb-admin ping --silent; do sleep 2; done
+
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: ctype, iconv, intl, pdo_mysql, pcov
+          coverage: pcov
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --optimize-autoloader
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: dw/go.mod
+          cache-dependency-path: dw/go.sum
+
+      - name: Create dw_* tables (gorm auto-migrate)
+        working-directory: dw
+        env:
+          DATABASE_URL: "user1:password1@tcp(127.0.0.1:3306)/github_finder_test?parseTime=true"
+        run: go run main.go migrate
+
+      - name: Apply dw SQL migrations not covered by AutoMigrate
+        env:
+          MYSQL_PWD: password1
+        run: mariadb -h 127.0.0.1 -u user1 github_finder_test < ../dw/model/migrations/20230129_1235.sql
+
+      - name: Run Doctrine migrations
+        run: APP_ENV=test bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Code style (php-cs-fixer)
+        run: composer csd
+
+      - name: Warmup Symfony cache
+        run: php bin/console cache:warmup --env=dev
+
+      - name: Static analysis (phpstan)
+        run: composer ps
+
+      - name: Tests + coverage
+        run: composer tuci
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ${{ format('{0}/coverage.xml', env.DIRECTORY) }}
+          flags: backend
+          token: ${{ secrets.CODECOV_TOKEN }}
