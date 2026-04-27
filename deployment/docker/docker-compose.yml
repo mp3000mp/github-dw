@@ -29,15 +29,32 @@ services:
       - ./mariadb_test/conf/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./mariadb_test/log:/var/log/mysql
 
+  # Usage: docker-compose run --rm dw go run main.go
+  #        docker-compose run --rm dw go run main.go migrate
   dw:
     image: golang:1.18
-    # command: go run main.go
-    # command: go run main.go migrate
     working_dir: /usr/src/app
+    env_file: ../../dw/.env
     volumes:
       - ../../dw:/usr/src/app
     depends_on:
       - mariadb
+
+  # Usage: docker-compose run --rm dw_test
+  dw_test:
+    image: golang:1.18
+    command: go test -race -count=1 -coverprofile=coverage.out -covermode=atomic ./...
+    working_dir: /usr/src/app
+    volumes:
+      - ../../dw:/usr/src/app
+
+  # Usage: docker-compose run --rm dw_lint
+  dw_lint:
+    image: golangci/golangci-lint:v1.64.8
+    command: golangci-lint run
+    working_dir: /usr/src/app
+    volumes:
+      - ../../dw:/usr/src/app
 
   backend:
     build: backend

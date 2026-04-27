@@ -17,29 +17,16 @@ func ParsePackageJson(rawContent string) ([]Package, error) {
 	// json decode
 	data := packageJson{}
 	err := json.Unmarshal([]byte(rawContent), &data)
-	if (err != nil) {
+	if err != nil {
 		return packages, err
 	}
 
 	// find packages
-	for pkg, version := range data.Require {
-		if IsPackage(pkg) {
-			packages = append(packages, Package{Name: pkg, Version: version})
-		}
-	}
-	for pkg, version := range data.DevRequire {
-		if IsPackage(pkg) {
-			packages = append(packages, Package{Name: pkg, Version: version})
-		}
-	}
-	for pkg, version := range data.PeerRequire {
-		if IsPackage(pkg) {
-			packages = append(packages, Package{Name: pkg, Version: version})
-		}
-	}
-	for pkg, version := range data.Engines {
-		if IsPackage(pkg) {
-			packages = append(packages, Package{Name: pkg, Version: version})
+	for _, deps := range []map[string]string{data.Require, data.DevRequire, data.PeerRequire, data.Engines} {
+		for pkg, version := range deps {
+			if IsPackage(pkg) {
+				packages = append(packages, Package{Name: pkg, Version: version})
+			}
 		}
 	}
 

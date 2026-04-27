@@ -14,18 +14,22 @@ type Repository struct {
 
 // list all repositories matching search
 func QueryRepo(context *Context, userName string, repoName string) (Repository, error) {
-	WaitBeforeQuery(context.RateLimiter, "core", true)
+	WaitBeforeQuery(context, "core", true)
+	context.RateLimiterMu.Lock()
 	context.RateLimiter.CoreLastQuery = time.Now()
-	githubRepo, _, err := context.Client.Repositories.Get(*context.Context, userName, repoName)
-	if !CheckResponse(err, &context.RateLimiter, "core") {
+	context.RateLimiterMu.Unlock()
+	githubRepo, _, err := context.Client.Repositories.Get(*context.Ctx, userName, repoName)
+	if !CheckResponse(err, context, "core") {
 		return Repository{}, err
 	}
 
 	// not used anymore because it costs one query per repo
-// 	WaitBeforeQuery(context.RateLimiter, "core", true)
+// 	WaitBeforeQuery(context, "core", true)
+// 	context.RateLimiterMu.Lock()
 // 	context.RateLimiter.CoreLastQuery = time.Now()
-// 	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Context, userName, repoName)
-// 	if !CheckResponse(err, &context.RateLimiter, "core") {
+// 	context.RateLimiterMu.Unlock()
+// 	githubLanguages, _, err := context.Client.Repositories.ListLanguages(*context.Ctx, userName, repoName)
+// 	if !CheckResponse(err, context, "core") {
 // 		return Repository{}, err
 // 	}
 

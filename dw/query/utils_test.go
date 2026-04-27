@@ -11,68 +11,68 @@ import (
 
 func TestCheckResponse(t *testing.T) {
 	assert := assert.New(t)
-	rl := RateLimiter{}
+	ctx := &Context{}
 
 	// no error
-	r := CheckResponse(nil, &rl, "search")
+	r := CheckResponse(nil, ctx, "search")
 	assert.Equal(true, r)
-	assert.Equal(true, rl.SearchLast429.IsZero())
+	assert.Equal(true, ctx.RateLimiter.SearchLast429.IsZero())
 
 	fmt.Println("------ Test output START ------")
 	// misc error
-	r = CheckResponse(errors.New("test"), &rl, "search")
+	r = CheckResponse(errors.New("test"), ctx, "search")
 	assert.Equal(false, r)
-	assert.Equal(true, rl.SearchLast429.IsZero())
+	assert.Equal(true, ctx.RateLimiter.SearchLast429.IsZero())
 
-    // rate limiter error
-	r = CheckResponse(errors.New("You have exceeded a secondary rate limit. Please wait a few minutes before you try again."), &rl, "search")
+	// rate limiter error
+	r = CheckResponse(errors.New("You have exceeded a secondary rate limit. Please wait a few minutes before you try again."), ctx, "search")
 	assert.Equal(false, r)
-	assert.Equal(false, rl.SearchLast429.IsZero())
+	assert.Equal(false, ctx.RateLimiter.SearchLast429.IsZero())
 	fmt.Println("------ Test output END ------")
 }
 
 func TestWaitBeforeQuery(t *testing.T) {
 	assert := assert.New(t)
 	now := time.Now()
-	rl := RateLimiter{}
+	ctx := &Context{}
 
 	// no data
-	r := WaitBeforeQuery(rl, "search", false)
+	r := WaitBeforeQuery(ctx, "search", false)
 	assert.Equal(0, r)
-	r = WaitBeforeQuery(rl, "core", false)
+	r = WaitBeforeQuery(ctx, "core", false)
 	assert.Equal(0, r)
 
 	// no 429 nok
-	rl.SearchLastQuery = now.Add(-119 * time.Second)
-	rl.CoreLastQuery = now.Add(-500 * time.Millisecond)
-	r = WaitBeforeQuery(rl, "search", false)
+	ctx.RateLimiter.SearchLastQuery = now.Add(-119 * time.Second)
+	ctx.RateLimiter.CoreLastQuery = now.Add(-500 * time.Millisecond)
+	r = WaitBeforeQuery(ctx, "search", false)
 	assert.NotEqual(0, r)
-	r = WaitBeforeQuery(rl, "core", false)
+	r = WaitBeforeQuery(ctx, "core", false)
 	assert.NotEqual(0, r)
 
 	// no 429 ok
-	rl.SearchLastQuery = now.Add(-121 * time.Second)
-	rl.CoreLastQuery = now.Add(-800 * time.Millisecond)
-	r = WaitBeforeQuery(rl, "search", false)
+	ctx.RateLimiter.SearchLastQuery = now.Add(-121 * time.Second)
+	ctx.RateLimiter.CoreLastQuery = now.Add(-800 * time.Millisecond)
+	r = WaitBeforeQuery(ctx, "search", false)
 	assert.Equal(0, r)
-	r = WaitBeforeQuery(rl, "core", false)
+	r = WaitBeforeQuery(ctx, "core", false)
 	assert.Equal(0, r)
 
 	fmt.Println("------ Test output START ------")
 	// 429 nok
-	rl.SearchLast429 = now.Add(-3599 * time.Second)
-	rl.CoreLast429 = now.Add(-3599 * time.Second)
-	r = WaitBeforeQuery(rl, "search", false)
+	ctx.RateLimiter.SearchLast429 = now.Add(-3599 * time.Second)
+	ctx.RateLimiter.CoreLast429 = now.Add(-3599 * time.Second)
+	r = WaitBeforeQuery(ctx, "search", false)
 	assert.NotEqual(0, r)
-	r = WaitBeforeQuery(rl, "core", false)
+	r = WaitBeforeQuery(ctx, "core", false)
 	assert.NotEqual(0, r)
 	fmt.Println("------ Test output END ------")
 
 	// 429 ok
-	rl.SearchLast429 = now.Add(-3601 * time.Second)
-	rl.CoreLast429 = now.Add(-3601 * time.Second)
-	r = WaitBeforeQuery(rl, "search", false)
+	ctx.RateLimiter.SearchLast429 = now.Add(-3601 * time.Second)
+	ctx.RateLimiter.CoreLast429 = now.Add(-3601 * time.Second)
+	r = WaitBeforeQuery(ctx, "search", false)
 	assert.Equal(0, r)
-	r = WaitBeforeQuery(rl, "core", false)
+	r = WaitBeforeQuery(ctx, "core", false)
 	assert.Equal(0, r)
 }

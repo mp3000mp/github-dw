@@ -49,7 +49,7 @@ func TestQueryRepo(t *testing.T) {
 // 		),
 	)
 	ctx := context.Background()
-	queryContext := Context{Client: github.NewClient(mockedClient), Context: &ctx}
+	queryContext := Context{Client: github.NewClient(mockedClient), Ctx: &ctx}
 
 	r, err := QueryRepo(&queryContext, "user", "repo")
 	sDate := "2022-07-16T01:00:00.000Z"

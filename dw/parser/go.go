@@ -24,7 +24,9 @@ func ParseGoMod(rawContent string) ([]Package, error) {
 		goVersion := goRegex.FindString(trimed)
 		if goVersion != "" {
 			pkg := strings.Split(goVersion, " ")
-			packages = append(packages, Package{Name: pkg[0], Version: pkg[1]})
+			if len(pkg) >= 2 {
+				packages = append(packages, Package{Name: pkg[0], Version: pkg[1]})
+			}
 		}
 
 		if strings.HasPrefix(trimed, "require") {

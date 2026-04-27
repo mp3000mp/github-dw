@@ -22,7 +22,7 @@ func TestQueryBlob(t *testing.T) {
 		),
 	)
 	ctx := context.Background()
-	queryContext := Context{Client: github.NewClient(mockedClient), Context: &ctx}
+	queryContext := Context{Client: github.NewClient(mockedClient), Ctx: &ctx}
 
 	r, err := QueryBlob(&queryContext, "user", "repo", "sha")
 	assert.Equal(nil, err)

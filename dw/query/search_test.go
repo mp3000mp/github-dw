@@ -61,7 +61,7 @@ func TestQuerySearchCodes(t *testing.T) {
 		),
 	)
 	ctx := context.Background()
-	queryContext := Context{Client: github.NewClient(mockedClient), Context: &ctx}
+	queryContext := Context{Client: github.NewClient(mockedClient), Ctx: &ctx}
 
 	r, maxPage, err := QuerySearchCodes(&queryContext, "test.txt", 100, 0, 100)
 	assert.Equal(nil, err)

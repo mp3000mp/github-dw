@@ -16,24 +16,17 @@ func ParseComposerJson(rawContent string) ([]Package, error) {
 	// json decode
 	data := composerJson{}
 	err := json.Unmarshal([]byte(rawContent), &data)
-	if (err != nil) {
+	if err != nil {
 		return packages, err
 	}
 
 	// find packages
-	for pkg, version := range data.Require {
-		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "|")
-		for _, v := range versions {
-			if v != "" && IsPackage(pkg) {
-				packages = append(packages, Package{Name: pkg, Version: v})
-			}
-		}
-	}
-	for pkg, version := range data.DevRequire {
-		versions := strings.Split(strings.ReplaceAll(version, " ", ""), "|")
-		for _, v := range versions {
-			if v != "" && IsPackage(pkg) {
-				packages = append(packages, Package{Name: pkg, Version: v})
+	for _, deps := range []map[string]string{data.Require, data.DevRequire} {
+		for pkg, version := range deps {
+			for _, v := range strings.Split(strings.ReplaceAll(version, " ", ""), "|") {
+				if v != "" && IsPackage(pkg) {
+					packages = append(packages, Package{Name: pkg, Version: v})
+				}
 			}
 		}
 	}

@@ -1,7 +1,5 @@
-package routine
+package worker
 
-import (
-	"time"
-)
+import "time"
 
 const Tick = time.Millisecond * 100

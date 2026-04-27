@@ -9,6 +9,10 @@ import (
   "gorm.io/gorm/schema"
 )
 
+const dbMaxOpenConns = 10
+const dbMaxIdleConns = 5
+const dbConnMaxLifetime = time.Hour
+
 type Repository struct {
 	ID uint                                             `gorm:"primaryKey"`
 	Name string                                         `gorm:"size:100;not null;index"`
@@ -97,16 +101,23 @@ func getNamingStrategy() schema.NamingStrategy {
 var Connection *gorm.DB
 
 func GetConnection(databaseUrl string) (*gorm.DB, error) {
-	var err error
 	if Connection == nil {
+		var err error
 		Connection, err = gorm.Open(mysql.Open(databaseUrl), &gorm.Config{
 			NamingStrategy: getNamingStrategy(),
 		})
+		if err != nil {
+			return nil, err
+		}
+		sqlDB, err := Connection.DB()
+		if err != nil {
+			return nil, err
+		}
+		sqlDB.SetMaxOpenConns(dbMaxOpenConns)
+		sqlDB.SetMaxIdleConns(dbMaxIdleConns)
+		sqlDB.SetConnMaxLifetime(dbConnMaxLifetime)
 	}
-   	if err != nil {
-		return nil, err
-   	}
-   	return Connection, nil
+	return Connection, nil
 }
 
 func InitDatabase(db *gorm.DB) error {

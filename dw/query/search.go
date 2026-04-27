@@ -26,11 +26,13 @@ func QuerySearchCodes(context *Context, searchFileName string, fileSize int, pag
 	// info: https://docs.github.com/en/search-github/searching-on-github/searching-code
 	// info: free account are limited to 1000 first results so we try to get more result by trying each size
 	// info: we limit to / because of too much useless results in vendor, libs that should be in .gitignore...
-	WaitBeforeQuery(context.RateLimiter, "search", true)
+	WaitBeforeQuery(context, "search", true)
+	context.RateLimiterMu.Lock()
 	context.RateLimiter.SearchLastQuery = time.Now()
-	searchRes, _, err := context.Client.Search.Code(*context.Context, fmt.Sprintf("filename:%s size:%d..%d extension:%s path:/", searchFileName, fileSize, fileSize, getFileExt(searchFileName)), opts)
+	context.RateLimiterMu.Unlock()
+	searchRes, _, err := context.Client.Search.Code(*context.Ctx, fmt.Sprintf("filename:%s size:%d..%d extension:%s path:/", searchFileName, fileSize, fileSize, getFileExt(searchFileName)), opts)
 
-	if !CheckResponse(err, &context.RateLimiter, "search") {
+	if !CheckResponse(err, context, "search") {
 		return codes, 0, err
 	}
 

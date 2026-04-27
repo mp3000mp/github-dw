@@ -11,10 +11,12 @@ type Blob struct {
 
 // list all repositories matching search
 func QueryBlob(context *Context, userName string, repoName string, fileSHA string) (Blob, error) {
-	WaitBeforeQuery(context.RateLimiter, "core", true)
+	WaitBeforeQuery(context, "core", true)
+	context.RateLimiterMu.Lock()
 	context.RateLimiter.CoreLastQuery = time.Now()
-	blob, _, err := context.Client.Git.GetBlob(*context.Context, userName, repoName, fileSHA)
-	if !CheckResponse(err, &context.RateLimiter, "core") {
+	context.RateLimiterMu.Unlock()
+	blob, _, err := context.Client.Git.GetBlob(*context.Ctx, userName, repoName, fileSHA)
+	if !CheckResponse(err, context, "core") {
 		return Blob{}, err
 	}
 
