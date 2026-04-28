@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import {useSecurityStore} from '@/stores/security'
-import variables from '@/../config/variables.json'
-import {useRouter} from 'vue-router'
-
+import { useSecurityStore } from '@/stores/security'
+import { useRouter } from 'vue-router'
+import config from '@/helpers/config'
 const router = useRouter()
 const securityStore = useSecurityStore()
 
@@ -10,15 +9,15 @@ async function logout() {
   await securityStore.logout()
   router.push({ name: 'home' })
 }
-
-const frontVersion = variables.APP_VERSION
 </script>
 
 <template>
   <header class="row align-items-center">
-    <h1 class="col-auto mr-auto"><router-link :to="{name: 'home'}">Github Finder</router-link></h1>
+    <h1 class="col-auto mr-auto">
+      <router-link :to="{ name: 'home' }">Github Finder</router-link>
+    </h1>
     <div class="col-auto" v-if="securityStore.getIsAuth">
-      <router-link :to="{name: 'admin'}" class="mr-3">Admin</router-link>
+      <router-link :to="{ name: 'admin' }" class="mr-3">Admin</router-link>
       <font-awesome @click="logout" class="cp" icon="right-from-bracket" />
     </div>
   </header>
@@ -32,7 +31,7 @@ const frontVersion = variables.APP_VERSION
         mp3000
         <font-awesome icon="hand-sparkles" />
       </a>
-      <div>v{{ frontVersion }}</div>
+      <div>v{{ config.version }}</div>
     </div>
   </footer>
 </template>

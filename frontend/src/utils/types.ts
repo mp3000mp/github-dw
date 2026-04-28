@@ -1,5 +1,5 @@
 type HTMLElementEvent<T extends HTMLElement> = Event & {
-    target: T;
+  target: T
 }
 
-export { HTMLElementEvent }
+export type { HTMLElementEvent }

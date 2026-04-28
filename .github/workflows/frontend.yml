@@ -1,0 +1,61 @@
+name: Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    env:
+      DIRECTORY: ./frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm ci
+
+      - name: Format
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm run format
+
+      - name: Lint
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm run lint
+
+      - name: Lint styles
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm run lint:style
+
+      - name: Unit tests
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm run test:cov
+
+      - name: Build
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm run build
+
+#      - name: Upload coverage reports to Codecov
+#        uses: codecov/codecov-action@v4
+#        with:
+#          file: ${{ format('{0}/coverage/clover.xml', env.DIRECTORY) }}
+#          flags: frontend
+#          token: ${{ secrets.CODECOV_TOKEN }}

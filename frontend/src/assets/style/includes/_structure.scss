@@ -1,4 +1,6 @@
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
 }
 
@@ -53,7 +55,7 @@ p {
 .card {
   background-color: $body-bg;
   color: $body-color;
-  border-color: rgba($body-color, .5);
+  border-color: rgba($body-color, 0.5);
 
   .card-header {
     background-color: darken($body-bg, 2%);

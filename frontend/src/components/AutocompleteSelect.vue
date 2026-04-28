@@ -1,23 +1,27 @@
 <script lang="ts" setup>
-import {computed, ref, Ref, watch} from 'vue'
-import {Option} from './types'
+import { computed, ref, watch } from 'vue'
+import type { Ref } from 'vue'
+import type { Option } from './types'
 
-const props = withDefaults(defineProps<{
-  disabled?: boolean;
-  inputId: string;
-  isLoading: false;
-  modelValue: string;
-  options: Option[];
-  placeholder?: string;
-  throttle?: number;
-}>(), {
-  disabled: false,
-  placeHolder: '',
-  throttle: 350
-})
+const props = withDefaults(
+  defineProps<{
+    disabled?: boolean
+    inputId: string
+    isLoading: boolean
+    modelValue: string
+    options: Option[]
+    placeholder?: string
+    throttle?: number
+  }>(),
+  {
+    disabled: false,
+    placeHolder: '',
+    throttle: 350
+  }
+)
 const emit = defineEmits(['reset-options', 'search', 'select-option', 'update:modelValue'])
 
-const selectedOption = ref(null) as Ref<null|string|number>
+const selectedOption = ref(null) as Ref<null | string | number>
 const isFocused = ref(false)
 const showOptions = computed(() => props.options.length > 0 && isFocused.value)
 
@@ -27,7 +31,7 @@ function selectOption(option: Option) {
   emit('select-option', selectedOption.value)
 }
 
-let timeout = null as number|null
+let timeout: ReturnType<typeof setTimeout> | null = null
 function onInput(value: string) {
   emit('update:modelValue', value)
   if (timeout !== null) {
@@ -42,36 +46,39 @@ function onInput(value: string) {
   }, props.throttle)
 }
 
-watch(() => props.modelValue, () => {
-  if (props.modelValue === '') {
-    selectedOption.value = null
+watch(
+  () => props.modelValue,
+  () => {
+    if (props.modelValue === '') {
+      selectedOption.value = null
+    }
   }
-})
+)
 </script>
 
 <template>
   <div class="acs">
     <input
-        :disabled="disabled"
-        autocomplete="off"
-        class="form-control"
-        :id="inputId"
-        type="text"
-        :placeholder="placeholder"
-        :value="modelValue"
-        @focus="isFocused = true"
-        @blur="isFocused = false"
-        @input="onInput($event.target.value)"
+      :disabled="disabled"
+      autocomplete="off"
+      class="form-control"
+      :id="inputId"
+      type="text"
+      :placeholder="placeholder"
+      :value="modelValue"
+      @focus="isFocused = true"
+      @blur="isFocused = false"
+      @input="onInput(($event.target as HTMLInputElement).value)"
     />
     <ul v-if="showOptions || isLoading" class="acs-options">
       <li v-if="isLoading" class="acs-loading text-center">...</li>
       <li
-          v-else
-          v-for="option in options"
-          :key="option.value"
-          @mousedown="selectOption(option)"
-          class="option"
-          :class="{selected: option.value === selectedOption}"
+        v-else
+        v-for="option in options"
+        :key="option.value"
+        @mousedown="selectOption(option)"
+        class="option"
+        :class="{ selected: option.value === selectedOption }"
       >
         {{ option.label }}
       </li>

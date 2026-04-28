@@ -3,7 +3,11 @@
 }
 
 // align
-$aligns: ("start": left, "center": center, "end": right);
+$aligns: (
+  'start': left,
+  'center': center,
+  'end': right
+);
 @each $alignk, $alignv in $aligns {
   .text-#{$alignk} {
     text-align: $alignv;
@@ -20,7 +24,11 @@ $aligns: ("start": left, "center": center, "end": right);
 }
 
 // colors
-$colors: ("danger": $danger-color, "success": $success-color, "warning": $warning-color);
+$colors: (
+  'danger': $danger-color,
+  'success': $success-color,
+  'warning': $warning-color
+);
 @each $colork, $colorv in $colors {
   .#{$colork} {
     color: $colorv;
@@ -28,36 +36,52 @@ $colors: ("danger": $danger-color, "success": $success-color, "warning": $warnin
 }
 
 // margin/padding
-$sizes: ("1": .25rem, "2": .5rem, "3": 1rem, "4": 1.5rem, "5": 3rem, "auto": auto, "0": 0);
+$sizes: (
+  '1': 0.25rem,
+  '2': 0.5rem,
+  '3': 1rem,
+  '4': 1.5rem,
+  '5': 3rem,
+  'auto': auto,
+  '0': 0
+);
 @each $sizek, $sizev in $sizes {
   .m-#{$sizek} {
     margin: $sizev;
   }
-  .mr-#{$sizek}, .mx-#{$sizek} {
+  .mr-#{$sizek},
+  .mx-#{$sizek} {
     margin-right: $sizev;
   }
-  .ml-#{$sizek}, .mx-#{$sizek} {
+  .ml-#{$sizek},
+  .mx-#{$sizek} {
     margin-left: $sizev;
   }
-  .mt-#{$sizek}, .my-#{$sizek} {
+  .mt-#{$sizek},
+  .my-#{$sizek} {
     margin-top: $sizev;
   }
-  .mb-#{$sizek}, .my-#{$sizek} {
+  .mb-#{$sizek},
+  .my-#{$sizek} {
     margin-bottom: $sizev;
   }
   .p-#{$sizek} {
     padding: $sizev;
   }
-  .pr-#{$sizek}, .px-#{$sizek} {
+  .pr-#{$sizek},
+  .px-#{$sizek} {
     padding-right: $sizev;
   }
-  .pl-#{$sizek}, .px-#{$sizek} {
+  .pl-#{$sizek},
+  .px-#{$sizek} {
     padding-left: $sizev;
   }
-  .pt-#{$sizek}, .py-#{$sizek} {
+  .pt-#{$sizek},
+  .py-#{$sizek} {
     padding-top: $sizev;
   }
-  .pb-#{$sizek}, .py-#{$sizek} {
+  .pb-#{$sizek},
+  .py-#{$sizek} {
     padding-bottom: $sizev;
   }
 }
@@ -67,31 +91,39 @@ $sizes: ("1": .25rem, "2": .5rem, "3": 1rem, "4": 1.5rem, "5": 3rem, "auto": aut
       .m-#{$bpk}-#{$sizek} {
         margin: $sizev;
       }
-      .mr-#{$bpk}-#{$sizek}, .mx-#{$bpk}-#{$sizek} {
+      .mr-#{$bpk}-#{$sizek},
+      .mx-#{$bpk}-#{$sizek} {
         margin-right: $sizev;
       }
-      .ml-#{$bpk}-#{$sizek}, .mx-#{$bpk}-#{$sizek} {
+      .ml-#{$bpk}-#{$sizek},
+      .mx-#{$bpk}-#{$sizek} {
         margin-left: $sizev;
       }
-      .mt-#{$bpk}-#{$sizek}, .my-#{$bpk}-#{$sizek} {
+      .mt-#{$bpk}-#{$sizek},
+      .my-#{$bpk}-#{$sizek} {
         margin-top: $sizev;
       }
-      .mb-#{$bpk}-#{$sizek}, .my-#{$bpk}-#{$sizek} {
+      .mb-#{$bpk}-#{$sizek},
+      .my-#{$bpk}-#{$sizek} {
         margin-bottom: $sizev;
       }
       .p-#{$bpk}-#{$sizek} {
         padding: $sizev;
       }
-      .pr-#{$bpk}-#{$sizek}, .px-#{$bpk}-#{$sizek} {
+      .pr-#{$bpk}-#{$sizek},
+      .px-#{$bpk}-#{$sizek} {
         padding-right: $sizev;
       }
-      .pl-#{$bpk}-#{$sizek}, .px-#{$bpk}-#{$sizek} {
+      .pl-#{$bpk}-#{$sizek},
+      .px-#{$bpk}-#{$sizek} {
         padding-left: $sizev;
       }
-      .pt-#{$bpk}-#{$sizek}, .py-#{$bpk}-#{$sizek} {
+      .pt-#{$bpk}-#{$sizek},
+      .py-#{$bpk}-#{$sizek} {
         padding-top: $sizev;
       }
-      .pb-#{$bpk}-#{$sizek}, .py-#{$bpk}-#{$sizek} {
+      .pb-#{$bpk}-#{$sizek},
+      .py-#{$bpk}-#{$sizek} {
         padding-bottom: $sizev;
       }
     }
@@ -100,7 +132,7 @@ $sizes: ("1": .25rem, "2": .5rem, "3": 1rem, "4": 1.5rem, "5": 3rem, "auto": aut
 
 // font sizes
 .fs-09 {
-  font-size: 0.90rem;
+  font-size: 0.9rem;
 }
 
 // popper vars

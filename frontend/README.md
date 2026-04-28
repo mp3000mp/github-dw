@@ -1,34 +1,39 @@
-# lala
+# frontend
+
+Vue 3 + TypeScript + Vite.
+
+## Requirements
+
+Node 22 (see `.nvmrc`).
 
 ## Project setup
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Start dev server (hot-reload)
 ```
-npm run serve
+npm run dev
 ```
 
-### Compiles and minifies for production
+### Build for production
 ```
 npm run build
 ```
 
-### Run your unit tests
+### Preview the production build
 ```
-npm run test:unit
-```
-
-### Run your end-to-end tests
-```
-npm run test:e2e
+npm run preview
 ```
 
-### Lints and fixes files
+### Run unit tests
 ```
-npm run lint
+npm test
+npm test:cov
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Lint
+```
+npm run lint        # eslint
+npm run lint:style  # stylelint
+```

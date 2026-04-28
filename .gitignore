@@ -14,8 +14,8 @@
 /deployment/docker/mariadb_test/log
 
 /frontend/ci
-/frontend/config/variables.json
-/frontend/config/variables.tmp.json
+/frontend/coverage
+/frontend/.env
 /frontend/dist
 /frontend/node_modules
 

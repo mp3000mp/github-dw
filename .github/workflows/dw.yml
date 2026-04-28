@@ -31,8 +31,11 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Build
-        run: go build ./...
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.8
+          working-directory: dw
 
       - name: Test (race detector + coverage)
         run: go test -race -count=1 -coverprofile=coverage.out -covermode=atomic ./...
@@ -40,8 +43,9 @@ jobs:
       - name: Coverage summary
         run: go tool cover -func=coverage.out
 
-      - name: Lint
-        uses: golangci/golangci-lint-action@v6
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          version: v1.64.8
-          working-directory: dw
+          file: dw/coverage.out
+          flags: dw
+          token: ${{ secrets.CODECOV_TOKEN }}

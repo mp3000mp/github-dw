@@ -15,35 +15,37 @@ on:
 jobs:
   lint-and-tests:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
     env:
-      DATABASE_URL: "mysql://user1:password1@127.0.0.1:3306/github_finder_test?serverVersion=11.4.5-MariaDB"
+      DIRECTORY: ./backend
+      DB_USER: user1
+      DB_PASSWORD: password1
+      DB_NAME: github_finder_test
 
     steps:
       - name: Start MariaDB
         run: |
           docker run -d --name mariadb_test \
             -e MARIADB_ROOT_PASSWORD=secret \
-            -e MARIADB_USER=user1 \
-            -e MARIADB_PASSWORD=password1 \
-            -e MARIADB_DATABASE=auto_entreprise_test \
+            -e MARIADB_USER=${{ env.DB_USER }} \
+            -e MARIADB_PASSWORD=${{ env.DB_PASSWORD }} \
+            -e MARIADB_DATABASE=${{ env.DB_NAME }} \
             -p 3306:3306 \
             mariadb:11.4 \
             --innodb-use-native-aio=0
           echo "127.0.0.1 mariadb_test" | sudo tee -a /etc/hosts
           until docker exec mariadb_test mariadb-admin ping --silent; do sleep 2; done
 
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
-          extensions: ctype, iconv, intl, pdo_mysql, pcov
+          extensions: ctype, iconv, mbstring, intl, pdo_sqlite, mysql
+          tools: composer:v2
           coverage: pcov
-          tools: composer
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -53,42 +55,50 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Dependencies
+        working-directory: ${{ env.DIRECTORY }}
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --optimize-autoloader
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: dw/go.mod
-          cache-dependency-path: dw/go.sum
-
-      - name: Create dw_* tables (gorm auto-migrate)
-        working-directory: dw
-        env:
-          DATABASE_URL: "user1:password1@tcp(127.0.0.1:3306)/github_finder_test?parseTime=true"
-        run: go run main.go migrate
-
-      - name: Apply dw SQL migrations not covered by AutoMigrate
-        env:
-          MYSQL_PWD: password1
-        run: mariadb -h 127.0.0.1 -u user1 github_finder_test < ../dw/model/migrations/20230129_1235.sql
-
-      - name: Run Doctrine migrations
-        run: APP_ENV=test bin/console doctrine:migrations:migrate --no-interaction
-
-      - name: Code style (php-cs-fixer)
+      - name: PHP cs fixer
+        working-directory: ${{ env.DIRECTORY }}
         run: composer csd
 
       - name: Warmup Symfony cache
+        working-directory: ${{ env.DIRECTORY }}
         run: php bin/console cache:warmup --env=dev
 
-      - name: Static analysis (phpstan)
+      - name: PHPStan
+        working-directory: ${{ env.DIRECTORY }}
         run: composer ps
 
-      - name: Tests + coverage
-        run: composer tuci
+      - name: Create database
+        working-directory: ${{ env.DIRECTORY }}
+        run: php bin/console doc:database:create --if-not-exists --no-interaction -e test
+        env:
+          DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ${{ format('{0}/coverage.xml', env.DIRECTORY) }}
-          flags: backend
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Apply dw SQL migrations
+        env:
+          MYSQL_PWD: ${{ env.DB_PASSWORD }}
+        run: |
+          for f in dw/model/migrations/*.sql; do
+            mariadb -h 127.0.0.1 -u ${{ env.DB_USER }} ${{ env.DB_NAME }} < "$f"
+          done
+
+      - name: Migrate database
+        working-directory: ${{ env.DIRECTORY }}
+        run: php bin/console doc:mig:mig --no-interaction -e test
+        env:
+          DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
+
+      - name: Exec tests
+        working-directory: ${{ env.DIRECTORY }}
+        run: composer tuci
+        env:
+          DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
+
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v4
+#        with:
+#          file: ${{ format('{0}/coverage.xml', env.DIRECTORY) }}
+#          flags: backend
+#          token: ${{ secrets.CODECOV_TOKEN }}

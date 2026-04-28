@@ -1,0 +1,10 @@
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: dw
+      carryforward: true
+    - name: backend
+      carryforward: true
+    - name: frontend
+      carryforward: true

@@ -12,21 +12,19 @@ set -x
 # get version
 reg='(.+): *(.+)'
 
+# get version
 line=$(sed -n '/^app_version: /p' vars.yml)
 [[ "$line" =~ $reg ]]
 version="${BASH_REMATCH[2]}"
 
-# get backend url
+# get backend host
 line=$(sed -n '/^backend_server_name: /p' vars.yml)
 [[ "$line" =~ $reg ]]
-url="https://${BASH_REMATCH[2]}"
+backend_host="${BASH_REMATCH[2]}"
 
-echo "$version"
-echo "$url"
-
+# build front
 cd ../../frontend &&
-  mv config/variables.json config/variables.tmp.json &&
-  echo "{\"APP_VERSION\":\"$version\",\"URL\":\"$url\"}" > config/variables.json
-  npm run build &&
-  cp config/variables.tmp.json config/variables.json
+  echo "VITE_VERSION=$version" > .env.production.local &&
+  echo "VITE_BACKEND_BASE_URL=https://$backend_host" >> .env.production.local &&
+  npm run build-only
 )

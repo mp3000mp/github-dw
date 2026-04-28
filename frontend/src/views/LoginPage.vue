@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, computed} from 'vue'
+import { ref, computed } from 'vue'
 import { useSecurityStore } from '@/stores/security'
 import { useRouter } from 'vue-router'
 
@@ -11,8 +11,8 @@ const securityRequests = computed(() => securityStore.actionRequests)
 const password = ref('')
 const username = ref('')
 
-async function login () {
-  if (securityRequests.value.login.loading) {
+async function login() {
+  if (securityRequests.value.login.isLoading) {
     return
   }
 
@@ -32,14 +32,35 @@ async function login () {
     <div class="row">
       <form @submit.prevent="login" class="app-block col-auto m-auto p-3" id="login-form">
         <div class="form-group mb-2">
-          <input required="required" class="form-control" id="username" type="text" placeholder="Username" v-model="username" />
+          <input
+            required
+            class="form-control"
+            id="username"
+            type="text"
+            placeholder="Username"
+            v-model="username"
+          />
         </div>
         <div class="form-group mb-2">
-          <input required="required" class="form-control" id="password" type="password" placeholder="Password" v-model="password" />
+          <input
+            required
+            class="form-control"
+            id="password"
+            type="password"
+            placeholder="Password"
+            v-model="password"
+          />
         </div>
         <div class="form-group">
-          <input class="btn fa-pull-right" type="submit" :disabled="securityRequests.login.loading" value="Log in" />
-          <div v-if="securityRequests.login.isError" class="danger mt-2">{{ securityRequests.login.message }}</div>
+          <input
+            class="btn fa-pull-right"
+            type="submit"
+            :disabled="securityRequests.login.isLoading"
+            value="Log in"
+          />
+          <div v-if="securityRequests.login.isError" class="danger mt-2">
+            {{ securityRequests.login.message }}
+          </div>
         </div>
       </form>
     </div>
