@@ -1,5 +1,5 @@
 import { SearchState } from './types'
-import { StoreRequest } from '@/stores/types'
+import { StoreRequest } from '@/stores/storeRequest'
 
 const state = new SearchState()
 state.actionRequests = {

@@ -18,6 +18,7 @@ export default mergeConfig(
                 exclude: [
                     ...coverageConfigDefaults.exclude,
                     '*.config.ts',
+                    'src/**/__tests__/**',
                 ],
             },
         }

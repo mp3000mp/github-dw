@@ -10,7 +10,7 @@
     - 'log'
 
 - name: Deploy frontend dist
-  synchronize:
+  ansible.posix.synchronize:
     delete: true
     src: '{{ playbook_dir }}/../../frontend/{{ item }}'
     dest: "{{ app_directory }}/frontend/"

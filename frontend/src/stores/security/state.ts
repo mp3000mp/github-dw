@@ -1,5 +1,5 @@
 import { Me, SecurityState } from './types'
-import { StoreRequest } from '@/stores/types'
+import { StoreRequest } from '@/stores/storeRequest'
 
 function initMe(): Me {
   const json = sessionStorage.getItem('me')

@@ -1,9 +1,8 @@
-version: '3'
-
 services:
   mariadb:
     image: mariadb:10.6
     user: "1000:1000"
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
       MYSQL_DATABASE: "$MYSQL_DATABASE"
@@ -17,6 +16,7 @@ services:
   dw:
     build: dw
     command: ./main
+    restart: unless-stopped
     volumes:
       - ../dw:/usr/src/app
     depends_on:
@@ -24,6 +24,7 @@ services:
 
   backend:
     build: backend
+    restart: unless-stopped
     ports:
       - "{{ back_proxy_port }}:80"
     volumes:

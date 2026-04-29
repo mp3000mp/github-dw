@@ -3,7 +3,7 @@
 	ServerName {{ frontend_server_name }}
 	DocumentRoot "{{ app_directory }}/frontend/dist"
 
-	<Directory /var/www/{{ app_directory }}/frontend/dist/>
+	<Directory {{ app_directory }}/frontend/dist/>
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride all
 		Require all granted

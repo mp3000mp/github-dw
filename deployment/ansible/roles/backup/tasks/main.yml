@@ -35,4 +35,4 @@
     month: "*"
     weekday: "*"
     user: "{{ maintainer_user }}"
-    job: "{{ app_directory }}/backup/backup.sh >> {{ app_directory }}/backup/tmp.log 2>$1"
+    job: "{{ app_directory }}/backup/backup.sh >> {{ app_directory }}/backup/tmp.log 2>&1"

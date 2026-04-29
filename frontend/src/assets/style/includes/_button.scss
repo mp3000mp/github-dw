@@ -8,11 +8,14 @@
   border-radius: 0.375rem;
   border: $body-color solid 1px;
   transition: background-color 350ms ease-in-out;
+
   &:hover {
     background-color: $link-color-hover;
   }
+
   &:disabled {
     color: rgb(109, 109, 109);
+
     &:hover {
       background-color: $link-color;
     }

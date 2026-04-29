@@ -24,22 +24,13 @@
     group: "{{ maintainer_user }}"
     mode: '740'
 
-- name: Copy restart dw script
-  template:
-    src: templates/restart.sh.j2
-    dest: "{{ app_directory }}/docker/restart.sh"
-    owner: "{{ maintainer_user }}"
-    group: "{{ maintainer_user }}"
-    mode: '750'
-
-- name: Set restart dw cronjob
+- name: Remove obsolete dw restart cronjob
   ansible.builtin.cron:
     name: "Restart ghf dw container"
-    state: present
-    minute: "*/5"
-    hour: "*"
-    day: "*"
-    month: "*"
-    weekday: "*"
+    state: absent
     user: "{{ maintainer_user }}"
-    job: "{{ app_directory }}/docker/restart.sh"
+
+- name: Remove obsolete dw restart script
+  ansible.builtin.file:
+    path: "{{ app_directory }}/docker/restart.sh"
+    state: absent

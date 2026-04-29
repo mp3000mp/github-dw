@@ -328,9 +328,11 @@ watch(timeline, () => {
 #camembert {
   max-width: 400px;
 }
+
 #timeline {
   width: 90%;
 }
+
 ul {
   list-style: none;
   margin: 0;

@@ -1,5 +1,5 @@
 import { UserState } from './types'
-import { StoreRequest } from '@/stores/types'
+import { StoreRequest } from '@/stores/storeRequest'
 
 const state = new UserState()
 state.actionRequests = {

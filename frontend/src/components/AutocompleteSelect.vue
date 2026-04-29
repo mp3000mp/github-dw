@@ -91,6 +91,7 @@ watch(
   position: relative;
   width: 100%;
 }
+
 .acs-options {
   z-index: 1;
   padding: 0;
@@ -105,11 +106,14 @@ watch(
   border: 1px solid rgba(222, 222, 222, 0.5);
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
+
   .option {
     padding: 0.2rem 0.5rem;
+
     &:hover {
       background-color: #cc8800;
     }
+
     &.selected {
       background-color: #ffa90a;
     }

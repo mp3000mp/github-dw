@@ -23,10 +23,14 @@ class AdminControllerTest extends AbstractControllerTest
         $this->client->request('GET', '/api/admin/errors');
         $this->assertResponseCode(200);
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
-        self::assertCount(1, $jsonResponse['routine2']);
-        self::assertEquals('error2', $jsonResponse['routine2'][0]['error']);
-        self::assertCount(1, $jsonResponse['routine3']);
-        self::assertEquals('error3', $jsonResponse['routine3'][0]['error']);
+        /** @var list<array<string, mixed>> $routine2 */
+        $routine2 = $jsonResponse['routine2'];
+        self::assertCount(1, $routine2);
+        self::assertEquals('error2', $routine2[0]['error']);
+        /** @var list<array<string, mixed>> $routine3 */
+        $routine3 = $jsonResponse['routine3'];
+        self::assertCount(1, $routine3);
+        self::assertEquals('error3', $routine3[0]['error']);
     }
 
     public function testStats(): void

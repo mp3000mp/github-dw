@@ -1,6 +1,6 @@
 # todo build and host images
 - name: Deploy docker directories
-  synchronize:
+  ansible.posix.synchronize:
     delete: true
     src: '{{ playbook_dir }}/../docker/{{ item }}'
     dest: "{{ app_directory }}/docker/"
@@ -26,7 +26,7 @@
     - '.env'
     - 'docker-compose.yml'
 
-- name: Deploy dcker files
+- name: Deploy docker files
   copy:
     src: '{{ playbook_dir }}/../docker/{{ item }}'
     dest: "{{ app_directory }}/docker/"

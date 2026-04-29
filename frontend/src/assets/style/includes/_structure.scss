@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 html,
 body,
 #app {
@@ -58,7 +60,7 @@ p {
   border-color: rgba($body-color, 0.5);
 
   .card-header {
-    background-color: darken($body-bg, 2%);
+    background-color: color.adjust($body-bg, $lightness: -2%);
     padding: 0;
   }
 
@@ -67,6 +69,6 @@ p {
   }
 
   .card-footer {
-    background-color: darken($body-bg, 2%);
+    background-color: color.adjust($body-bg, $lightness: -2%);
   }
 }

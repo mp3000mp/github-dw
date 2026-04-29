@@ -1,5 +1,5 @@
 - name: Rsync backend directories
-  synchronize:
+  ansible.posix.synchronize:
     delete: true
     src: '{{ playbook_dir }}/../../backend/{{ item }}'
     dest: "{{ app_directory }}/backend/"
@@ -16,14 +16,6 @@
     - 'src'
     - 'templates'
     - 'translations'
-    - 'vendor'
-
-- name: Remove backendfiles
-  file:
-    state: absent
-    path: "{{ app_directory }}/backend/{{ item }}"
-  loop:
-    - 'bin/phpunit'
 
 - name: Deploy backend files
   copy:
@@ -57,9 +49,3 @@
     - 'var'
     - 'var/log'
     - 'var/cache'
-
-# not needed because we sync vendor for now
-#- name: Composer install
-#  shell:
-#    cmd: docker-compose exec backend bash -l -c "composer install"
-#    chdir: "{{ app_directory }}/docker"

@@ -1,17 +1,22 @@
 - name: Docker compose up
-  docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ app_directory }}/docker"
     state: present
-    build: true
+    build: always
 
-- name: Composer cache clear
+- name: Composer install
   shell:
-    cmd: docker-compose exec backend bash -l -c "php bin/console cache:clear"
+    cmd: docker compose exec -T backend bash -l -c "composer install --no-dev --optimize-autoloader --no-interaction"
     chdir: "{{ app_directory }}/docker"
 
-- name: Composer migration
+- name: Symfony cache clear
   shell:
-    cmd: docker-compose exec backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"
+    cmd: docker compose exec -T backend bash -l -c "php bin/console cache:clear --no-interaction"
+    chdir: "{{ app_directory }}/docker"
+
+- name: Doctrine migration
+  shell:
+    cmd: docker compose exec -T backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"
     chdir: "{{ app_directory }}/docker"
 
 # todo if first deployment create first user with command

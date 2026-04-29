@@ -98,7 +98,7 @@ onMounted(() => {
 
 input {
   &.is-invalid {
-    border: 1px solid red;
+    border: 1px solid #b32727;
   }
 }
 </style>

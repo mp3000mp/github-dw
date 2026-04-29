@@ -1,4 +1,4 @@
-import type { StoreRequest } from '@/stores/types'
+import type { StoreRequest } from '@/stores/storeRequest'
 import type { CallbackOnError } from '@/helpers/apiRegistry'
 
 interface ErrorResponseSchemas {
