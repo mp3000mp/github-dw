@@ -8,7 +8,7 @@ use App\Entity\Repository;
 use App\Repository\RepositoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RepositoryController extends AbstractController
 {
     #[Route(path: '/search', name: 'repositories.search', methods: ['POST'])]
-    public function search(Request $request, SerializerInterface $serializer, RateLimiterFactory $searchRouteLimiter): Response
+    public function search(Request $request, SerializerInterface $serializer, RateLimiterFactoryInterface $searchRouteLimiter): Response
     {
         $limiter = $searchRouteLimiter->create($request->getClientIp());
         if (!$limiter->consume(1)->isAccepted()) {

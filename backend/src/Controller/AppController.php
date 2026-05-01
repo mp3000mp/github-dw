@@ -31,7 +31,7 @@ class AppController extends AbstractController
     #[Route(path: '/404', name: 'app.404', methods: ['GET'])]
     public function error404(Request $request): Response
     {
-        $err = $request->get('exception');
+        $err = $request->attributes->get('exception');
 
         //        if ($this->getParameter('app.env') === 'test') {
         //            dump($err);

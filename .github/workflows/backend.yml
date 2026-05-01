@@ -42,7 +42,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.4'
           extensions: ctype, iconv, mbstring, intl, pdo_sqlite, mysql
           tools: composer:v2
           coverage: pcov
@@ -77,11 +77,12 @@ jobs:
           DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
 
       - name: Apply dw SQL migrations
-        env:
-          MYSQL_PWD: ${{ env.DB_PASSWORD }}
         run: |
           for f in dw/model/migrations/*.sql; do
-            mariadb -h 127.0.0.1 -u ${{ env.DB_USER }} ${{ env.DB_NAME }} < "$f"
+            docker exec -i \
+              -e MYSQL_PWD=${{ env.DB_PASSWORD }} \
+              mariadb_test \
+              mariadb -u ${{ env.DB_USER }} ${{ env.DB_NAME }} < "$f"
           done
 
       - name: Migrate database

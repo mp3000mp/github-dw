@@ -5,7 +5,7 @@ namespace App\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
@@ -17,9 +17,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 class Authenticator extends AbstractLoginFormAuthenticator
 {
     private SerializerInterface $serializer;
-    private RateLimiterFactory $loginRouteLimiter;
+    private RateLimiterFactoryInterface $loginRouteLimiter;
 
-    public function __construct(SerializerInterface $serializer, RateLimiterFactory $loginRouteLimiter)
+    public function __construct(SerializerInterface $serializer, RateLimiterFactoryInterface $loginRouteLimiter)
     {
         $this->serializer = $serializer;
         $this->loginRouteLimiter = $loginRouteLimiter;

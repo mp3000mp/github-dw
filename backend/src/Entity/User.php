@@ -132,6 +132,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return null;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

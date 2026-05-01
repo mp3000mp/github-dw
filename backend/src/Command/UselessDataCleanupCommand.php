@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -188,6 +188,6 @@ class UselessDataCleanupCommand extends Command
      */
     public function doDelete(string $sql, array $ids): void
     {
-        $this->em->getConnection()->executeQuery($sql, ['ids' => $ids], ['ids' => Connection::PARAM_INT_ARRAY]);
+        $this->em->getConnection()->executeQuery($sql, ['ids' => $ids], ['ids' => ArrayParameterType::INTEGER]);
     }
 }
