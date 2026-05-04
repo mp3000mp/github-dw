@@ -76,18 +76,15 @@ jobs:
         env:
           DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
 
-      - name: Apply dw SQL migrations
-        run: |
-          for f in dw/model/migrations/*.sql; do
-            docker exec -i \
-              -e MYSQL_PWD=${{ env.DB_PASSWORD }} \
-              mariadb_test \
-              mariadb -u ${{ env.DB_USER }} ${{ env.DB_NAME }} < "$f"
-          done
-
       - name: Migrate database
         working-directory: ${{ env.DIRECTORY }}
         run: php bin/console doc:mig:mig --no-interaction -e test
+        env:
+          DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
+
+      - name: Sync dw schema from Doctrine entities
+        working-directory: ${{ env.DIRECTORY }}
+        run: php bin/console doctrine:schema:update --complete --force --no-interaction -e test
         env:
           DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
 

@@ -26,6 +26,14 @@
     - '.env'
     - 'docker-compose.yml'
 
+- name: Create backend php.ini
+  template:
+    src: "templates/php.ini.j2"
+    dest: "{{ app_directory }}/docker/backend/conf.d/php.ini"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '640'
+
 - name: Deploy docker files
   copy:
     src: '{{ playbook_dir }}/../docker/{{ item }}'
