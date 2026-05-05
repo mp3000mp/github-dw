@@ -30,8 +30,8 @@ class Repository
     #[Groups(['all'])]
     private string $username;
 
-    #[ORM\Column(type: 'string', length: 50)]
-    private ?string $mainLanguage;
+    #[ORM\Column(type: 'string', length: 50, options: ['default' => ''])]
+    private string $mainLanguage = '';
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['all'])]
@@ -154,12 +154,12 @@ class Repository
         $this->username = $username;
     }
 
-    public function getMainLanguage(): ?string
+    public function getMainLanguage(): string
     {
         return $this->mainLanguage;
     }
 
-    public function setMainLanguage(?string $mainLanguage): void
+    public function setMainLanguage(string $mainLanguage): void
     {
         $this->mainLanguage = $mainLanguage;
     }
