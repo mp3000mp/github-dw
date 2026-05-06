@@ -25,7 +25,7 @@ class UserFixtures extends Fixture
         $user->setEmail('admin@mp3000.fr');
         $user->setUsername('admin');
         $user->setPassword($hashedPassword);
-        $user->setPasswordUpdatedAt(new \DateTime());
+        $user->setPasswordUpdatedAt(new \DateTimeImmutable());
         $user->setRoles(['ROLE_ADMIN']);
         $user->setIsEnabled(true);
 

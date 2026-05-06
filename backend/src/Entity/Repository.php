@@ -73,21 +73,21 @@ class Repository
     #[Groups(['admin'])]
     private ?int $size;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['admin'])]
-    private \DateTime $routine1At;
+    private \DateTimeImmutable $routine1At;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['admin'])]
-    private ?\DateTime $routine2At;
+    private ?\DateTimeImmutable $routine2At;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['all'])]
-    private ?\DateTime $createdAt;
+    private ?\DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['all'])]
-    private ?\DateTime $pushedAt;
+    private ?\DateTimeImmutable $pushedAt;
 
     /**
      * @var Collection<int, RepositoryLanguage>
@@ -264,42 +264,42 @@ class Repository
         $this->size = $size;
     }
 
-    public function getRoutine1At(): \DateTime
+    public function getRoutine1At(): \DateTimeImmutable
     {
         return $this->routine1At;
     }
 
-    public function setRoutine1At(\DateTime $routine1At): void
+    public function setRoutine1At(\DateTimeImmutable $routine1At): void
     {
         $this->routine1At = $routine1At;
     }
 
-    public function getRoutine2At(): ?\DateTime
+    public function getRoutine2At(): ?\DateTimeImmutable
     {
         return $this->routine2At;
     }
 
-    public function setRoutine2At(?\DateTime $routine2At): void
+    public function setRoutine2At(?\DateTimeImmutable $routine2At): void
     {
         $this->routine2At = $routine2At;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
-    public function getPushedAt(): ?\DateTime
+    public function getPushedAt(): ?\DateTimeImmutable
     {
         return $this->pushedAt;
     }
 
-    public function setPushedAt(?\DateTime $pushedAt): void
+    public function setPushedAt(?\DateTimeImmutable $pushedAt): void
     {
         $this->pushedAt = $pushedAt;
     }

@@ -30,12 +30,12 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
     /**
      * @return array{
      *     error: string,
-     *     date: \DateTime,
+     *     date: \DateTimeImmutable,
      *     path: string,
      *     url: string,
      * }
      */
-    public function findErrors(\DateTime $from, int $limit = 100): array
+    public function findErrors(\DateTimeInterface $from, int $limit = 100): array
     {
         return $this->createQueryBuilder('rptf')
             ->select(['rptf.routineError as error', 'rptf.routine3At as date', 'rptf.path', 'r.url'])
@@ -77,7 +77,7 @@ class RepositoryPackageTypeFileRepository extends ServiceEntityRepository
      *     errors: int,
      * }[]
      */
-    public function timelineRoutine3(\DateTime $minDate): array
+    public function timelineRoutine3(\DateTimeInterface $minDate): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addScalarResult('label', 'label', 'string');

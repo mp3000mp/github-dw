@@ -16,19 +16,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class JsonRequestHelper
 {
-    private string $pathSchemas;
-    private SerializerInterface $serialiser;
-    private Validator $jsonValidator;
-    private LoggerInterface $logger;
-    private ValidatorInterface $validator;
+    private readonly string $pathSchemas;
+    private readonly Validator $jsonValidator;
 
-    public function __construct(ParameterBagInterface $parameterBag, SerializerInterface $serializer, ValidatorInterface $validator, LoggerInterface $logger)
-    {
+    public function __construct(
+        ParameterBagInterface $parameterBag,
+        private readonly SerializerInterface $serializer,
+        private readonly ValidatorInterface $validator,
+        private readonly LoggerInterface $logger,
+    ) {
         $this->pathSchemas = $parameterBag->get('app.schemas_path');
-        $this->serialiser = $serializer;
         $this->jsonValidator = new Validator();
-        $this->validator = $validator;
-        $this->logger = $logger;
     }
 
     /**
@@ -67,7 +65,7 @@ class JsonRequestHelper
         if (null !== $entity) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $entity;
         }
-        $objData = $this->serialiser->deserialize($rawData, $class, 'json', $context);
+        $objData = $this->serializer->deserialize($rawData, $class, 'json', $context);
         $errors = $this->validator->validate($objData);
         if (count($errors)) {
             $err = "Entity does not validate. Violations:\n";

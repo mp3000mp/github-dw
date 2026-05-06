@@ -16,13 +16,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class Authenticator extends AbstractLoginFormAuthenticator
 {
-    private SerializerInterface $serializer;
-    private RateLimiterFactoryInterface $loginRouteLimiter;
-
-    public function __construct(SerializerInterface $serializer, RateLimiterFactoryInterface $loginRouteLimiter)
-    {
-        $this->serializer = $serializer;
-        $this->loginRouteLimiter = $loginRouteLimiter;
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly RateLimiterFactoryInterface $loginRouteLimiter,
+    ) {
     }
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response

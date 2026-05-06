@@ -12,11 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:health-check', description: 'Check external services.')]
 class HealthCheckCommand extends Command
 {
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $em;
         parent::__construct();
     }
 

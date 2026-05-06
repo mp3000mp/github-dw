@@ -7,7 +7,6 @@ parameters:
     app.env: '%env(APP_ENV)%'
     app.version: '%env(APP_VERSION)%'
     app.schemas_path: '%kernel.project_dir%/resources/schemas/'
-    app.front_url: '%env(CORS_ALLOW_ORIGIN)%'
 
 services:
     # default configuration for services in *this* file

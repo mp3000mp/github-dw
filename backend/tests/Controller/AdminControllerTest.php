@@ -67,10 +67,11 @@ class AdminControllerTest extends AbstractControllerTest
         $jsonResponse = $this->getResponseJson($this->client->getResponse());
 
         $labels = [];
-        $d = new \DateTime('-7 days');
-        while ($d < new \DateTime()) {
+        $d = new \DateTimeImmutable('-7 days');
+        $now = new \DateTimeImmutable();
+        while ($d < $now) {
             $labels[] = $d->format('Y-m-d');
-            $d->add(new \DateInterval('P1D'));
+            $d = $d->add(new \DateInterval('P1D'));
         }
 
         self::assertEqualsCanonicalizing($labels, $jsonResponse['labels']);

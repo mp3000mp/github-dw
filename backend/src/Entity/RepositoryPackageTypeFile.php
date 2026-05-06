@@ -32,13 +32,13 @@ class RepositoryPackageTypeFile
     #[ORM\Column(type: 'string', length: 100)]
     private string $sha;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['admin'])]
-    private \DateTime $routine1At;
+    private \DateTimeImmutable $routine1At;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Groups(['admin'])]
-    private ?\DateTime $routine3At;
+    private ?\DateTimeImmutable $routine3At;
 
     #[ORM\ManyToOne(targetEntity: Repository::class, inversedBy: 'repositoryPackageTypeFiles')]
     #[ORM\JoinColumn(nullable: false)]
@@ -95,22 +95,22 @@ class RepositoryPackageTypeFile
         $this->sha = $sha;
     }
 
-    public function getRoutine1At(): \DateTime
+    public function getRoutine1At(): \DateTimeImmutable
     {
         return $this->routine1At;
     }
 
-    public function setRoutine1At(\DateTime $routine1At): void
+    public function setRoutine1At(\DateTimeImmutable $routine1At): void
     {
         $this->routine1At = $routine1At;
     }
 
-    public function getRoutine3At(): ?\DateTime
+    public function getRoutine3At(): ?\DateTimeImmutable
     {
         return $this->routine3At;
     }
 
-    public function setRoutine3At(?\DateTime $routine3At): void
+    public function setRoutine3At(?\DateTimeImmutable $routine3At): void
     {
         $this->routine3At = $routine3At;
     }

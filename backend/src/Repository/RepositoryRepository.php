@@ -31,11 +31,11 @@ class RepositoryRepository extends ServiceEntityRepository
     /**
      * @return array{
      *     error: string,
-     *     date: \DateTime,
+     *     date: \DateTimeImmutable,
      *     url: string,
      * }[]
      */
-    public function findErrors(\DateTime $from, int $limit = 100): array
+    public function findErrors(\DateTimeInterface $from, int $limit = 100): array
     {
         return $this->createQueryBuilder('r')
             ->select(['r.routineError as error', 'r.routine2At as date', 'r.url'])
@@ -187,7 +187,7 @@ class RepositoryRepository extends ServiceEntityRepository
      *     done: int,
      * }[]
      */
-    public function timelineRoutine1(\DateTime $minDate): array
+    public function timelineRoutine1(\DateTimeInterface $minDate): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addScalarResult('label', 'label', 'string');
@@ -211,7 +211,7 @@ class RepositoryRepository extends ServiceEntityRepository
      *     errors: int[],
      * }[]
      */
-    public function timelineRoutine2(\DateTime $minDate): array
+    public function timelineRoutine2(\DateTimeInterface $minDate): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addScalarResult('label', 'label', 'string');

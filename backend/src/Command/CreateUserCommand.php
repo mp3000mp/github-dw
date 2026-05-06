@@ -50,7 +50,7 @@ class CreateUserCommand extends Command
         $user->setIsEnabled(true);
         $user->setUsername($input->getArgument('username'));
         $user->setEmail($input->getArgument('email'));
-        $user->setPasswordUpdatedAt(new \DateTime());
+        $user->setPasswordUpdatedAt(new \DateTimeImmutable());
         $user->setRoles($roles);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
 

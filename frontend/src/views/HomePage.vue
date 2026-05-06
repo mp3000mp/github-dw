@@ -26,12 +26,12 @@ function removeDependency(id: number) {
   dependencies.value = dependencies.value.filter((p) => p.id !== id)
 }
 
-interface updateDependencyVersionsPayload {
+interface UpdateDependencyVersionsPayload {
   id: number
   minVersion: string
   maxVersion: string
 }
-function updateDependencyVersions(payload: updateDependencyVersionsPayload) {
+function updateDependencyVersions(payload: UpdateDependencyVersionsPayload) {
   const currentDep = dependencies.value.find((p) => p.id === payload.id)
   if (currentDep) {
     currentDep.minVersion = formatVersion(payload.minVersion)

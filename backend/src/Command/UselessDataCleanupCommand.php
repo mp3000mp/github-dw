@@ -15,11 +15,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:data:cleanup', description: 'Clean up useless data.')]
 class UselessDataCleanupCommand extends Command
 {
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $em;
         parent::__construct();
     }
 

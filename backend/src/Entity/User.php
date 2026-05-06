@@ -34,19 +34,18 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     #[Groups(['admin', 'me'])]
     private string $username;
 
-    #[Assert\Email]
     #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $password;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTime $password_updated_at;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $password_updated_at;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $reset_password_token;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTime $reset_password_at;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $reset_password_at;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['admin'])]
@@ -167,12 +166,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->password = $password;
     }
 
-    public function getPasswordUpdatedAt(): ?\DateTime
+    public function getPasswordUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->password_updated_at;
     }
 
-    public function setPasswordUpdatedAt(?\DateTime $password_updated_at): void
+    public function setPasswordUpdatedAt(?\DateTimeImmutable $password_updated_at): void
     {
         $this->password_updated_at = $password_updated_at;
     }
@@ -192,12 +191,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         $this->reset_password_token = md5(random_bytes(64));
     }
 
-    public function getResetPasswordAt(): ?\DateTime
+    public function getResetPasswordAt(): ?\DateTimeImmutable
     {
         return $this->reset_password_at;
     }
 
-    public function setResetPasswordAt(?\DateTime $reset_password_at): void
+    public function setResetPasswordAt(?\DateTimeImmutable $reset_password_at): void
     {
         $this->reset_password_at = $reset_password_at;
     }

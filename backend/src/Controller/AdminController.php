@@ -26,7 +26,7 @@ class AdminController extends AbstractController
         /** @var RepositoryPackageTypeFileRepository $repoPackageRepo */
         $repoPackageRepo = $this->em->getRepository(RepositoryPackageTypeFile::class);
 
-        $d = new \DateTime('-7 days');
+        $d = new \DateTimeImmutable('-7 days');
         $routine2Errors = $repoRepo->findErrors($d, 10);
         $routine3Errors = $repoPackageRepo->findErrors($d, 10);
 
@@ -67,13 +67,13 @@ class AdminController extends AbstractController
         $repoPackageTypeFilesRepo = $this->em->getRepository(RepositoryPackageTypeFile::class);
 
         // todo handle day, week, month
-        $minDate = new \DateTime('-7 days');
-        $minDate->setTime(0, 0);
-        $d = clone $minDate;
+        $minDate = (new \DateTimeImmutable('-7 days'))->setTime(0, 0);
+        $now = new \DateTimeImmutable();
+        $d = $minDate;
         $labels = [];
-        while ($d < new \DateTime()) {
+        while ($d < $now) {
             $labels[] = $d->format('Y-m-d');
-            $d->add(new \DateInterval('P1D'));
+            $d = $d->add(new \DateInterval('P1D'));
         }
 
         return $this->json([

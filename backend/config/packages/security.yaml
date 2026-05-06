@@ -28,8 +28,7 @@ security:
             # switch_user: true
 
     access_control:
-        - { path: ^/api,       roles: PUBLIC_ACCESS }
-        - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

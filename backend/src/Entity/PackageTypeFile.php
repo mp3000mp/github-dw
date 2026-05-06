@@ -42,9 +42,9 @@ class PackageTypeFile
     #[Groups(['admin'])]
     private int $githubCurrentPage;
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
     #[Groups(['admin'])]
-    private \DateTime $updatedAt;
+    private \DateTimeImmutable $updatedAt;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     #[Groups(['admin'])]
@@ -116,12 +116,12 @@ class PackageTypeFile
         $this->githubCurrentPage = $githubCurrentPage;
     }
 
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }

@@ -11,14 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyAbstr
 
 abstract class AbstractController extends SymfonyAbstractController
 {
-    protected EntityManagerInterface $em;
-    protected JsonRequestHelper $requestHelper;
-    protected JsonResponseHelper $responseHelper;
-
-    public function __construct(EntityManagerInterface $em, JsonRequestHelper $requestHelper, JsonResponseHelper $responseHelper)
-    {
-        $this->em = $em;
-        $this->responseHelper = $responseHelper;
-        $this->requestHelper = $requestHelper;
+    public function __construct(
+        protected readonly EntityManagerInterface $em,
+        protected readonly JsonRequestHelper $requestHelper,
+        protected readonly JsonResponseHelper $responseHelper,
+    ) {
     }
 }

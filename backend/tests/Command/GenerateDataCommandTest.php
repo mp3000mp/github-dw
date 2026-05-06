@@ -2,19 +2,26 @@
 
 namespace App\Tests\Command;
 
+use App\Command\GenerateDataCommand;
+use App\Entity\Repository;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 class GenerateDataCommandTest extends AbstractCommandTest
 {
     public function testExecute(): void
     {
-        $commandName = 'app:generate-data';
-        $commandTester = $this->getCommandTester($commandName);
+        $parameterBag = $this->createMock(ParameterBagInterface::class);
+        $parameterBag->method('get')->with('app.env')->willReturn('dev');
 
-        $commandTester->execute([
-            'command' => $commandName,
-            'number' => 100,
-        ]);
+        $repoCountBefore = count($this->em->getRepository(Repository::class)->findAll());
 
-        $output = $commandTester->getDisplay();
-        self::assertEquals("This command should be used in DEV env only.\n", $output);
+        $commandTester = new CommandTester(new GenerateDataCommand($this->em, $parameterBag));
+        $commandTester->execute(['number' => 100]);
+
+        self::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
+        self::assertStringContainsString('SUCCESS', $commandTester->getDisplay());
+        self::assertSame($repoCountBefore + 100, count($this->em->getRepository(Repository::class)->findAll()));
     }
 }

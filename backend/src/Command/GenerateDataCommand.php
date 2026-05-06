@@ -21,35 +21,23 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 #[AsCommand(name: 'app:generate-data', description: 'Generate dev data.')]
 class GenerateDataCommand extends Command
 {
-    private EntityManagerInterface $em;
-    private ParameterBagInterface $parameterBag;
-    private ?Generator $faker;
+    private ?Generator $faker = null;
 
-    private float $routine2Ratio;
-    private float $routine2ErrorRatio;
-    private float $routine3Ratio;
-    private float $routine3ErrorRatio;
-    private float $validPackageVersionRatio;
-    private int $packagePerRepo;
-    private float $createPackageRatio;
+    private float $routine2Ratio = 0.75;
+    private float $routine2ErrorRatio = 0.01;
+    private float $routine3Ratio = 0.8;
+    private float $routine3ErrorRatio = 0.03;
+    private float $validPackageVersionRatio = 0.99;
+    private int $packagePerRepo = 10;
+    private float $createPackageRatio = 0.1;
 
     /** @var array<string, Package> */
     private array $packageUniq = [];
 
-    public function __construct(EntityManagerInterface $em, ParameterBagInterface $parameterBag)
-    {
-        $this->em = $em;
-        $this->parameterBag = $parameterBag;
-        $this->faker = null;
-
-        $this->routine2Ratio = 0.75;
-        $this->routine2ErrorRatio = 0.01;
-        $this->routine3Ratio = 0.8;
-        $this->routine3ErrorRatio = 0.03;
-        $this->createPackageRatio = 0.1;
-        $this->validPackageVersionRatio = 0.99;
-        $this->packagePerRepo = 10;
-
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly ParameterBagInterface $parameterBag,
+    ) {
         parent::__construct();
     }
 
@@ -93,7 +81,7 @@ class GenerateDataCommand extends Command
             // routine 1
             $packageTypeFile = $this->faker->randomElement($allPackageTypeFiles);
             $repo = new Repository();
-            $repo->setRoutine1At($this->faker->dateTimeBetween('-1 month', '-1 day'));
+            $repo->setRoutine1At($this->fakerDate('-1 month', '-1 day'));
             $repo->setName($this->faker->domainWord());
             $repo->setUsername($this->faker->userName());
             $repo->setUrl($this->genUrl($allUrls));
@@ -111,7 +99,7 @@ class GenerateDataCommand extends Command
             if (!$this->alea($this->routine2Ratio)) {
                 continue;
             }
-            $repo->setRoutine2At($this->faker->dateTimeBetween($repo->getRoutine1At()));
+            $repo->setRoutine2At($this->fakerDate($repo->getRoutine1At()));
             if ($this->alea($this->routine2ErrorRatio)) {
                 $repo->setRoutineError($this->faker->realText(100));
                 continue;
@@ -125,14 +113,14 @@ class GenerateDataCommand extends Command
             $repo->setOpenIssuesCount($this->faker->randomNumber(4));
             $repo->setGithubId($this->faker->randomNumber(9));
             $repo->setSize($this->faker->randomNumber(7));
-            $repo->setCreatedAt($this->faker->dateTimeBetween('-3 years', '-3 months'));
-            $repo->setPushedAt($this->faker->dateTimeBetween('-3 months'));
+            $repo->setCreatedAt($this->fakerDate('-3 years', '-3 months'));
+            $repo->setPushedAt($this->fakerDate('-3 months'));
 
             // routine 3
             if (!$this->alea($this->routine3Ratio)) {
                 continue;
             }
-            $repoPackageTypeFile->setRoutine3At($this->faker->dateTimeBetween($repo->getRoutine1At()));
+            $repoPackageTypeFile->setRoutine3At($this->fakerDate($repo->getRoutine1At()));
             if ($this->alea($this->routine3ErrorRatio)) {
                 $repoPackageTypeFile->setRoutineError($this->faker->realText(100));
                 continue;
@@ -211,6 +199,18 @@ class GenerateDataCommand extends Command
     private function alea(float $ratio): bool
     {
         return $this->faker->randomFloat(3, 0, 1) < $ratio;
+    }
+
+    private function fakerDate(\DateTimeInterface|string $from = '-30 years', \DateTimeInterface|string $to = 'now'): \DateTimeImmutable
+    {
+        if ($from instanceof \DateTimeImmutable) {
+            $from = \DateTime::createFromImmutable($from);
+        }
+        if ($to instanceof \DateTimeImmutable) {
+            $to = \DateTime::createFromImmutable($to);
+        }
+
+        return \DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween($from, $to));
     }
 
     /**
