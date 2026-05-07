@@ -5,7 +5,6 @@
 You can easily mount:
 - A mariadb server for dev environment
 - A mariadb server for test environment
-- A maildev server
 - An adminer instance
 
 To do this:
@@ -17,7 +16,6 @@ docker-compose up -d
 ```
 
 Dev tools are now accessible here:
-- Maildev: localhost:1080
 - Adminer: localhost:5001
 
 ## Prod
@@ -27,11 +25,10 @@ Dev tools are now accessible here:
 This repo does not include server provisioning but you can refer to [this other repo](https://github.com/mp3000mp/template-ansible) if you like.
 
 This hosting server needs the following requirements to deploy:
-- python3-pip (for Ansible Docker module compatibility)
+- ansible
 - rsync
 - docker
-- docker-compose
-- nodejs >16.0
+- docker compose
 - apache with proxy and proxy_http modules
 - certbot
 

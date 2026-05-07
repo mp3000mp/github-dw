@@ -75,8 +75,8 @@ class UselessDataCleanupCommand extends Command
             $ids = $this->getIds($sql);
             $rows[] = $this->getRow('Packages', count($ids), $sqlTotal);
             if (!$dryRun && count($ids) > 0) {
-                $sqlDelete = 'DELETE FROM dw_package WHERE id IN (:ids)';
-                $this->doDelete($sqlDelete, $ids);
+                $this->doDelete('DELETE FROM dw_repository_package WHERE package_id IN (:ids)', $ids);
+                $this->doDelete('DELETE FROM dw_package WHERE id IN (:ids)', $ids);
             }
 
             // repo package type files
@@ -94,8 +94,8 @@ class UselessDataCleanupCommand extends Command
             $ids = $this->getIds($sql, $ids);
             $rows[] = $this->getRow('Repo package type files', count($ids), $sqlTotal);
             if (!$dryRun && count($ids) > 0) {
-                $sqlDelete = 'DELETE FROM dw_repository_package_type_file WHERE id IN (:ids)';
-                $this->doDelete($sqlDelete, $ids);
+                $this->doDelete('DELETE FROM dw_repository_package WHERE repository_package_type_file_id IN (:ids)', $ids);
+                $this->doDelete('DELETE FROM dw_repository_package_type_file WHERE id IN (:ids)', $ids);
             }
 
             // repositories
@@ -113,10 +113,11 @@ class UselessDataCleanupCommand extends Command
             $ids = $this->getIds($sql, $ids);
             $rows[] = $this->getRow('Repositories', count($ids), $sqlTotal);
             if (!$dryRun && count($ids) > 0) {
-                $sqlDelete = 'DELETE FROM dw_repository_package WHERE repository_id IN (:ids)';
-                $this->doDelete($sqlDelete, $ids);
-                $sqlDelete = 'DELETE FROM dw_repository WHERE id IN (:ids)';
-                $this->doDelete($sqlDelete, $ids);
+                $this->doDelete('DELETE FROM dw_repository_package WHERE repository_id IN (:ids)', $ids);
+                $this->doDelete('DELETE FROM dw_repository_language WHERE repository_id IN (:ids)', $ids);
+                $this->doDelete('DELETE FROM dw_repository_topic WHERE repository_id IN (:ids)', $ids);
+                $this->doDelete('DELETE FROM dw_repository_package_type_file WHERE repository_id IN (:ids)', $ids);
+                $this->doDelete('DELETE FROM dw_repository WHERE id IN (:ids)', $ids);
             }
         } catch (\Exception $e) {
             if (!$dryRun) {

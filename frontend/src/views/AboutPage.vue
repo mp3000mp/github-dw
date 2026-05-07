@@ -58,7 +58,9 @@ function animateEmail() {
         <p>Because I'm lazy.</p>
         <h3>Is this project open source ?</h3>
         <p>
-          Not yet because it's dirty. But maybe one day and you'll be able to find it by looking for
+          Yes! Find the sources on
+          <a href="https://github.com/mp3000mp/github-dw" title="Github repository">Github</a>
+          — or use this very tool to find it by searching for
           <a href="https://symfony.com/doc/current/index.html" title="awesome backend framework"
             >Symfony</a
           >
