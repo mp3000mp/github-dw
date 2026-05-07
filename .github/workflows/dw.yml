@@ -44,8 +44,8 @@ jobs:
         run: go tool cover -func=coverage.out
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-          file: dw/coverage.out
+          files: dw/coverage.out
           flags: dw
           token: ${{ secrets.CODECOV_TOKEN }}

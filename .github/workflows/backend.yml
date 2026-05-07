@@ -94,9 +94,9 @@ jobs:
         env:
           DATABASE_URL: mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@mariadb_test:3306/${{ env.DB_NAME }}?serverVersion=mariadb-11.4.0
 
-#      - name: Upload coverage to Codecov
-#        uses: codecov/codecov-action@v4
-#        with:
-#          file: ${{ format('{0}/coverage.xml', env.DIRECTORY) }}
-#          flags: backend
-#          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ${{ format('{0}/coverage.xml', env.DIRECTORY) }}
+          flags: backend
+          token: ${{ secrets.CODECOV_TOKEN }}
