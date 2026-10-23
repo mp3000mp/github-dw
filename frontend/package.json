@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "vite",
@@ -35,8 +35,8 @@
   },
   "devDependencies": {
     "@pinia/testing": "^0.1.7",
-    "@tsconfig/node22": "^22.0.5",
-    "@types/node": "^22.0.0",
+    "@tsconfig/node24": "^24.0.5",
+    "@types/node": "^24.19.2",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vitest/coverage-v8": "^4.1.5",
     "@vue/eslint-config-prettier": "^10.2.0",
