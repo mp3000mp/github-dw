@@ -7,6 +7,9 @@
     rsync_opts:
       - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
       - '--chmod=0750'
+      # dev only: phpunit runner, and the gitignored IDE-only config dump regenerated on cache warmup
+      - '--exclude=/bin/phpunit'
+      - '--exclude=/config/reference.php'
   loop:
     - 'bin'
     - 'config'
@@ -16,6 +19,26 @@
     - 'src'
     - 'templates'
     - 'translations'
+
+# Built without dev dependencies by local_build.sh (the local backend/vendor/ keeps them).
+- name: Rsync backend vendor
+  ansible.posix.synchronize:
+    delete: true
+    src: '{{ playbook_dir }}/.build/backend/vendor'
+    dest: "{{ app_directory }}/backend/"
+    recursive: true
+    rsync_opts:
+      - "--chown={{ maintainer_user }}:{{ maintainer_user }}"
+      - '--chmod=0750'
+
+# Excluded files are left in place by --delete: clean up those sent by earlier deploys.
+- name: Remove dev only backend files
+  file:
+    path: "{{ app_directory }}/backend/{{ item }}"
+    state: absent
+  loop:
+    - 'bin/phpunit'
+    - 'config/reference.php'
 
 - name: Deploy backend files
   copy:

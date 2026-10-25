@@ -4,12 +4,47 @@
   become_user: "{{ maintainer_user }}"
   vars_files:
     - vars.yml
+  pre_tasks:
+    # Built here rather than asked for: the vendor/, dist/ and dw binary shipped below are always
+    # those of the working copy — never a stale build.
+    - name: Build backend vendor, frontend dist and dw binary locally
+      ansible.builtin.command:
+        cmd: "./local_build.sh {{ build_targets | join(' ') }}"
+        chdir: "{{ playbook_dir }}"
+      vars:
+        build_targets: >-
+          {{ ['backend', 'frontend', 'dw']
+             | select('in', ansible_run_tags + (['backend', 'frontend', 'dw'] if 'all' in ansible_run_tags else []))
+             | reject('in', ansible_skip_tags) | list }}
+      delegate_to: localhost
+      become: false
+      changed_when: true
+      tags: [backend, frontend, dw]
+
+    - name: Ensure frontend directory exists
+      become_user: root
+      ansible.builtin.file:
+        path: "{{ app_directory }}/frontend"
+        state: directory
+        owner: "{{ maintainer_user }}"
+        group: "{{ maintainer_user }}"
+        mode: '755'
+      tags: [backend, frontend, infra]
+
+    - name: Enable maintenance mode for the deploy window
+      ansible.builtin.file:
+        path: "{{ app_directory }}/frontend/maintenance.on"
+        state: touch
+        owner: "{{ maintainer_user }}"
+        group: "{{ maintainer_user }}"
+        mode: '644'
+      tags: [backend, frontend, infra]
   roles:
-    - files
-    - docker
-    - deploy_dw
-    - deploy_back
-    - deploy_front
-#    - apache
-#    - backup
-#    - launch
+    - { role: files, tags: [infra] }
+    - { role: docker, tags: [infra] }
+    - { role: backup, tags: [never, backup] }
+    - { role: deploy_dw, tags: [dw] }
+    - { role: deploy_back, tags: [backend] }
+    - { role: deploy_front, tags: [frontend] }
+    - { role: launch, tags: [infra, backend, dw] }
+    - { role: maintenance, tags: [backend, frontend, infra] }

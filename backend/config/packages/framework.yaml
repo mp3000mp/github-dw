@@ -19,6 +19,12 @@ framework:
     php_errors:
         log: true
 
+when@prod:
+    framework:
+        # behind the host apache reverse proxy, reached through the docker bridge network
+        trusted_proxies: 'private_ranges'
+        trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port']
+
 when@test:
     framework:
         test: true

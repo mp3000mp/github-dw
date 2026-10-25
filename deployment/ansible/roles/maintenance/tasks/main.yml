@@ -1,0 +1,7 @@
+- name: Toggle maintenance sentinel file
+  file:
+    path: "{{ app_directory }}/frontend/maintenance.on"
+    state: "{{ 'touch' if maintenance_mode | bool else 'absent' }}"
+    owner: "{{ maintainer_user }}"
+    group: "{{ maintainer_user }}"
+    mode: '644'

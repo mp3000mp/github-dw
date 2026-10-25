@@ -5,6 +5,7 @@
 /dw/.env
 
 /deployment/ansible/vars.yml
+/deployment/ansible/.build
 /deployment/ansible/roles/*/vars.yml
 
 /deployment/docker/.env
@@ -16,6 +17,7 @@
 /frontend/ci
 /frontend/coverage
 /frontend/.env
+/frontend/.env.production.local
 /frontend/dist
 /frontend/node_modules
 

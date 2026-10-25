@@ -3,12 +3,19 @@
 	ServerName {{ frontend_server_name }}
 	DocumentRoot "{{ app_directory }}/frontend/dist"
 
+	# Maintenance mode: when {{ app_directory }}/frontend/maintenance.on exists,
+	# every non-asset request gets a 503 served from maintenance.html.
+	RewriteEngine On
+	RewriteCond {{ app_directory }}/frontend/maintenance.on -f
+	RewriteCond %{REQUEST_URI} !=/maintenance.html
+	RewriteCond %{REQUEST_URI} !\.(css|js|png|jpe?g|gif|svg|ico|webp|woff2?|ttf)$
+	RewriteRule .* - [R=503,L]
+	ErrorDocument 503 /maintenance.html
+
 	<Directory {{ app_directory }}/frontend/dist/>
-		Options Indexes FollowSymLinks MultiViews
+		Options FollowSymLinks MultiViews
 		AllowOverride all
 		Require all granted
-		Order allow,deny
-		allow from all
 		RewriteEngine on
 		RewriteBase /
 		RewriteRule ^index\.html$ - [L]

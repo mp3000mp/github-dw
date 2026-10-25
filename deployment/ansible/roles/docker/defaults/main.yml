@@ -1,0 +1,2 @@
+# Changing it on a running server recreates every container under the new name.
+compose_project_name: ghf

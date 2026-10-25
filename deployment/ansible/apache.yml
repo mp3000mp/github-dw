@@ -1,0 +1,8 @@
+- name: Install Apache vhosts and certificates
+  hosts: prod_servers
+  become: true
+  become_user: root
+  vars_files:
+    - vars.yml
+  roles:
+    - apache

@@ -3,6 +3,8 @@
 	ServerName {{ backend_server_name }}
 
 	ProxyPreserveHost On
+	RequestHeader set X-Forwarded-Proto "https"
+	RequestHeader set X-Forwarded-Port "443"
 	ProxyPass / http://localhost:{{ back_proxy_port }}/
 	ProxyPassReverse / http://localhost:{{ back_proxy_port }}/
 	ProxyPassReverseCookieDomain localhost {{ backend_server_name }}

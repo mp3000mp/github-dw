@@ -1,6 +1,9 @@
 date.timezone="Europe/Paris"
 memory_limit=2G
 
+; CVE-2026-115560 mitigation — unused feature; drop once PHP ships the fix.
+session.upload_progress.enabled=0
+
 ; Logging
 error_reporting = E_ALL
 log_errors = On

@@ -30,7 +30,7 @@ services:
   # Usage: docker-compose run --rm dw go run main.go
   #        docker-compose run --rm dw go run main.go migrate
   dw:
-    image: golang:1.18
+    image: golang:1.24
     working_dir: /usr/src/app
     env_file: ../../dw/.env
     volumes:
@@ -40,7 +40,7 @@ services:
 
   # Usage: docker-compose run --rm dw_test
   dw_test:
-    image: golang:1.18
+    image: golang:1.24
     command: go test -race -count=1 -coverprofile=coverage.out -covermode=atomic ./...
     working_dir: /usr/src/app
     volumes:
@@ -55,7 +55,9 @@ services:
       - ../../dw:/usr/src/app
 
   backend:
-    build: backend
+    build:
+      context: backend
+      target: dev
     ports:
       - "5000:80"
     volumes:

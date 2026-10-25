@@ -1,9 +1,19 @@
+# Caps docker logs (backend prod.log goes to stderr), rotated by docker itself.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   mariadb:
-    image: mariadb:10.6
+    image: mariadb:11.4
     user: "1000:1000"
     restart: unless-stopped
+    logging: *logging
     environment:
+      # runs mariadb-upgrade on start when the data dir comes from an older version
+      MARIADB_AUTO_UPGRADE: "1"
       MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
       MYSQL_DATABASE: "$MYSQL_DATABASE"
       MYSQL_USER: "$MYSQL_USER"
@@ -17,14 +27,19 @@ services:
     build: dw
     command: ./main
     restart: unless-stopped
+    logging: *logging
     volumes:
       - ../dw:/usr/src/app
     depends_on:
       - mariadb
 
   backend:
-    build: backend
+    build:
+      context: backend
+      target: prod
+      pull: true
     restart: unless-stopped
+    logging: *logging
     ports:
       - "{{ back_proxy_port }}:80"
     volumes:

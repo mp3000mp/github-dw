@@ -7,9 +7,9 @@ This tool helps you finding Github projects basing your search on the dependenci
 ![Screenshot](docs/screenshots/Screenshot_1.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)](backend/composer.json)
+[![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)](backend/composer.json)
 [![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)](backend/composer.json)
-[![Go](https://img.shields.io/badge/Go-1.18+-00ADD8?logo=go&logoColor=white)](dw/go.mod)
+[![Go](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go&logoColor=white)](dw/go.mod)
 [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white)](frontend/package.json)
 [![Node](https://img.shields.io/badge/Node-22-339933?logo=nodedotjs&logoColor=white)](frontend/.nvmrc)
 

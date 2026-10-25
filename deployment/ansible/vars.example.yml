@@ -3,6 +3,13 @@ admin_email: me@me.fr
 app_directory: /var/www/app
 maintainer_user: user1
 
+# Docker compose project name — changing it on a running server recreates every container under the new name.
+compose_project_name: ghf
+
+# Site state AFTER deploy (true = stays closed to the public); the deploy window always goes to maintenance.
+maintenance_mode: false
+
+# MariaDB server version — must match the mariadb image tag (roles/docker/templates/docker-compose.yml.j2); used in Doctrine's DATABASE_URL.
 mysql_version: 11.4.5
 mysql_root_password: root_pwd
 mysql_database: template_sf

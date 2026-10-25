@@ -1,22 +1,59 @@
-- name: Docker compose up
-  community.docker.docker_compose_v2:
-    project_src: "{{ app_directory }}/docker"
-    state: present
-    build: always
+# Plain `docker compose` rather than community.docker.docker_compose_v2: no collection version to keep in sync.
 
-- name: Composer install
-  shell:
-    cmd: docker compose exec -T backend bash -l -c "composer install --no-dev --optimize-autoloader --no-interaction"
+# Floating tags (mariadb:11.4) only pick up security fixes when re-pulled; buildable images re-pull their base via build.pull.
+- name: Pull upstream images
+  ansible.builtin.command:
+    cmd: docker compose pull --ignore-buildable
     chdir: "{{ app_directory }}/docker"
+  changed_when: false
 
-- name: Symfony cache clear
-  shell:
-    cmd: docker compose exec -T backend bash -l -c "php bin/console cache:clear --no-interaction"
+- name: Rebuild images and recreate containers that changed
+  ansible.builtin.command:
+    cmd: docker compose up -d --build --remove-orphans
     chdir: "{{ app_directory }}/docker"
+  register: compose_up
+  changed_when: >-
+    ('Started' in compose_up.stderr) or
+    ('Created' in compose_up.stderr) or
+    ('Recreated' in compose_up.stderr)
+
+# Code, dw binary, php.ini and vhost are bind-mounted: up -d does not see their content change.
+- name: Restart backend and dw to reload bind-mounted code and conf
+  ansible.builtin.command:
+    cmd: docker compose restart backend dw
+    chdir: "{{ app_directory }}/docker"
+  changed_when: true
+
+- name: Wait for the database to accept connections
+  ansible.builtin.command:
+    cmd: docker compose exec -T mariadb mariadb-admin ping --silent
+    chdir: "{{ app_directory }}/docker"
+  register: db_ping
+  until: db_ping.rc == 0
+  retries: 30
+  delay: 2
+  changed_when: false
+
+# vendor/ is shipped as is: the prod container cached for the previous vendor/ is never revalidated
+# (APP_DEBUG=0) and can fatal on boot, cache:clear included. Removed on disk, from inside the
+# container so its uid owns the files whatever the maintainer uid.
+- name: Remove the Symfony prod cache built for the previous code
+  ansible.builtin.command:
+    cmd: docker compose exec -T backend rm -rf var/cache/prod
+    chdir: "{{ app_directory }}/docker"
+  changed_when: true
+
+- name: Symfony cache warmup
+  ansible.builtin.command:
+    cmd: docker compose exec -T backend php bin/console cache:warmup --no-interaction
+    chdir: "{{ app_directory }}/docker"
+  changed_when: true
 
 - name: Doctrine migration
-  shell:
-    cmd: docker compose exec -T backend bash -l -c "php bin/console doctrine:migration:migrate --no-interaction"
+  ansible.builtin.command:
+    cmd: docker compose exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
     chdir: "{{ app_directory }}/docker"
+  register: migrate
+  changed_when: "'No migrations to execute' not in migrate.stdout"
 
 # todo if first deployment create first user with command

@@ -1,0 +1,2 @@
+# Site state AFTER deploy (true = stays closed to the public); the deploy window always goes to maintenance.
+maintenance_mode: false

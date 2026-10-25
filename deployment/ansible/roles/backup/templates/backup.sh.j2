@@ -31,7 +31,7 @@ ssh ${REMOTE_HOST} "mkdir -p ${DEST_DB_DIR}"
 ssh ${REMOTE_HOST} "find ${REMOTE_DIR}/* -maxdepth 0 -type d -mtime +30 -exec rm -r {} +"
 
 cd ${SRC_DIR}/docker
-/usr/local/bin/docker-compose exec -T mariadb mysqldump --user ${SQL_USER} --password=${SQL_PASSWORD} ${SQL_DB} > ${TMP_LOCALE_BACKUP}
+/usr/local/bin/docker-compose exec -T mariadb mariadb-dump --user ${SQL_USER} --password=${SQL_PASSWORD} ${SQL_DB} > ${TMP_LOCALE_BACKUP}
 tar czf ${TMP_LOCALE_BACKUP}.tar.gz ${TMP_LOCALE_BACKUP}
 openssl enc -aes-256-cbc -pbkdf2 -iter 20060 -pass file:${SRC_DIR}/backup/.backup_key -in ${TMP_LOCALE_BACKUP}.tar.gz -out ${TMP_LOCALE_BACKUP}.tar.gz.enc
 # decrypt
